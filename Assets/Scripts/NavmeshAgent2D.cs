@@ -90,7 +90,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     protected float Heuristic(NavmeshNode2D n, NavmeshNode2D end) {
-        return Mathf.Abs(end.position.x - n.position.x) + Mathf.Abs(end.position.y - n.position.y);
+        return Mathf.Abs(end.worldPosition.x - n.worldPosition.x) + Mathf.Abs(end.worldPosition.y - n.worldPosition.y);
     }
 
     protected float Gcost(NavmeshNode2D parent, NavmeshNode2D n) {
@@ -98,7 +98,7 @@ public class NavmeshAgent2D : MonoBehaviour {
         else if (parent == n) { n.gcost = 0; }
         else
         {
-            n.gcost = parent.gcost + Vector2.Distance(parent.position, n.position);
+            n.gcost = parent.gcost + Vector2.Distance(parent.worldPosition, n.worldPosition);
         }
 
         return n.gcost;
@@ -125,9 +125,9 @@ public class NavmeshAgent2D : MonoBehaviour {
     private void OnDrawGizmosSelected() {
         if (!area) { area = FindObjectOfType<NavmeshArea2D>(); }
 
-        Gizmos.DrawCube(area.NodeAtPoint(transform.position, this).position, Vector3.one/4);
+        Gizmos.DrawCube(area.NodeAtPoint(transform.position, this).worldPosition, Vector3.one/4);
         for (int i = 1; i < path.Count; i++) {
-            Debug.DrawLine(path[i-1].position, path[i].position, Color.green);
+            Debug.DrawLine(path[i-1].worldPosition, path[i].worldPosition, Color.green);
         }
     }
 }
