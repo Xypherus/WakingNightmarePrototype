@@ -11,6 +11,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     public float jumpDistance;
     public float speed;
     public float maxSpeed;
+    public float maxReach;
 
     public List<NavmeshNode2D> path = new List<NavmeshNode2D>();
     new public Rigidbody2D rigidbody;
@@ -28,11 +29,30 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     public void DismountLadder() {
+        Debug.Log("Dismounting Ladder");
         ladder = null;
-        rigidbody.isKinematic = false;
+        rigidbody.bodyType = RigidbodyType2D.Dynamic;
     }
 
-    protected void Start() {
+    public void LadderMountDismount(float radius) {
+        Debug.Log("Toggleing Ladder");
+        if (!ladder) { MountNearestLadder(radius); }
+        else { DismountLadder(); }
+    }
+
+    public void MountNearestLadder(float radius) {
+        Debug.Log("Attempting Mounting Ladder");
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, radius, area.layerMask);
+
+        foreach (Collider2D collider in colliders) {
+            if (collider.GetComponent<Ladder>()) {
+                collider.GetComponent<Ladder>().MountLadder(this);
+                break;
+            }
+        }
+    }
+
+    protected virtual void Start() {
         rigidbody = GetComponent<Rigidbody2D>();
         area = FindObjectOfType<NavmeshArea2D>();
         path = new List<NavmeshNode2D>();
@@ -41,15 +61,11 @@ public class NavmeshAgent2D : MonoBehaviour {
         collider.size = new Vector2(width, height);
     }
 
-    protected void FixedUpdate() {
-
-        if (rigidbody.velocity.magnitude > maxSpeed) {
-            rigidbody.velocity.Normalize();
-            rigidbody.velocity = rigidbody.velocity * maxSpeed;
-        }
+    protected virtual void FixedUpdate() {
+        Orient();
     }
 
-    protected List<NavmeshNode2D> GetPath(Vector2 start, Vector2 end) {
+    protected virtual List<NavmeshNode2D> GetPath(Vector2 start, Vector2 end) {
         List<NavmeshNode2D> closedList = new List<NavmeshNode2D>();
         List<NavmeshNode2D> openList = new List<NavmeshNode2D>();
         NavmeshNode2D startNode = area.NodeAtPoint(start, this);
@@ -84,16 +100,16 @@ public class NavmeshAgent2D : MonoBehaviour {
         return closedList;
     }
 
-    protected float TotalCost(NavmeshNode2D parent, NavmeshNode2D n, NavmeshNode2D end) {
+    protected virtual float TotalCost(NavmeshNode2D parent, NavmeshNode2D n, NavmeshNode2D end) {
         n.fcost = Gcost(parent, n) + Heuristic(n, end);
         return n.fcost;
     }
 
-    protected float Heuristic(NavmeshNode2D n, NavmeshNode2D end) {
+    protected virtual float Heuristic(NavmeshNode2D n, NavmeshNode2D end) {
         return Mathf.Abs(end.worldPosition.x - n.worldPosition.x) + Mathf.Abs(end.worldPosition.y - n.worldPosition.y);
     }
 
-    protected float Gcost(NavmeshNode2D parent, NavmeshNode2D n) {
+    protected virtual float Gcost(NavmeshNode2D parent, NavmeshNode2D n) {
         if (n.type == NavmeshNode2D.NodeType.None) { n.gcost = Mathf.Infinity; }
         else if (parent == n) { n.gcost = 0; }
         else
@@ -104,20 +120,32 @@ public class NavmeshAgent2D : MonoBehaviour {
         return n.gcost;
     }
 
+    private void Orient() {
+        if (ladder)
+        {
+            transform.up = ladder.transform.up;
+        }
+        else {
+            //Later: Get normal vector of the ground undernieth and set the tran's up to that.
+            transform.up = Vector3.up;
+        }
+    }
+
     private void OnDrawGizmos() {
         if (!collider) { collider = GetComponent<CapsuleCollider2D>(); }
         collider.size = new Vector2(width, height);
     }
 
     private IEnumerator MoveToEnumerator(Vector2 position, UnityEngine.Events.UnityAction callback) {
-        rigidbody.isKinematic = true;
+        rigidbody.velocity = Vector2.zero;
+        rigidbody.bodyType = RigidbodyType2D.Kinematic;
         if (pathing) { isStopped = true; }
         for (float i = 0; i < 1; i += Time.deltaTime) {
             transform.position = Vector3.Lerp(transform.position, position, i);
             yield return new WaitForEndOfFrame();
         }
         transform.position = position;
-        rigidbody.isKinematic = false;
+        rigidbody.bodyType = RigidbodyType2D.Dynamic;
         if (pathing) { isStopped = false; }
         callback();
     }
