@@ -34,6 +34,10 @@ public class Ladder : MonoBehaviour {
         OrientLadder();
 	}
 
+    public Vector3 GetUp() {
+        return ((Vector3)top - transform.position).normalized;
+    }
+
     public void MoveOnLadder(NavmeshAgent2D actor, Vector2 movement) {
         if (ladderType == LadderType.Side)
         {

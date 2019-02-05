@@ -123,7 +123,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     private void Orient() {
         if (ladder)
         {
-            transform.up = ladder.transform.up;
+            transform.up = ladder.GetUp();
         }
         else {
             //Later: Get normal vector of the ground undernieth and set the tran's up to that.
