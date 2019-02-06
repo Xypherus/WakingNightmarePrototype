@@ -10,6 +10,7 @@ public class NavmeshObstacle2D : MonoBehaviour {
     Vector3 previousScale;
 
     public NavmeshArea2D area;
+    [HideInInspector]
     public new Collider2D collider;
 
 	// Use this for initialization
@@ -24,35 +25,28 @@ public class NavmeshObstacle2D : MonoBehaviour {
             previousRotation != transform.rotation ||
             previousScale != transform.localScale)
         {
-            UnityEngine.Profiling.Profiler.BeginSample("Navmesh Updating");
             area.UpdateGrid(collider);
-            UnityEngine.Profiling.Profiler.EndSample();
         }
 
+        UnityEngine.Profiling.Profiler.BeginSample("Other Obstacle Stuff");
         previousPos = transform.position;
         previousRotation = transform.rotation;
         previousScale = transform.localScale;
+        UnityEngine.Profiling.Profiler.EndSample();
 	}
 
     void OnDrawGizmosSelected() {
-        /*
         collider = GetComponent<Collider2D>();
         area = GameObject.FindObjectOfType<NavmeshArea2D>();
 
-        Vector2 min = collider.bounds.min;
-        Vector2 max = collider.bounds.max;
+        Vector2 min = new Vector2 (collider.bounds.min.x -1, collider.bounds.min.y-1 );
+        Vector2 max = new Vector2(collider.bounds.max.x + 1, collider.bounds.max.y + 1);
 
-        float width = max.x - min.x;
-        float height = max.y - min.y;
-        
-        min = new Vector2(transform.position.x - width, transform.position.y - height);
-        max = new Vector2(transform.position.x + width, transform.position.y + width);
-        
+
 
         Debug.DrawLine(min, new Vector2(min.x, max.y), Color.green);
         Debug.DrawLine(new Vector2(min.x, max.y), new Vector2(max.x, max.y), Color.green);
         Debug.DrawLine(min, new Vector2(max.x, min.y), Color.green);
         Debug.DrawLine(new Vector2(max.x, min.y), new Vector2(max.x, max.y), Color.green);
-        */
     }
 }

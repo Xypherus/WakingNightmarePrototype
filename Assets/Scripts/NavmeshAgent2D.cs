@@ -11,6 +11,9 @@ public class NavmeshAgent2D : MonoBehaviour {
     public float jumpDistance;
     public float speed;
     public float maxSpeed;
+    public float maxReach;
+
+    public bool isGrounded;
 
     public List<NavmeshNode2D> path = new List<NavmeshNode2D>();
     new public Rigidbody2D rigidbody;
@@ -19,37 +22,59 @@ public class NavmeshAgent2D : MonoBehaviour {
     public bool isStopped;
     public bool pathing;
 
-    new CapsuleCollider2D collider;
+    protected CapsuleCollider2D capsuleCollider;
 
     NavmeshArea2D area;
+
+    #region Testing Variables
+    protected Transform _sprite;
+    protected float _initSpriteHeight;
+    #endregion
 
     public void MoveTo(Vector2 position, UnityEngine.Events.UnityAction callback) {
         StartCoroutine(MoveToEnumerator(position, callback));
     }
 
     public void DismountLadder() {
+        Debug.Log("Dismounting Ladder");
         ladder = null;
-        rigidbody.isKinematic = false;
+        rigidbody.bodyType = RigidbodyType2D.Dynamic;
     }
 
-    protected void Start() {
-        rigidbody = GetComponent<Rigidbody2D>();
-        area = FindObjectOfType<NavmeshArea2D>();
-        path = new List<NavmeshNode2D>();
-        collider = GetComponent<CapsuleCollider2D>();
-        crouchHeight = height / 2;
-        collider.size = new Vector2(width, height);
+    public void LadderMountDismount(float radius) {
+        if (!ladder) { MountNearestLadder(radius); }
+        else { DismountLadder(); }
     }
 
-    protected void FixedUpdate() {
+    public void MountNearestLadder(float radius) {
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, radius, area.layerMask);
 
-        if (rigidbody.velocity.magnitude > maxSpeed) {
-            rigidbody.velocity.Normalize();
-            rigidbody.velocity = rigidbody.velocity * maxSpeed;
+        foreach (Collider2D collider in colliders) {
+            if (collider.GetComponent<Ladder>()) {
+                collider.GetComponent<Ladder>().MountLadder(this);
+                break;
+            }
         }
     }
 
-    protected List<NavmeshNode2D> GetPath(Vector2 start, Vector2 end) {
+    protected virtual void Start() {
+        rigidbody = GetComponent<Rigidbody2D>();
+        area = FindObjectOfType<NavmeshArea2D>();
+        path = new List<NavmeshNode2D>();
+        capsuleCollider = GetComponent<CapsuleCollider2D>();
+        crouchHeight = height / 2;
+        capsuleCollider.size = new Vector2(width, height);
+
+        _sprite = transform.Find("Sprite");
+        _initSpriteHeight = _sprite.localScale.y;
+    }
+
+    protected virtual void FixedUpdate() {
+        Orient();
+        GroundCheck();
+    }
+
+    protected virtual List<NavmeshNode2D> GetPath(Vector2 start, Vector2 end) {
         List<NavmeshNode2D> closedList = new List<NavmeshNode2D>();
         List<NavmeshNode2D> openList = new List<NavmeshNode2D>();
         NavmeshNode2D startNode = area.NodeAtPoint(start, this);
@@ -84,40 +109,74 @@ public class NavmeshAgent2D : MonoBehaviour {
         return closedList;
     }
 
-    protected float TotalCost(NavmeshNode2D parent, NavmeshNode2D n, NavmeshNode2D end) {
+    protected virtual float TotalCost(NavmeshNode2D parent, NavmeshNode2D n, NavmeshNode2D end) {
         n.fcost = Gcost(parent, n) + Heuristic(n, end);
         return n.fcost;
     }
 
-    protected float Heuristic(NavmeshNode2D n, NavmeshNode2D end) {
-        return Mathf.Abs(end.position.x - n.position.x) + Mathf.Abs(end.position.y - n.position.y);
+    protected virtual float Heuristic(NavmeshNode2D n, NavmeshNode2D end) {
+        return Mathf.Abs(end.worldPosition.x - n.worldPosition.x) + Mathf.Abs(end.worldPosition.y - n.worldPosition.y);
     }
 
-    protected float Gcost(NavmeshNode2D parent, NavmeshNode2D n) {
+    protected virtual float Gcost(NavmeshNode2D parent, NavmeshNode2D n) {
         if (n.type == NavmeshNode2D.NodeType.None) { n.gcost = Mathf.Infinity; }
         else if (parent == n) { n.gcost = 0; }
         else
         {
-            n.gcost = parent.gcost + Vector2.Distance(parent.position, n.position);
+            n.gcost = parent.gcost + Vector2.Distance(parent.worldPosition, n.worldPosition);
         }
 
         return n.gcost;
     }
 
+    protected virtual void Orient() {
+        if (ladder)
+        {
+            if (rigidbody.velocity.x != 0) {
+                float direction = Mathf.Abs(rigidbody.velocity.x) / rigidbody.velocity.x;
+                _sprite.localScale = new Vector3(direction, _sprite.localScale.y);
+            }
+            transform.up = ladder.GetUp();
+        }
+        else {
+            //Later: Get normal vector of the ground undernieth and set the tran's up to that.
+            //transform.up = Vector3.up;
+
+            RaycastHit2D surfacePoint = Physics2D.Raycast(transform.position, Vector2.down, height, 1 << LayerMask.NameToLayer("Environment"));
+
+            if (surfacePoint)
+            {
+                Debug.Log("found the ground");
+                transform.up = Vector2.Lerp(transform.up, surfacePoint.normal, 10 * Time.deltaTime);
+            }
+            else {
+                transform.up = Vector2.Lerp(transform.up, Vector2.up, 10 * Time.deltaTime);
+            }
+        }
+    }
+
     private void OnDrawGizmos() {
-        if (!collider) { collider = GetComponent<CapsuleCollider2D>(); }
-        collider.size = new Vector2(width, height);
+        if (!capsuleCollider) { capsuleCollider = GetComponent<CapsuleCollider2D>(); }
+        capsuleCollider.size = new Vector2(width, height);
+    }
+
+    protected void GroundCheck() {
+        RaycastHit2D ground = Physics2D.Raycast(transform.position, -transform.up, (capsuleCollider.size.y/2)+0.02f, 1 << LayerMask.NameToLayer("Environment"));
+
+        if (ground || ladder) { isGrounded = true; }
+        else { isGrounded = false; }
     }
 
     private IEnumerator MoveToEnumerator(Vector2 position, UnityEngine.Events.UnityAction callback) {
-        rigidbody.isKinematic = true;
+        rigidbody.velocity = Vector2.zero;
+        rigidbody.bodyType = RigidbodyType2D.Kinematic;
         if (pathing) { isStopped = true; }
-        for (float i = 0; i < 1; i += Time.deltaTime) {
+        for (float i = 0; i < 0.5; i += Time.deltaTime) {
             transform.position = Vector3.Lerp(transform.position, position, i);
             yield return new WaitForEndOfFrame();
         }
         transform.position = position;
-        rigidbody.isKinematic = false;
+        rigidbody.bodyType = RigidbodyType2D.Dynamic;
         if (pathing) { isStopped = false; }
         callback();
     }
@@ -125,9 +184,9 @@ public class NavmeshAgent2D : MonoBehaviour {
     private void OnDrawGizmosSelected() {
         if (!area) { area = FindObjectOfType<NavmeshArea2D>(); }
 
-        Gizmos.DrawCube(area.NodeAtPoint(transform.position, this).position, Vector3.one/4);
+        Gizmos.DrawCube(area.NodeAtPoint(transform.position, this).worldPosition, Vector3.one/4);
         for (int i = 1; i < path.Count; i++) {
-            Debug.DrawLine(path[i-1].position, path[i].position, Color.green);
+            Debug.DrawLine(path[i-1].worldPosition, path[i].worldPosition, Color.green);
         }
     }
 }
