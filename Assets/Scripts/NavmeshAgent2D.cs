@@ -13,6 +13,8 @@ public class NavmeshAgent2D : MonoBehaviour {
     public float maxSpeed;
     public float maxReach;
 
+    public bool isGrounded;
+
     public List<NavmeshNode2D> path = new List<NavmeshNode2D>();
     new public Rigidbody2D rigidbody;
     public Ladder ladder;
@@ -20,9 +22,14 @@ public class NavmeshAgent2D : MonoBehaviour {
     public bool isStopped;
     public bool pathing;
 
-    new CapsuleCollider2D collider;
+    protected CapsuleCollider2D capsuleCollider;
 
     NavmeshArea2D area;
+
+    #region Testing Variables
+    protected Transform _sprite;
+    protected float _initSpriteHeight;
+    #endregion
 
     public void MoveTo(Vector2 position, UnityEngine.Events.UnityAction callback) {
         StartCoroutine(MoveToEnumerator(position, callback));
@@ -35,13 +42,11 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     public void LadderMountDismount(float radius) {
-        Debug.Log("Toggleing Ladder");
         if (!ladder) { MountNearestLadder(radius); }
         else { DismountLadder(); }
     }
 
     public void MountNearestLadder(float radius) {
-        Debug.Log("Attempting Mounting Ladder");
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, radius, area.layerMask);
 
         foreach (Collider2D collider in colliders) {
@@ -56,13 +61,17 @@ public class NavmeshAgent2D : MonoBehaviour {
         rigidbody = GetComponent<Rigidbody2D>();
         area = FindObjectOfType<NavmeshArea2D>();
         path = new List<NavmeshNode2D>();
-        collider = GetComponent<CapsuleCollider2D>();
+        capsuleCollider = GetComponent<CapsuleCollider2D>();
         crouchHeight = height / 2;
-        collider.size = new Vector2(width, height);
+        capsuleCollider.size = new Vector2(width, height);
+
+        _sprite = transform.Find("Sprite");
+        _initSpriteHeight = _sprite.localScale.y;
     }
 
     protected virtual void FixedUpdate() {
         Orient();
+        GroundCheck();
     }
 
     protected virtual List<NavmeshNode2D> GetPath(Vector2 start, Vector2 end) {
@@ -120,27 +129,49 @@ public class NavmeshAgent2D : MonoBehaviour {
         return n.gcost;
     }
 
-    private void Orient() {
+    protected virtual void Orient() {
         if (ladder)
         {
+            if (rigidbody.velocity.x != 0) {
+                float direction = Mathf.Abs(rigidbody.velocity.x) / rigidbody.velocity.x;
+                _sprite.localScale = new Vector3(direction, _sprite.localScale.y);
+            }
             transform.up = ladder.GetUp();
         }
         else {
             //Later: Get normal vector of the ground undernieth and set the tran's up to that.
-            transform.up = Vector3.up;
+            //transform.up = Vector3.up;
+
+            RaycastHit2D surfacePoint = Physics2D.Raycast(transform.position, Vector2.down, height, 1 << LayerMask.NameToLayer("Environment"));
+
+            if (surfacePoint)
+            {
+                Debug.Log("found the ground");
+                transform.up = Vector2.Lerp(transform.up, surfacePoint.normal, 10 * Time.deltaTime);
+            }
+            else {
+                transform.up = Vector2.Lerp(transform.up, Vector2.up, 10 * Time.deltaTime);
+            }
         }
     }
 
     private void OnDrawGizmos() {
-        if (!collider) { collider = GetComponent<CapsuleCollider2D>(); }
-        collider.size = new Vector2(width, height);
+        if (!capsuleCollider) { capsuleCollider = GetComponent<CapsuleCollider2D>(); }
+        capsuleCollider.size = new Vector2(width, height);
+    }
+
+    protected void GroundCheck() {
+        RaycastHit2D ground = Physics2D.Raycast(transform.position, -transform.up, (capsuleCollider.size.y/2)+0.02f, 1 << LayerMask.NameToLayer("Environment"));
+
+        if (ground || ladder) { isGrounded = true; }
+        else { isGrounded = false; }
     }
 
     private IEnumerator MoveToEnumerator(Vector2 position, UnityEngine.Events.UnityAction callback) {
         rigidbody.velocity = Vector2.zero;
         rigidbody.bodyType = RigidbodyType2D.Kinematic;
         if (pathing) { isStopped = true; }
-        for (float i = 0; i < 1; i += Time.deltaTime) {
+        for (float i = 0; i < 0.5; i += Time.deltaTime) {
             transform.position = Vector3.Lerp(transform.position, position, i);
             yield return new WaitForEndOfFrame();
         }

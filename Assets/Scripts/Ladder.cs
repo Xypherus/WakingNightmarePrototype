@@ -14,6 +14,9 @@ public class Ladder : MonoBehaviour {
     [Tooltip("The sprite of the ladder when it is the background type.")]
     public Sprite BackgroundSprite;
 
+    public Ladder next = null;
+    public Ladder previous = null;
+
     Vector2 top;
     Vector2 bottom;
     Vector2 left;
@@ -43,7 +46,6 @@ public class Ladder : MonoBehaviour {
         {
             float direction = movement.x;
             if (direction == 0) { direction = movement.y; }
-            Debug.Log(direction);
 
             if (direction > 0)
             {
@@ -53,6 +55,9 @@ public class Ladder : MonoBehaviour {
             {
                 actor.transform.position = Vector3.MoveTowards(actor.transform.position, bottom, actor.speed / 4 * Time.deltaTime);
             }
+
+            if (actor.transform.position == (Vector3)bottom && previous) { actor.ladder = previous; }
+            else if (actor.transform.position == (Vector3)top && next) { actor.ladder = next; }
         }
         else {
             Vector3 target = Vector3.zero;

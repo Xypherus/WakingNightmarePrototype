@@ -6,8 +6,12 @@ using UnityEngine;
 public class PlayerController : NavmeshAgent2D {
     
     public float accelMultiplier;
+    public float jumpForce;
     public bool isProne = false;
+
     private Rigidbody2D rb;
+
+    
 
     protected override void Start()
     {
@@ -20,6 +24,10 @@ public class PlayerController : NavmeshAgent2D {
         if (Time.timeScale > 0) {
             if (Input.GetButtonDown("Action")) {
                 LadderMountDismount(maxReach);
+            }
+
+            if (!isProne && isGrounded && Input.GetButtonDown("Jump")) {
+                Jump();
             }
         }
     }
@@ -36,11 +44,22 @@ public class PlayerController : NavmeshAgent2D {
     protected virtual void Move() {
         if (!ladder)
         {
+            if (isProne)
+            {
+                capsuleCollider.size = new Vector2(capsuleCollider.size.x, crouchHeight);
+                _sprite.localScale = new Vector3(_sprite.localScale.x, _initSpriteHeight / 2);
+            }
+            else {
+                capsuleCollider.size = new Vector2(capsuleCollider.size.x, height);
+                _sprite.localScale = new Vector3(_sprite.localScale.x, _initSpriteHeight);
+            }
+
             MoveHorizontal();
             MaxSpeedCheck();
             Decelerate();
         }
         else {
+            _sprite.localScale = new Vector3(_sprite.localScale.x, _initSpriteHeight);
             ladder.MoveOnLadder(GetComponent<NavmeshAgent2D>(), new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
         }
     }
@@ -82,6 +101,12 @@ public class PlayerController : NavmeshAgent2D {
         
     }
 
+    protected virtual void Jump() {
+        if (isGrounded) {
+            DismountLadder();
+            rb.AddForce(new Vector2(0f, jumpForce));
+        }
+    }
     
     protected virtual void Decelerate() {
         if (Input.GetAxisRaw("Horizontal") == 0) { StartCoroutine(Decelerator()); }
