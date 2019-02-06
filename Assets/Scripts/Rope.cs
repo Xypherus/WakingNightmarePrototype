@@ -39,7 +39,7 @@ public class Rope : MonoBehaviour {
 
             GameObject ladder = Instantiate(ropeSegment, position, transform.rotation, transform);
             Ladder ladderObject = ladder.GetComponent<Ladder>();
-            ladder.transform.localScale = new Vector3(ladder.transform.localScale.x, height*4, ladder.transform.localScale.z);
+            ladder.transform.localScale = new Vector3(ladder.transform.localScale.x, height, ladder.transform.localScale.z);
 
             segments.Add(ladderObject);
         }

@@ -243,7 +243,7 @@ Transform:
   - {fileID: 1427952275}
   - {fileID: 1568820391}
   - {fileID: 1039730237}
-  - {fileID: 1946197296}
+  - {fileID: 850474267}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -289,7 +289,7 @@ MonoBehaviour:
   isStopped: 0
   pathing: 0
   accelMultiplier: 25
-  jumpForce: 100
+  jumpForce: 120
   isProne: 0
 --- !u!70 &351964787
 CapsuleCollider2D:
@@ -1345,6 +1345,50 @@ Transform:
   m_Father: {fileID: 176475096}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -354.484}
+--- !u!1 &850474266
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 850474267}
+  - component: {fileID: 850474268}
+  m_Layer: 0
+  m_Name: Rope
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &850474267
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 850474266}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -4.34, y: -0.33, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 176475096}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &850474268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 850474266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c27d4410eeac2bd48a4faa18de423a25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  length: 4
+  segmentCount: 5
+  ropeSegment: {fileID: 1863153879985350, guid: ef1d7b7622d430648b078f362a2ebdae,
+    type: 2}
 --- !u!1 &1009741342
 GameObject:
   m_ObjectHideFlags: 0
@@ -2832,50 +2876,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &1946197295
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1946197296}
-  - component: {fileID: 1946197297}
-  m_Layer: 0
-  m_Name: Rope
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1946197296
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1946197295}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.54, y: -1.88, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 176475096}
-  m_RootOrder: 9
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1946197297
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1946197295}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c27d4410eeac2bd48a4faa18de423a25, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  length: 2
-  segmentCount: 3
-  ropeSegment: {fileID: 1863153879985350, guid: ef1d7b7622d430648b078f362a2ebdae,
-    type: 2}
 --- !u!1 &2100407696
 GameObject:
   m_ObjectHideFlags: 0
