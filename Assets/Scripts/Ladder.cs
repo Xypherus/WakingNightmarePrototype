@@ -42,26 +42,32 @@ public class Ladder : MonoBehaviour {
     }
 
     public void MoveOnLadder(NavmeshAgent2D actor, Vector2 movement) {
+        bool avoidCollCheck = false;
+        if (CheckActorCollisions(actor) > 0) { avoidCollCheck = true; }
+
+        Vector3 previousPos = actor.transform.position;
         if (ladderType == LadderType.Side)
         {
             float direction = movement.x;
             if (direction == 0) { direction = movement.y; }
 
-            if (direction > 0)
+            if (direction > 0 )
             {
                 actor.transform.position = Vector3.MoveTowards(actor.transform.position, top, actor.speed / 4 * Time.deltaTime);
             }
-            else if (direction < 0)
+            else if (direction < 0 )
             {
                 actor.transform.position = Vector3.MoveTowards(actor.transform.position, bottom, actor.speed / 4 * Time.deltaTime);
             }
+
+            if (!avoidCollCheck) { HandleActorCollisions(actor, previousPos); }
 
             if (actor.transform.position == (Vector3)bottom && previous) { actor.ladder = previous; }
             else if (actor.transform.position == (Vector3)top && next) { actor.ladder = next; }
         }
         else {
             Vector3 target = Vector3.zero;
-            if (movement.x > 0) { target.x = right.x; }
+            if (movement.x > 0 ) { target.x = right.x; }
             else if (movement.x < 0) { target.x = left.x; }
             else { target.x = actor.transform.position.x; }
 
@@ -70,7 +76,9 @@ public class Ladder : MonoBehaviour {
             else { target.y = actor.transform.position.y; }
 
             actor.transform.position = Vector3.MoveTowards(actor.transform.position, target, actor.speed / 4 * Time.deltaTime);
-        }
+
+            if (!avoidCollCheck) { HandleActorCollisions(actor, previousPos); }
+        } 
     }
 
     public void MountLadder(NavmeshAgent2D actor) {
@@ -91,8 +99,21 @@ public class Ladder : MonoBehaviour {
         }
         else {
             actor.rigidbody.bodyType = RigidbodyType2D.Kinematic;
+            actor.rigidbody.velocity = Vector3.zero;
             actor.ladder = this;
         }
+    }
+
+    void HandleActorCollisions(NavmeshAgent2D agent, Vector3 returnPosition) {
+        if (CheckActorCollisions(agent) > 0) { agent.transform.position = returnPosition; }
+    }
+
+    public int CheckActorCollisions(NavmeshAgent2D agent) {
+        Collider2D[] contacts = new Collider2D[100];
+        ContactFilter2D filter = new ContactFilter2D();
+        filter.SetLayerMask(1 << LayerMask.NameToLayer("Environment"));
+        int discrepencies = agent.GetComponent<Collider2D>().OverlapCollider(filter, contacts);
+        return discrepencies;
     }
 
     void OrientLadder() {

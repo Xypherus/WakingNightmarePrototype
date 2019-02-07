@@ -36,7 +36,10 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     public void DismountLadder() {
-        Debug.Log("Dismounting Ladder");
+        if (!ladder) { Debug.LogWarning("Could not dismount ladder because it does not exist."); return; }
+        if (ladder.CheckActorCollisions(this) > 0) { Debug.LogWarning("Could not dismount ladder because player is inside terrain!"); return; }
+
+        Debug.Log("Dismounting Ladder...");
         ladder = null;
         rigidbody.bodyType = RigidbodyType2D.Dynamic;
     }
@@ -47,14 +50,25 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     public void MountNearestLadder(float radius) {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, radius, area.layerMask);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, radius, 1 << LayerMask.NameToLayer("Ladder"));
+        Collider2D closest = null;
+        float closestDistance = Mathf.Infinity;
 
         foreach (Collider2D collider in colliders) {
-            if (collider.GetComponent<Ladder>()) {
-                collider.GetComponent<Ladder>().MountLadder(this);
-                break;
+            if (closest == null) {
+                closest = collider;
+                closestDistance = Vector2.Distance(collider.transform.position, transform.position);
+                continue;
+            }
+
+            float distance = Vector2.Distance(collider.transform.position, transform.position);
+            if (distance <= closestDistance) {
+                closest = collider;
+                closestDistance = distance;
             }
         }
+
+        if (closest != null) { closest.GetComponent<Ladder>().MountLadder(this); }
     }
 
     protected virtual void Start() {
@@ -146,7 +160,6 @@ public class NavmeshAgent2D : MonoBehaviour {
 
             if (surfacePoint)
             {
-                Debug.Log("found the ground");
                 transform.up = Vector2.Lerp(transform.up, surfacePoint.normal, 10 * Time.deltaTime);
             }
             else {

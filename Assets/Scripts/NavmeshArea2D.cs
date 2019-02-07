@@ -532,7 +532,7 @@ public class NavmeshNode2D
                 if (ceiling != null)
                 {
                     //check if the distance between that ceiling is less than the agent height. if so,
-                    float clearence = Vector2.Distance(worldPosition, ceiling.worldPosition);
+                    float clearence = Vector2.Distance(worldPosition, ceiling.worldPosition) - area.resolution;
                     if (clearence <= agent.height)
                     {
                         //check if it is less than or equal to the agent's crouch height. if that is true, the NodeType is NodeType.None. 
