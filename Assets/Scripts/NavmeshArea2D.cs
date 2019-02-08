@@ -48,8 +48,8 @@ public class NavmeshArea2D : MonoBehaviour {
     /// </summary>
     /// <param name="worldPosition">The position to convert to grid space.</param>
     /// <returns>The converted position from world space to grid space.</returns>
-    public Vector2 WorldToGridPosition(Vector2 worldPosition) {
-        Vector2 gridPosition = new Vector2(Mathf.RoundToInt((worldPosition.x - bounds.min.x) / resolution), Mathf.CeilToInt((worldPosition.y - bounds.min.y) / resolution));
+    public Vector2Int WorldToGridPosition(Vector2 worldPosition) {
+        Vector2Int gridPosition = new Vector2Int(Mathf.RoundToInt((worldPosition.x - bounds.min.x) / resolution), Mathf.CeilToInt((worldPosition.y - bounds.min.y) / resolution));
         return gridPosition;
     }
 
@@ -196,6 +196,37 @@ public class NavmeshArea2D : MonoBehaviour {
             }
         }
 
+    }
+
+    /// <summary>
+    /// Get specific node types inside a circle with a given radius.
+    /// </summary>
+    /// <param name="agent">Required to specify which Navmesh to check</param>
+    /// <param name="origin">The center of the circle in world space</param>
+    /// <param name="checkTypes">The nodes to check for</param>
+    /// <param name="radius">The radius of the circle to check</param>
+    /// <returns>A list of nodes, if any found. Null if no nodes found.</returns>
+    public List<NavmeshNode2D> NodesOfTypeInRange(NavmeshAgent2D agent, Vector2 origin, List<NavmeshNode2D.NodeType> checkTypes, float radius) {
+        Vector2Int gridOrigin = WorldToGridPosition(origin);
+        int gridRadius = Mathf.RoundToInt(radius / resolution);
+        List<NavmeshNode2D> nodes = new List<NavmeshNode2D>();
+
+        for (int newx = gridOrigin.x - gridRadius; newx <=gridOrigin.x + gridRadius; newx++)
+        {
+            if (newx > xcount - 1) { break; }
+            else if (newx < 0) { continue; }
+            for (int newy = gridOrigin.y - gridRadius; newy <=gridOrigin.y + gridRadius; newy++)
+            {
+                if (Vector2.Distance(origin, meshes[agent][newx, newy].worldPosition) > radius) { continue; }
+
+                if (checkTypes.Contains(meshes[agent][newx, newy].type)) {
+                    nodes.Add(meshes[agent][newx, newy]);
+                }
+            }
+        }
+
+        if (nodes.Count > 0) { return nodes; }
+        else { return null; }
     }
 
     /// <summary>

@@ -614,13 +614,13 @@ PlayerSettings:
       daydreamIconForeground: {fileID: 0}
       daydreamIconBackground: {fileID: 0}
   cloudServicesEnabled:
-    Collab: 1
+    Collab: 0
     UNet: 1
   facebookSdkVersion: 7.9.4
   apiCompatibilityLevel: 2
-  cloudProjectId: e0fac72f-b40f-40d8-ab98-76cb300d54ff
-  projectName: WakingNightmarePrototyping
-  organizationId: pjlicios
+  cloudProjectId: cc25b6e9-157e-46a9-8fcf-95a07e287e6e
+  projectName: WakingNightmarePrototyping (1)
+  organizationId: adam-514329
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0
