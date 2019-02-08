@@ -273,7 +273,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 351964785}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b030e443bbeb5084994e644010be0bf0, type: 3}
+  m_Script: {fileID: 11500000, guid: f0343b6cc38ef2744b3d5d2018b4877f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   width: 1
@@ -288,7 +288,7 @@ MonoBehaviour:
   ladder: {fileID: 0}
   isStopped: 0
   pathing: 0
-  accelMultiplier: 25
+  accelMultiplier: 10
   jumpForce: 120
   isProne: 0
 --- !u!70 &351964787
@@ -1382,11 +1382,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 850474266}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c27d4410eeac2bd48a4faa18de423a25, type: 3}
+  m_Script: {fileID: 11500000, guid: 8668a9ea58795934caf9e6c0bb4d1130, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   length: 4
-  segmentCount: 5
+  segmentCount: 4
   ropeSegment: {fileID: 1863153879985350, guid: ef1d7b7622d430648b078f362a2ebdae,
     type: 2}
 --- !u!1 &1009741342
