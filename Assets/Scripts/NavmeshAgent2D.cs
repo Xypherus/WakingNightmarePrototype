@@ -18,6 +18,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     public List<NavmeshNode2D> path = new List<NavmeshNode2D>();
     new public Rigidbody2D rigidbody;
     public Ladder ladder;
+    public NavmeshNode2D ledge;
 
     public bool isStopped;
     public bool pathing;
@@ -33,6 +34,53 @@ public class NavmeshAgent2D : MonoBehaviour {
 
     public void MoveTo(Vector2 position, UnityEngine.Events.UnityAction callback) {
         StartCoroutine(MoveToEnumerator(position, callback));
+    }
+
+    public virtual void GrabLedge() {
+        List<NavmeshNode2D> ledges = area.NodesOfTypeInRange(this, transform.position, new List<NavmeshNode2D.NodeType> { NavmeshNode2D.NodeType.Ledge}, maxReach);
+        if (ledges == null) { return; }
+
+        NavmeshNode2D closest = ledges[0];
+        float closestDistance = Mathf.Infinity;
+        foreach (NavmeshNode2D ledge in ledges) {
+            float distance = Vector2.Distance(transform.position, ledge.worldPosition);
+            if ( distance <= closestDistance) { closest = ledge; closestDistance = distance; }
+        }
+
+        //Todo: change to hanging animation
+        MoveTo(closest.worldPosition, () =>
+        {
+            ledge = closest;
+            rigidbody.bodyType = RigidbodyType2D.Kinematic;
+        });
+    }
+
+    public virtual void ClimbLedge() {
+        if (ledge == null) { return; }
+
+        List<NavmeshNode2D.NavmeshNodeConnection2D> surfaces = new List<NavmeshNode2D.NavmeshNodeConnection2D>();
+        ledge.ConnectedToTypes(new List<NavmeshNode2D.NodeType> { NavmeshNode2D.NodeType.Walkable, NavmeshNode2D.NodeType.Crawlable}, out surfaces);
+        RaycastHit2D surface = Physics2D.Raycast(surfaces[0].b.worldPosition, Vector2.down, area.resolution, 1 << LayerMask.NameToLayer("Environment"));
+        Debug.DrawLine(surfaces[0].b.worldPosition, surface.point, Color.red, 3f);
+
+        if (surface)
+        {
+            Debug.Log("Climbing Ledge...");
+            
+            MoveTo(new Vector2(surface.point.x, surface.point.y + (height/2)), () => { ledge = null; });
+        }
+        else { Debug.Log("Can not climb this ledge."); }
+    }
+
+    public virtual void ReleaseLedge() {
+        if (ledge == null) { return; }
+
+        ledge = null;
+        rigidbody.bodyType = RigidbodyType2D.Dynamic;
+    }
+
+    public Vector2 GetSize() {
+        return new Vector2(width * transform.localScale.x, height * transform.localScale.y);
     }
 
     public void DismountLadder() {
@@ -84,6 +132,12 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     protected virtual void FixedUpdate() {
+
+        if (capsuleCollider.size.y < capsuleCollider.size.x) { capsuleCollider.direction = CapsuleDirection2D.Horizontal; }
+        else { capsuleCollider.direction = CapsuleDirection2D.Vertical; }
+
+        _sprite.localScale = capsuleCollider.size;
+
         Orient();
         GroundCheck();
     }
@@ -148,7 +202,7 @@ public class NavmeshAgent2D : MonoBehaviour {
         {
             if (rigidbody.velocity.x != 0) {
                 float direction = Mathf.Abs(rigidbody.velocity.x) / rigidbody.velocity.x;
-                _sprite.localScale = new Vector3(direction, _sprite.localScale.y);
+                _sprite.localScale = new Vector3(direction * Mathf.Abs(_sprite.localScale.x), _sprite.localScale.y);
             }
             transform.up = ladder.GetUp();
         }
@@ -156,7 +210,7 @@ public class NavmeshAgent2D : MonoBehaviour {
             //Later: Get normal vector of the ground undernieth and set the tran's up to that.
             //transform.up = Vector3.up;
 
-            RaycastHit2D surfacePoint = Physics2D.Raycast(transform.position, Vector2.down, height, 1 << LayerMask.NameToLayer("Environment"));
+            RaycastHit2D surfacePoint = Physics2D.Raycast(transform.position, Vector2.down, GetSize().y, 1 << LayerMask.NameToLayer("Environment"));
 
             if (surfacePoint)
             {
@@ -170,11 +224,14 @@ public class NavmeshAgent2D : MonoBehaviour {
 
     private void OnDrawGizmos() {
         if (!capsuleCollider) { capsuleCollider = GetComponent<CapsuleCollider2D>(); }
-        capsuleCollider.size = new Vector2(width, height);
+        if (!Application.isPlaying)
+        {
+            capsuleCollider.size = new Vector2(width, height);
+        }
     }
 
     protected void GroundCheck() {
-        RaycastHit2D ground = Physics2D.Raycast(transform.position, -transform.up, (capsuleCollider.size.y/2)+0.02f, 1 << LayerMask.NameToLayer("Environment"));
+        RaycastHit2D ground = Physics2D.Raycast(transform.position, -transform.up, (GetSize().y/2)+0.02f, 1 << LayerMask.NameToLayer("Environment"));
 
         if (ground || ladder) { isGrounded = true; }
         else { isGrounded = false; }
@@ -184,7 +241,7 @@ public class NavmeshAgent2D : MonoBehaviour {
         rigidbody.velocity = Vector2.zero;
         rigidbody.bodyType = RigidbodyType2D.Kinematic;
         if (pathing) { isStopped = true; }
-        for (float i = 0; i < 0.5; i += Time.deltaTime) {
+        for (float i = 0; i < 0.2; i += Time.deltaTime) {
             transform.position = Vector3.Lerp(transform.position, position, i);
             yield return new WaitForEndOfFrame();
         }

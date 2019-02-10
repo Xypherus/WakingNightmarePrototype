@@ -156,7 +156,7 @@ public class NavmeshArea2D : MonoBehaviour {
             meshes.Add(agent, new NavmeshNode2D[xcount,ycount]);
             for (int x = 0; x < xcount; x++) {
                 for (int y = 0; y < ycount; y++) {
-                    meshes[agent][x, y] = new NavmeshNode2D(agent,(Vector2) bounds.min + (new Vector2(x * resolution,y * resolution)), new Vector2Int(x,y));
+                    meshes[agent][x, y] = new NavmeshNode2D(agent, this, (Vector2) bounds.min + (new Vector2(x * resolution,y * resolution)), new Vector2Int(x,y));
                 }
             }
             InitializeGrid(agent);
@@ -351,27 +351,24 @@ public class NavmeshNode2D
     public enum SurfaceType { Ledge, Flat, None };
     public SurfaceType surfaceType;
     public NavmeshAgent2D agent;
+    public NavmeshArea2D area;
     public Ladder ladder;
 
     public float gcost;
     public float fcost;
 
-    NavmeshArea2D area;
 
     /// <summary>
     /// Create a navigable Node. DEFAULT
     /// </summary>
     public NavmeshNode2D()
     {
-        area = GameObject.FindObjectOfType<NavmeshArea2D>();
         agent = null;
         type = NodeType.None;
         surfaceType = SurfaceType.None;
         worldPosition = Vector3.zero;
         connections = new List<NavmeshNodeConnection2D>();
         ladder = null;
-
-        Validate();
     }
 
     /// <summary>
@@ -380,11 +377,11 @@ public class NavmeshNode2D
     /// <param name="agent">The corresponding agent this node will be navigable for.</param>
     /// <param name="worldPosition">The position of this node in world coordinates.</param>
     /// <param name="gridPosition">The index position in the NavmeshArea2D area grid.</param>
-    public NavmeshNode2D(NavmeshAgent2D agent, Vector3 worldPosition, Vector2Int gridPosition)
+    public NavmeshNode2D(NavmeshAgent2D agent, NavmeshArea2D area, Vector3 worldPosition, Vector2Int gridPosition)
     {
+        this.area = area;
         type = NodeType.None;
         surfaceType = SurfaceType.None;
-        area = GameObject.FindObjectOfType<NavmeshArea2D>();
         connections = new List<NavmeshNodeConnection2D>();
         this.agent = agent;
         this.worldPosition = worldPosition;
@@ -559,12 +556,12 @@ public class NavmeshNode2D
             if (surface != null) {
 
                 //Check if there is a cieling, and 
-                NavmeshNode2D ceiling = area.CastForType(gridPosition, Vector2.up, new List<NodeType> { NodeType.None }, agent, (int) (agent.height*area.resolution));
+                NavmeshNode2D ceiling = area.CastForType(gridPosition, Vector2.up, new List<NodeType> { NodeType.None }, agent, (int) (agent.GetSize().y*area.resolution));
                 if (ceiling != null)
                 {
                     //check if the distance between that ceiling is less than the agent height. if so,
                     float clearence = Vector2.Distance(worldPosition, ceiling.worldPosition) - area.resolution;
-                    if (clearence <= agent.height)
+                    if (clearence <= agent.GetSize().y)
                     {
                         //check if it is less than or equal to the agent's crouch height. if that is true, the NodeType is NodeType.None. 
                         if (clearence <= agent.crouchHeight) { type = NodeType.Air; }
