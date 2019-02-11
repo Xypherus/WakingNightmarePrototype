@@ -17,6 +17,7 @@ public class NavmeshArea2D : MonoBehaviour {
     public List<NavmeshAgent2D> agents;
     [Tooltip("The 2D box to limit the creation of the navmesh.")]
     public Bounds bounds;
+    public bool showDebug;
     #endregion
 
     public Dictionary<NavmeshAgent2D, NavmeshNode2D[,]> meshes;
@@ -282,10 +283,12 @@ public class NavmeshArea2D : MonoBehaviour {
     public void OnDrawGizmosSelected() {
         Gizmos.color = Color.blue;
         Gizmos.DrawWireCube(bounds.center, bounds.extents*2);
-        if (Application.isEditor) {
+
+        if (Application.isEditor && showDebug) {
             InitializeGrid();
         }
-        for (int x = 0; x < xcount; x++)
+
+        for (int x = 0; x < xcount || showDebug; x++)
         {
             for (int y = 0; y < ycount; y++)
             {
