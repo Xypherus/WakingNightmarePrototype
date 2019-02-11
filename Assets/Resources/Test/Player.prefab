@@ -122,8 +122,8 @@ MonoBehaviour:
   height: 1
   crouchHeight: 0
   jumpDistance: 1
-  speed: 10
-  maxSpeed: 20
+  speed: 25
+  maxSpeed: 50
   maxReach: 1
   isGrounded: 0
   rigidbody: {fileID: 0}
@@ -131,7 +131,7 @@ MonoBehaviour:
   isStopped: 0
   pathing: 0
   accelMultiplier: 10
-  jumpForce: 120
+  jumpForce: 550
   isProne: 0
 --- !u!212 &212680948935643776
 SpriteRenderer:

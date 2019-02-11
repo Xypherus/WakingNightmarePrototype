@@ -14,6 +14,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     public float maxReach;
 
     public bool isGrounded;
+    public bool canGrab = true;
 
     public List<NavmeshNode2D> path = new List<NavmeshNode2D>();
     new public Rigidbody2D rigidbody;
@@ -37,9 +38,11 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     public virtual void GrabLedge() {
-        List<NavmeshNode2D> ledges = area.NodesOfTypeInRange(this, transform.position, new List<NavmeshNode2D.NodeType> { NavmeshNode2D.NodeType.Ledge}, maxReach);
+        if (!canGrab) { return; }
+        List<NavmeshNode2D> ledges = area.NodesOfTypeInRange(this, transform.position, new List<NavmeshNode2D.NodeType> { NavmeshNode2D.NodeType.Ledge}, maxReach*transform.localScale.x);
         if (ledges == null) { return; }
 
+        canGrab = false;
         NavmeshNode2D closest = ledges[0];
         float closestDistance = Mathf.Infinity;
         foreach (NavmeshNode2D ledge in ledges) {
@@ -52,6 +55,7 @@ public class NavmeshAgent2D : MonoBehaviour {
         {
             ledge = closest;
             rigidbody.bodyType = RigidbodyType2D.Kinematic;
+            canGrab = true;
         });
     }
 
@@ -67,12 +71,16 @@ public class NavmeshAgent2D : MonoBehaviour {
         {
             Debug.Log("Climbing Ledge...");
             
-            MoveTo(new Vector2(surface.point.x, surface.point.y + (height/2)), () => { ledge = null; });
+            MoveTo(new Vector2(surface.point.x, surface.point.y + (height/2)), () => {
+                ledge = null;
+                rigidbody.AddForce(300 * (new Vector2(Input.GetAxisRaw("Horizontal"), 1f)));
+            });
         }
-        else { Debug.Log("Can not climb this ledge."); }
+        else { Debug.LogWarning("Can not climb this ledge."); }
     }
 
     public virtual void ReleaseLedge() {
+        Debug.Log("Releasing ledge");
         if (ledge == null) { return; }
 
         ledge = null;
@@ -210,15 +218,7 @@ public class NavmeshAgent2D : MonoBehaviour {
             //Later: Get normal vector of the ground undernieth and set the tran's up to that.
             //transform.up = Vector3.up;
 
-            RaycastHit2D surfacePoint = Physics2D.Raycast(transform.position, Vector2.down, GetSize().y, 1 << LayerMask.NameToLayer("Environment"));
-
-            if (surfacePoint)
-            {
-                transform.up = Vector2.Lerp(transform.up, surfacePoint.normal, 10 * Time.deltaTime);
-            }
-            else {
-                transform.up = Vector2.Lerp(transform.up, Vector2.up, 10 * Time.deltaTime);
-            }
+            transform.up = Vector2.up;
         }
     }
 
@@ -231,7 +231,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     protected void GroundCheck() {
-        RaycastHit2D ground = Physics2D.Raycast(transform.position, -transform.up, (GetSize().y/2)+0.02f, 1 << LayerMask.NameToLayer("Environment"));
+        Collider2D ground = Physics2D.OverlapBox(new Vector2(transform.position.x, transform.position.y - (transform.localScale.y)), new Vector2(GetSize().x, 0.02f), 0f, 1 << LayerMask.NameToLayer("Environment"));
 
         if (ground || ladder) { isGrounded = true; }
         else { isGrounded = false; }
@@ -251,13 +251,27 @@ public class NavmeshAgent2D : MonoBehaviour {
         callback();
     }
 
-    private void OnDrawGizmosSelected() {
+    void DrawGroundedBox() {
+        Vector2 bottomLeft = new Vector2(transform.position.x - transform.localScale.x / 2 , transform.position.y - transform.localScale.y / 2 - 0.1f);
+        Vector2 bottomRight = new Vector2(transform.position.x + transform.localScale.x / 2, transform.position.y - transform.localScale.y / 2 - 0.1f);
+        Vector2 topRight = new Vector2(transform.position.x + transform.localScale.x / 2, transform.position.y - transform.localScale.y / 2 + 0.1f);
+        Vector2 topLeft = new Vector2(transform.position.x - transform.localScale.x / 2, transform.position.y - transform.localScale.y / 2 + 0.1f);
+
+        Debug.DrawLine(bottomLeft, bottomRight, Color.yellow);
+        Debug.DrawLine(bottomRight, topRight, Color.yellow);
+        Debug.DrawLine(bottomLeft, topLeft, Color.yellow);
+        Debug.DrawLine(topLeft, topRight, Color.yellow);
+    }
+
+    protected virtual void OnDrawGizmosSelected() {
         if (!area) { area = FindObjectOfType<NavmeshArea2D>(); }
 
         Gizmos.DrawCube(area.NodeAtPoint(transform.position, this).worldPosition, Vector3.one/4);
         for (int i = 1; i < path.Count; i++) {
             Debug.DrawLine(path[i-1].worldPosition, path[i].worldPosition, Color.green);
         }
+
+        DrawGroundedBox();
     }
 }
 

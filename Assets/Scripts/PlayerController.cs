@@ -20,17 +20,18 @@ public class PlayerController : NavmeshAgent2D {
         base.Start();
     }
 
+    bool wasCrouched;
     protected void Update() {
         if (Time.timeScale > 0) {
 
-            if (Input.GetButton("Prone")) { isProne = true; }
-            else {
+            if (Input.GetButton("Prone") && !ladder && canGrab && ledge == null) { isProne = true; wasCrouched = true; GrabLedge(); }
+            else if (!Input.GetButton("Prone") && !ladder && ledge == null){
                 Vector2 newSize = new Vector2(width*transform.localScale.x, height*transform.localScale.y);
                 Vector2 newPos = new Vector2(transform.position.x, (transform.position.y - (crouchHeight * transform.localScale.y) / 2 + (height * transform.localScale.y) / 2));
                 Collider2D ceiling = Physics2D.OverlapCapsule(newPos, newSize, CapsuleDirection2D.Vertical, 0f, 1 << LayerMask.NameToLayer("Environment"));
 
-                if (!ceiling) { isProne = false; }
-                else { isProne = true; }
+                if (!ceiling) { isProne = false; wasCrouched = false; }
+                else if (wasCrouched) { isProne = true; wasCrouched = true; }
             }
 
             if (Input.GetButtonDown("Action")) {
@@ -59,7 +60,8 @@ public class PlayerController : NavmeshAgent2D {
         if (isProne) { capsuleCollider.size = new Vector2(width, crouchHeight); }
         else { capsuleCollider.size = new Vector2(width, height); }
 
-        if (rb.velocity.y < -5 && !ladder & ledge == null) {
+        if (rb.velocity.y < 0 && Input.GetButton("Grab") && !ladder & ledge == null) {
+            Debug.Log("grabbing");
             GrabLedge();
         }
 
@@ -83,6 +85,7 @@ public class PlayerController : NavmeshAgent2D {
 
     private void MoveHorizontal()
     {
+        if (!isGrounded) { return; }
         Vector3 movement = Vector3.zero;
         float direction = Mathf.Clamp(Input.GetAxis("Horizontal") * accelMultiplier, -1f, 1f);
 
@@ -128,6 +131,7 @@ public class PlayerController : NavmeshAgent2D {
     }
     
     protected virtual void Decelerate() {
+        if (!isGrounded) { return; }
         if (Input.GetAxisRaw("Horizontal") == 0) { StartCoroutine(Decelerator()); }
         else { StopCoroutine(Decelerator()); }
     }
@@ -135,6 +139,7 @@ public class PlayerController : NavmeshAgent2D {
     protected IEnumerator Decelerator() {
         float direction = Mathf.Abs(rb.velocity.x) / rb.velocity.x;
         while (rb.velocity.x != 0) {
+            if (Input.GetAxisRaw("Horizontal") != 0 || !isGrounded) { break; }
             Vector2 deceleration = new Vector2(direction * (1/accelMultiplier), 0);
             rb.velocity -= deceleration;
 
@@ -142,5 +147,9 @@ public class PlayerController : NavmeshAgent2D {
             yield return new WaitForEndOfFrame();
         }
     }
-    
+
+    protected override void OnDrawGizmosSelected()
+    {
+        base.OnDrawGizmosSelected();
+    }
 }
