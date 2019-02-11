@@ -25,6 +25,7 @@ public class NavmeshObstacle2D : MonoBehaviour {
             previousRotation != transform.rotation ||
             previousScale != transform.localScale)
         {
+            Debug.Log("updating grid");
             area.UpdateGrid(collider);
         }
 
