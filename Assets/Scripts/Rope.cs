@@ -17,6 +17,7 @@ public class Rope : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        transform.localScale = new Vector3(1, 1, 1);
         segments = new List<Ladder>();
         UpdateSegments();
 	}
@@ -72,11 +73,7 @@ public class Rope : MonoBehaviour {
                 Ladder sections = segments[i];
                 //Sets each of the segments to be connected to the previous segment via a hinge joint
                 HingeJoint2D Hinge = sections.GetComponent<HingeJoint2D>();
-                if (i > 0 && i < segmentCount - 1)
-                {
-                    Hinge.connectedBody = segments[i + 1].GetComponent<Rigidbody2D>();
-                }
-                else if(i == 0)
+                if (i >= 0 && i < segmentCount - 1)
                 {
                     Hinge.connectedBody = segments[i + 1].GetComponent<Rigidbody2D>();
                 }
