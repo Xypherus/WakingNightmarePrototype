@@ -36,9 +36,10 @@ public class Rope : MonoBehaviour {
 
         float height = length / segmentCount;
 
+        Vector3 start = transform.position - new Vector3 (0f, height / 2);
         for (int i = segmentCount - 1; i >= 0; i--)
         {
-            Vector3 position = new Vector3(transform.position.x, (transform.position.y - (i * height)) - (height / 2));
+            Vector3 position = start - (transform.rotation * new Vector2(0f, (i * height)));
 
             GameObject ladder = Instantiate(ropeSegment, position, transform.rotation, transform);
             Ladder ladderObject = ladder.GetComponent<Ladder>();

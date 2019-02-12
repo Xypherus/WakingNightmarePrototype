@@ -16,6 +16,7 @@ public class Ladder : MonoBehaviour {
 
     public Ladder next = null;
     public Ladder previous = null;
+    public float height;
 
     Vector2 top;
     Vector2 bottom;
@@ -39,6 +40,7 @@ public class Ladder : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
+        height = Vector2.Distance(bottom, top);
         positionDelta = (Vector2) transform.position - lastPosition;
 
         RenderSprite();
@@ -53,33 +55,44 @@ public class Ladder : MonoBehaviour {
 
     public void MoveOnLadder(NavmeshAgent2D actor, Vector2 movement) {
         //TODO: Reprogram to move to a point that is a percentage the distance to top;
-
-        actor.transform.position = actor.transform.position + (Vector3) positionDelta;
-
-        if (actor.isProne) { return; }
+        Vector3 previousPos = actor.transform.position;
 
         bool avoidCollCheck = false;
         if (CheckActorCollisions(actor) > 0) { avoidCollCheck = true; }
-
-        Vector3 previousPos = actor.transform.position;
         if (ladderType == LadderType.Side)
         {
+            float percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
+            actor.transform.position = Vector2.Lerp(bottom, top, percent);
+            previousPos = actor.transform.position;
+            if (actor.isProne) { return; }
+
             float direction = movement.x;
             if (direction == 0) { direction = movement.y; }
 
             if (direction > 0 )
             {
-                actor.transform.position = Vector3.MoveTowards(actor.transform.position, top, actor.speed / 4 * Time.deltaTime);
+                percent += (actor.speed/4 / height) * Time.deltaTime;
+                //actor.transform.position = Vector3.MoveTowards(actor.transform.position, top, actor.speed / 4 * Time.deltaTime);
             }
             else if (direction < 0 )
             {
-                actor.transform.position = Vector3.MoveTowards(actor.transform.position, bottom, actor.speed / 4 * Time.deltaTime);
+                percent -= (actor.speed/4 / height) * Time.deltaTime;
+                //actor.transform.position = Vector3.MoveTowards(actor.transform.position, bottom, actor.speed / 4 * Time.deltaTime);
             }
+
+            if (percent <= 0 && previous) {
+                actor.transform.position = previous.top;
+                actor.ladder = previous;
+            }
+            else if (percent >= 1 && next) {
+                actor.transform.position = next.bottom;
+                actor.ladder = next;
+            }
+
+            actor.transform.position = Vector2.Lerp(bottom, top, percent);
 
             if (!avoidCollCheck) { HandleActorCollisions(actor, previousPos); }
 
-            if (actor.transform.position == (Vector3)bottom && previous) { actor.ladder = previous; }
-            else if (actor.transform.position == (Vector3)top && next) { actor.ladder = next; }
         }
         else {
             Vector3 target = Vector3.zero;

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 
 using UnityEngine;
+using Unity.Jobs;
+using Unity.Collections;
 
 /// <summary>
 /// A component used to create a navmesh within a specific area. This object creates a grid of nodes for each given agent, and updates those nodes corresponding to the environment.
@@ -30,8 +32,8 @@ public class NavmeshArea2D : MonoBehaviour {
     float updateRate = 0.02f;
     float lastUpdate;
 
-	// Use this for initialization
-	protected void Start () {
+    // Use this for initialization
+    protected void Start () {
         collider = GetComponent<CompositeCollider2D>();
         InitializeGrid();
 	}
@@ -55,6 +57,7 @@ public class NavmeshArea2D : MonoBehaviour {
     }
 
     private void DrawDebugLines() {
+        if (!showDebug) { return; }
         for(int y = 0; y < ycount; y++)
         {
             for(int x = 0; x < xcount; x++)
@@ -240,18 +243,20 @@ public class NavmeshArea2D : MonoBehaviour {
     /// <param name="distance">How far the cast will check.</param>
     /// <returns>The node with the given type if found. Null if none found.</returns>
     public NavmeshNode2D CastForType(Vector2Int gridPosition, Vector2 direction, List<NavmeshNode2D.NodeType> types, NavmeshAgent2D agent, int distance = 1000) {
+
         UnityEngine.Profiling.Profiler.BeginSample("Grid Cast");
         Vector2Int position = gridPosition;
 
-        position.x = Mathf.Clamp(position.x + Mathf.RoundToInt(Mathf.Clamp(direction.x, -1, 1)), 0, xcount-1);
+        position.x = Mathf.Clamp(position.x + Mathf.RoundToInt(Mathf.Clamp(direction.x, -1, 1)), 0, xcount - 1);
         position.y = Mathf.Clamp(position.y + Mathf.RoundToInt(Mathf.Clamp(direction.y, -1, 1)), 0, ycount - 1);
         int count = 0;
         do
         {
-            if (types.Contains(meshes[agent][position.x, position.y].type))
+            NavmeshNode2D node = meshes[agent][position.x, position.y];
+            if (types.Contains(node.type))
             {
                 UnityEngine.Profiling.Profiler.EndSample();
-                return meshes[agent][position.x, position.y];
+                return node;
             }
 
             position.x = Mathf.Clamp(position.x + Mathf.RoundToInt(Mathf.Clamp(direction.x, -1, 1)), 0, xcount - 1);
@@ -321,6 +326,7 @@ public class NavmeshArea2D : MonoBehaviour {
 /// <summary>
 /// A type used to deliniate navigable and non-navigable points in the environment.
 /// </summary>
+
 public class NavmeshNode2D
 {
     /// <summary>
@@ -520,7 +526,19 @@ public class NavmeshNode2D
     {
         UnityEngine.Profiling.Profiler.BeginSample("Node Validation");
         //if the world position of this node is inside a piece of the environment,
-        Collider2D asset = Physics2D.OverlapCircle(worldPosition, 0, area.layerMask);
+        Collider2D[] assets = Physics2D.OverlapCircleAll(worldPosition, 0, area.layerMask);
+        Collider2D asset = null;
+
+        foreach (Collider2D selection in assets) {
+            string layerName = LayerMask.LayerToName(selection.gameObject.layer);
+            if (layerName == "Environment")
+            {
+                asset = selection;
+                break;
+            }
+            else if (layerName == "Ladder") { asset = selection; }
+        }
+
         if (asset)
         {
             //check if that piece of environment is a Ladder.
@@ -552,7 +570,7 @@ public class NavmeshNode2D
     public void DetectSurface()
     {
         UnityEngine.Profiling.Profiler.BeginSample("Surface Detection");
-        if (type == NodeType.Air)
+        if (type == NodeType.Air || type == NodeType.Ladder)
         {
             NavmeshNode2D surface = area.CastForType(gridPosition, Vector2.down, new List<NodeType> { NodeType.None}, agent, 1);
 
@@ -579,9 +597,9 @@ public class NavmeshNode2D
             }
         }
 
-        if (type == NodeType.Walkable || type == NodeType.Crawlable) {
+        if (type == NodeType.Walkable || type == NodeType.Crawlable || type == NodeType.Ladder) {
             List<NavmeshNodeConnection2D> connections = new List<NavmeshNodeConnection2D>();
-            ConnectedToTypes(new List<NodeType> { NodeType.Air}, out connections);
+            ConnectedToTypes(new List<NodeType> { NodeType.Air, NodeType.Ladder}, out connections);
 
             foreach (NavmeshNodeConnection2D connection in connections) {
                 connection.b.DetectLedge();
@@ -593,7 +611,7 @@ public class NavmeshNode2D
 
     void DetectLedge() {
         UnityEngine.Profiling.Profiler.BeginSample("Ledge Detection");
-        if (type != NodeType.Air) { UnityEngine.Profiling.Profiler.EndSample(); return; }
+        if (type != NodeType.Air && type != NodeType.Ladder) { UnityEngine.Profiling.Profiler.EndSample(); return; }
 
         List<NavmeshNodeConnection2D> connections = new List<NavmeshNodeConnection2D>();
 
@@ -630,5 +648,17 @@ public class NavmeshNode2D
         DetectSurface();
         UnityEngine.Profiling.Profiler.EndSample();
     }
+
+    public static NodePointer GetPointer(NavmeshNode2D node) {
+        NodePointer pointer;
+        if (node == null) { pointer.node = new NavmeshNode2D(); }
+        else { pointer.node = node; }
+
+        return pointer;
+    }
+}
+
+public struct NodePointer {
+    public NavmeshNode2D node;
 }
 

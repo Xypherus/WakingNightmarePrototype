@@ -32,18 +32,8 @@ public class PlayerController : NavmeshAgent2D {
                 LadderMountDismount(maxReach);
             }
 
-            if (!isProne && isGrounded && Input.GetButtonDown("Jump")) {
+            if (Input.GetButtonDown("Jump")) {
                 Jump();
-            }
-
-            if (ledge != null) {
-                if (isProne)
-                {
-                    ReleaseLedge();
-                }
-                else if (Input.GetButtonDown("Jump")) {
-                    ClimbLedge();
-                }
             }
         }
     }
@@ -56,6 +46,13 @@ public class PlayerController : NavmeshAgent2D {
 
         if (rb.velocity.y < 0 && Input.GetButton("Grab") && !ladder & ledge == null) {
             GrabLedge();
+        }
+
+        if (ledge != null && Input.GetAxisRaw("Vertical") > 0) {
+            ClimbLedge();
+        }
+        if (ledge != null && Input.GetAxisRaw("Vertical") < 0 || Input.GetButton("Grab")) {
+            ReleaseLedge();
         }
 
         Move();
@@ -72,7 +69,7 @@ public class PlayerController : NavmeshAgent2D {
         }
         else if (ladder && ledge == null)
         {
-            Vector3 movement = new Vector2(speed, 0f);
+            Vector3 movement = new Vector2(speed/4, 0f);
             float direction = Mathf.Clamp(Input.GetAxis("Horizontal") * accelMultiplier, -1f, 1f);
 
             ladder.MoveOnLadder(GetComponent<NavmeshAgent2D>(), new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
@@ -127,8 +124,8 @@ public class PlayerController : NavmeshAgent2D {
     }
 
     protected virtual void Jump() {
-        if (ladder) { DismountLadder(); }
-        else if (ledge != null) { ClimbLedge(); return; }
+        if (ladder) { DismountLadder(); rb.AddForce(new Vector2(0f, jumpForce*2)); return; }
+        else if (ledge != null) { ReleaseLedge(); rb.AddForce(new Vector2(0f, jumpForce*2)); return; }
 
         if (isGrounded) {
             rb.AddForce(new Vector2(0f, jumpForce));
