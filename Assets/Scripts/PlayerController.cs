@@ -7,7 +7,7 @@ public class PlayerController : NavmeshAgent2D {
     
     public float accelMultiplier;
     public float jumpForce;
-    public bool isProne = false;
+    
 
     private Rigidbody2D rb;
 
@@ -18,21 +18,15 @@ public class PlayerController : NavmeshAgent2D {
         rb = GetComponent<Rigidbody2D>();
 
         base.Start();
+
+        if (area == null) { Debug.LogWarning("There is no Navmesh set up in this scene. Not all movement features will be available."); }
     }
 
     bool wasCrouched;
-    protected void Update() {
+    protected override void Update() {
+        base.Update();
+
         if (Time.timeScale > 0) {
-
-            if (Input.GetButton("Prone") && !ladder && canGrab && ledge == null) { isProne = true; wasCrouched = true; GrabLedge(); }
-            else if (!Input.GetButton("Prone") && !ladder && ledge == null){
-                Vector2 newSize = new Vector2(width*transform.localScale.x, height*transform.localScale.y);
-                Vector2 newPos = new Vector2(transform.position.x, (transform.position.y - (crouchHeight * transform.localScale.y) / 2 + (height * transform.localScale.y) / 2));
-                Collider2D ceiling = Physics2D.OverlapCapsule(newPos, newSize, CapsuleDirection2D.Vertical, 0f, 1 << LayerMask.NameToLayer("Environment"));
-
-                if (!ceiling) { isProne = false; wasCrouched = false; }
-                else if (wasCrouched) { isProne = true; wasCrouched = true; }
-            }
 
             if (Input.GetButtonDown("Action")) {
                 LadderMountDismount(maxReach);
@@ -61,7 +55,6 @@ public class PlayerController : NavmeshAgent2D {
         else { capsuleCollider.size = new Vector2(width, height); }
 
         if (rb.velocity.y < 0 && Input.GetButton("Grab") && !ladder & ledge == null) {
-            Debug.Log("grabbing");
             GrabLedge();
         }
 
@@ -79,13 +72,24 @@ public class PlayerController : NavmeshAgent2D {
         }
         else if (ladder && ledge == null)
         {
+            Vector3 movement = new Vector2(speed, 0f);
+            float direction = Mathf.Clamp(Input.GetAxis("Horizontal") * accelMultiplier, -1f, 1f);
+
             ladder.MoveOnLadder(GetComponent<NavmeshAgent2D>(), new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
+
+            if (isProne) {
+                Debug.Log("Applying force to ladder");
+                Rigidbody2D ladderBody = ladder.GetComponent<Rigidbody2D>();
+                if (ladderBody)
+                {
+                    ladderBody.AddRelativeForce(direction * movement);
+                }
+            }
         }
     }
 
     private void MoveHorizontal()
     {
-        if (!isGrounded) { return; }
         Vector3 movement = Vector3.zero;
         float direction = Mathf.Clamp(Input.GetAxis("Horizontal") * accelMultiplier, -1f, 1f);
 
@@ -93,10 +97,11 @@ public class PlayerController : NavmeshAgent2D {
         {
             movement = new Vector3(speed / 2, 0f);
         }
-        else {
+        else
+        {
             movement = new Vector3(speed, 0);
         }
-        
+
         rb.AddForce(direction * movement);
     }
 

@@ -25,16 +25,26 @@ public class Ladder : MonoBehaviour {
     new BoxCollider2D collider;
     new SpriteRenderer renderer;
 
+    Vector2 lastPosition;
+    Vector2 positionDelta;
+
     private void Start()
     {
         collider = GetComponent<BoxCollider2D>();
         renderer = GetComponent<SpriteRenderer>();
+
+        lastPosition = transform.position;
+        positionDelta = Vector2.zero;
     }
 
     // Update is called once per frame
     void Update () {
+        positionDelta = (Vector2) transform.position - lastPosition;
+
         RenderSprite();
         OrientLadder();
+
+        lastPosition = transform.position;
 	}
 
     public Vector3 GetUp() {
@@ -42,6 +52,12 @@ public class Ladder : MonoBehaviour {
     }
 
     public void MoveOnLadder(NavmeshAgent2D actor, Vector2 movement) {
+        //TODO: Reprogram to move to a point that is a percentage the distance to top;
+
+        actor.transform.position = actor.transform.position + (Vector3) positionDelta;
+
+        if (actor.isProne) { return; }
+
         bool avoidCollCheck = false;
         if (CheckActorCollisions(actor) > 0) { avoidCollCheck = true; }
 
@@ -100,8 +116,8 @@ public class Ladder : MonoBehaviour {
         else {
             actor.rigidbody.bodyType = RigidbodyType2D.Kinematic;
             actor.rigidbody.velocity = Vector3.zero;
-            actor.ladder = this;
         }
+        
     }
 
     void HandleActorCollisions(NavmeshAgent2D agent, Vector3 returnPosition) {

@@ -810,6 +810,16 @@ Prefab:
       propertyPath: bounds.m_Center.y
       value: -14.4
       objectReference: {fileID: 0}
+    - target: {fileID: 114703357456668706, guid: 593c903d1d01dc24b813d6ec6de56b7b,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114703357456668706, guid: 593c903d1d01dc24b813d6ec6de56b7b,
+        type: 2}
+      propertyPath: showDebug
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 593c903d1d01dc24b813d6ec6de56b7b, type: 2}
   m_IsPrefabAsset: 0
@@ -1376,6 +1386,36 @@ PolygonCollider2D:
       - {x: -1.8299999, y: -2.95}
       - {x: -1.81, y: -2.85}
       - {x: -1.67, y: -2.4199998}
+--- !u!1 &342823265 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1165656113484612, guid: 46d4816e7d0761242b9bc384942f38b7,
+    type: 2}
+  m_PrefabInternal: {fileID: 1823913528}
+--- !u!61 &342823266
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 342823265}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0.5860691}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 20.48, y: 10.24}
+    newSize: {x: 20.48, y: 10.24}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 14.05, y: 3.2106514}
+  m_EdgeRadius: 0
 --- !u!1001 &364692369
 Prefab:
   m_ObjectHideFlags: 0
@@ -4262,19 +4302,19 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4627537042124350, guid: 266a8f9c7ae496044924005d8e563812, type: 2}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4627537042124350, guid: 266a8f9c7ae496044924005d8e563812, type: 2}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4627537042124350, guid: 266a8f9c7ae496044924005d8e563812, type: 2}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0.04675775
       objectReference: {fileID: 0}
     - target: {fileID: 4627537042124350, guid: 266a8f9c7ae496044924005d8e563812, type: 2}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.99890625
       objectReference: {fileID: 0}
     - target: {fileID: 4627537042124350, guid: 266a8f9c7ae496044924005d8e563812, type: 2}
       propertyPath: m_RootOrder
@@ -4282,15 +4322,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4627537042124350, guid: 266a8f9c7ae496044924005d8e563812, type: 2}
       propertyPath: m_LocalScale.x
-      value: 5.3148
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4627537042124350, guid: 266a8f9c7ae496044924005d8e563812, type: 2}
       propertyPath: m_LocalScale.y
-      value: 5.3148
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4627537042124350, guid: 266a8f9c7ae496044924005d8e563812, type: 2}
       propertyPath: m_LocalScale.z
-      value: 5.3148
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114532801695554520, guid: 266a8f9c7ae496044924005d8e563812,
         type: 2}
@@ -4305,6 +4345,20 @@ Prefab:
     - target: {fileID: 1976197337086708, guid: 266a8f9c7ae496044924005d8e563812, type: 2}
       propertyPath: m_Layer
       value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532801695554520, guid: 266a8f9c7ae496044924005d8e563812,
+        type: 2}
+      propertyPath: ropeSegment
+      value: 
+      objectReference: {fileID: 1863153879985350, guid: 550eab1975c9c4e6c8e3e60bd045166e,
+        type: 2}
+    - target: {fileID: 4627537042124350, guid: 266a8f9c7ae496044924005d8e563812, type: 2}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 5.36
+      objectReference: {fileID: 0}
+    - target: {fileID: 4627537042124350, guid: 266a8f9c7ae496044924005d8e563812, type: 2}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 266a8f9c7ae496044924005d8e563812, type: 2}
@@ -7546,11 +7600,11 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4861670924193674, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -17.41
+      value: 56.2
       objectReference: {fileID: 0}
     - target: {fileID: 4861670924193674, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 1.56
+      value: -16.2
       objectReference: {fileID: 0}
     - target: {fileID: 4861670924193674, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
       propertyPath: m_LocalPosition.z
@@ -10646,7 +10700,8 @@ Prefab:
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 65539096388279654, guid: 46d4816e7d0761242b9bc384942f38b7, type: 2}
   m_SourcePrefab: {fileID: 100100000, guid: 46d4816e7d0761242b9bc384942f38b7, type: 2}
   m_IsPrefabAsset: 0
 --- !u!4 &1823913529 stripped
@@ -11245,13 +11300,13 @@ Transform:
     type: 2}
   m_PrefabInternal: {fileID: 971410580}
   m_GameObject: {fileID: 1866879861}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0.04675775, w: 0.99890625}
   m_LocalPosition: {x: 64.5, y: 14.8, z: 0}
-  m_LocalScale: {x: 5.3148, y: 5.3148, z: 5.3148}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 728965720}
   m_RootOrder: 11
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 5.36}
 --- !u!114 &1866879863
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11266,7 +11321,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   length: 38.74
   segmentCount: 42
-  ropeSegment: {fileID: 1863153879985350, guid: ef1d7b7622d430648b078f362a2ebdae,
+  ropeSegment: {fileID: 1863153879985350, guid: 550eab1975c9c4e6c8e3e60bd045166e,
     type: 2}
 --- !u!1 &1897064620 stripped
 GameObject:

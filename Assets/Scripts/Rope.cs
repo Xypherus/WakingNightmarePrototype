@@ -85,7 +85,7 @@ public class Rope : MonoBehaviour {
         }
     }     
 
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
         if (length > 0 && segmentCount > 0) {
             float height = length / segmentCount;
@@ -97,7 +97,7 @@ public class Rope : MonoBehaviour {
                 if (i % 2 == 0) { lineColor = Color.green; }
                 else { lineColor = Color.blue; }
 
-                Vector3 position = start - new Vector3(0, i * height, 0);
+                Vector3 position = start - (transform.rotation * new Vector3(0, i * height, 0));
                 Debug.DrawLine(lastPos, position, lineColor);
                 lastPos = position;
             }
