@@ -264,8 +264,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8668a9ea58795934caf9e6c0bb4d1130, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  length: 4
-  segmentCount: 4
+  length: 5
+  segmentCount: 8
   ropeSegment: {fileID: 1863153879985350, guid: 550eab1975c9c4e6c8e3e60bd045166e,
     type: 2}
 --- !u!4 &1561445804
