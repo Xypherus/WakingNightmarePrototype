@@ -27,7 +27,6 @@ public class NavmeshAgent2D : MonoBehaviour {
     public bool pathing;
 
     protected CapsuleCollider2D capsuleCollider;
-
     protected NavmeshArea2D area;
 
     bool wasCrouched = false;
@@ -142,6 +141,15 @@ public class NavmeshAgent2D : MonoBehaviour {
         if (closest != null) { closest.GetComponent<Ladder>().MountLadder(this); }
     }
 
+    protected virtual void Crouch() {
+        if (isProne) {
+            capsuleCollider.size = new Vector2(width, crouchHeight);
+        }
+        else {
+            capsuleCollider.size = new Vector2(width, height);
+        }
+    }
+
     protected virtual void Start() {
         rigidbody = GetComponent<Rigidbody2D>();
         area = FindObjectOfType<NavmeshArea2D>();
@@ -246,7 +254,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     protected void GroundCheck() {
-        Collider2D ground = Physics2D.OverlapBox(new Vector2(transform.position.x, transform.position.y - (transform.localScale.y/2)), new Vector2(GetSize().x/2, 0.02f), 0f, 1 << LayerMask.NameToLayer("Environment"));
+        Collider2D ground = Physics2D.OverlapBox(new Vector2(transform.position.x, transform.position.y - (transform.localScale.y/2)), new Vector2(GetSize().x/2, 0.04f), 0f, 1 << LayerMask.NameToLayer("Environment"));
 
         if (ground) { isGrounded = true; }
         else { isGrounded = false; }
@@ -267,10 +275,10 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     void DrawGroundedBox() {
-        Vector2 bottomLeft = new Vector2(transform.position.x - transform.localScale.x / 4 , transform.position.y - transform.localScale.y / 2 - 0.1f);
-        Vector2 bottomRight = new Vector2(transform.position.x + transform.localScale.x / 4, transform.position.y - transform.localScale.y / 2 - 0.1f);
-        Vector2 topRight = new Vector2(transform.position.x + transform.localScale.x / 4, transform.position.y - transform.localScale.y / 2 + 0.1f);
-        Vector2 topLeft = new Vector2(transform.position.x - transform.localScale.x / 4, transform.position.y - transform.localScale.y / 2 + 0.1f);
+        Vector2 bottomLeft = new Vector2(transform.position.x - transform.localScale.x / 4 , transform.position.y - transform.localScale.y / 2 - 0.2f);
+        Vector2 bottomRight = new Vector2(transform.position.x + transform.localScale.x / 4, transform.position.y - transform.localScale.y / 2 - 0.2f);
+        Vector2 topRight = new Vector2(transform.position.x + transform.localScale.x / 4, transform.position.y - transform.localScale.y / 2 + 0.2f);
+        Vector2 topLeft = new Vector2(transform.position.x - transform.localScale.x / 4, transform.position.y - transform.localScale.y / 2 + 0.2f);
 
         Debug.DrawLine(bottomLeft, bottomRight, Color.yellow);
         Debug.DrawLine(bottomRight, topRight, Color.yellow);
