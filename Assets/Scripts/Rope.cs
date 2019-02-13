@@ -17,6 +17,7 @@ public class Rope : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        transform.localScale = new Vector3(1, 1, 1);
         segments = new List<Ladder>();
         UpdateSegments();
 	}
@@ -27,27 +28,31 @@ public class Rope : MonoBehaviour {
         _lastRopeSegment = ropeSegment;
         _lastLength = length;
 	}
-    
-    void UpdateSegments() {
+
+    void UpdateSegments()
+    {
         foreach (Ladder segment in segments) { Destroy(segment.gameObject); }
         segments.Clear();
 
         float height = length / segmentCount;
 
-        for (int i = segmentCount-1; i >= 0; i--) {
-            Vector3 position = new Vector3(transform.position.x, (transform.position.y - (i * height)) - (height/2));
+        Vector3 start = transform.position - new Vector3 (0f, height / 2);
+        for (int i = segmentCount - 1; i >= 0; i--)
+        {
+            Vector3 position = start - (transform.rotation * new Vector2(0f, (i * height)));
 
             GameObject ladder = Instantiate(ropeSegment, position, transform.rotation, transform);
             Ladder ladderObject = ladder.GetComponent<Ladder>();
             ladder.transform.localScale = new Vector3(ladder.transform.localScale.x, height, ladder.transform.localScale.z);
-
             segments.Add(ladderObject);
         }
 
         if (segmentCount > 1)
         {
+   
             for (int i = 0; i < segmentCount; i++)
             {
+
                 Ladder ladder = segments[i];
 
                 if (i == 0)
@@ -58,15 +63,27 @@ public class Rope : MonoBehaviour {
                 {
                     ladder.previous = segments[i - 1];
                 }
-                else {
+                else
+                {
                     ladder.next = segments[i + 1];
                     ladder.previous = segments[i - 1];
                 }
             }
-        }  
-    }
+            for(int i = segmentCount - 1; i >= 0; i--)
+            {
+                Ladder sections = segments[i];
+                //Sets each of the segments to be connected to the previous segment via a hinge joint
+                HingeJoint2D Hinge = sections.GetComponent<HingeJoint2D>();
+                if (i >= 0 && i < segmentCount - 1)
+                {
+                    Hinge.connectedBody = segments[i + 1].GetComponent<Rigidbody2D>();
+                }
 
-    private void OnDrawGizmosSelected()
+            }
+        }
+    }     
+
+    private void OnDrawGizmos()
     {
         if (length > 0 && segmentCount > 0) {
             float height = length / segmentCount;
@@ -78,7 +95,7 @@ public class Rope : MonoBehaviour {
                 if (i % 2 == 0) { lineColor = Color.green; }
                 else { lineColor = Color.blue; }
 
-                Vector3 position = start - new Vector3(0, i * height, 0);
+                Vector3 position = start - (transform.rotation * new Vector3(0, i * height, 0));
                 Debug.DrawLine(lastPos, position, lineColor);
                 lastPos = position;
             }

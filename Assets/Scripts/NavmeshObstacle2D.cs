@@ -17,7 +17,11 @@ public class NavmeshObstacle2D : MonoBehaviour {
 	void Start () {
         collider = GetComponent<Collider2D>();
         area = GameObject.FindObjectOfType<NavmeshArea2D>();
-	}
+
+        previousPos = transform.position;
+        previousRotation = transform.rotation;
+        previousScale = transform.localScale;
+    }
 	
 	// Update is called once per frame
 	void Update () {
