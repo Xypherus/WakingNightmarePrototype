@@ -14,9 +14,7 @@ public class PlayerController : NavmeshAgent2D {
     [Tooltip("The force used to propell the player upward. Higher values for objects with higher mass.")]
     public float jumpForce;
     #endregion
-
-    bool wasCrouched;
-
+    
     protected override void Start()
     {
         //Call start on the base NavmeshAgent2D
@@ -114,7 +112,7 @@ public class PlayerController : NavmeshAgent2D {
 
             ladder.MoveOnLadder(GetComponent<NavmeshAgent2D>(), new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
 
-            if (isProne)
+            if (Input.GetAxisRaw("Horizontal") != 0)
             {
                 Debug.Log("Applying force to ladder");
                 Rigidbody2D ladderigidbodyody = ladder.GetComponent<Rigidbody2D>();

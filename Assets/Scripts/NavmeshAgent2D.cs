@@ -5,6 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(CapsuleCollider2D))]
 [RequireComponent(typeof(Rigidbody2D))]
 public class NavmeshAgent2D : MonoBehaviour {
+    #region Editor Variables
     public float width;
     public float height;
     public float crouchHeight;
@@ -12,11 +13,14 @@ public class NavmeshAgent2D : MonoBehaviour {
     public float speed;
     public float maxSpeed;
     public float maxReach;
+    #endregion
 
+    #region Movement Bools
     public bool isGrounded;
     public bool canGrab = true;
     public bool isProne = false;
     public bool sprinting = false;
+    #endregion
 
     public List<NavmeshNode2D> path = new List<NavmeshNode2D>();
     new public Rigidbody2D rigidbody;
@@ -29,7 +33,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     protected CapsuleCollider2D capsuleCollider;
     protected NavmeshArea2D area;
 
-    bool wasCrouched = false;
+    protected bool wasCrouched = false;
 
     #region Testing Variables
     protected Transform _sprite;
@@ -38,6 +42,29 @@ public class NavmeshAgent2D : MonoBehaviour {
 
     protected virtual void Update() {
         
+    }
+
+    protected virtual void FixedUpdate() {
+
+        if (capsuleCollider.size.y < capsuleCollider.size.x) { capsuleCollider.direction = CapsuleDirection2D.Horizontal; }
+        else { capsuleCollider.direction = CapsuleDirection2D.Vertical; }
+
+        _sprite.localScale = capsuleCollider.size;
+
+        Orient();
+        GroundCheck();
+    }
+
+    protected virtual void Start() {
+        rigidbody = GetComponent<Rigidbody2D>();
+        area = FindObjectOfType<NavmeshArea2D>();
+        path = new List<NavmeshNode2D>();
+        capsuleCollider = GetComponent<CapsuleCollider2D>();
+        crouchHeight = height / 2;
+        capsuleCollider.size = new Vector2(width, height);
+
+        _sprite = transform.Find("Sprite");
+        _initSpriteHeight = _sprite.localScale.y;
     }
 
     public void MoveTo(Vector2 position, UnityEngine.Events.UnityAction callback) {
@@ -150,29 +177,6 @@ public class NavmeshAgent2D : MonoBehaviour {
         }
     }
 
-    protected virtual void Start() {
-        rigidbody = GetComponent<Rigidbody2D>();
-        area = FindObjectOfType<NavmeshArea2D>();
-        path = new List<NavmeshNode2D>();
-        capsuleCollider = GetComponent<CapsuleCollider2D>();
-        crouchHeight = height / 2;
-        capsuleCollider.size = new Vector2(width, height);
-
-        _sprite = transform.Find("Sprite");
-        _initSpriteHeight = _sprite.localScale.y;
-    }
-
-    protected virtual void FixedUpdate() {
-
-        if (capsuleCollider.size.y < capsuleCollider.size.x) { capsuleCollider.direction = CapsuleDirection2D.Horizontal; }
-        else { capsuleCollider.direction = CapsuleDirection2D.Vertical; }
-
-        _sprite.localScale = capsuleCollider.size;
-
-        Orient();
-        GroundCheck();
-    }
-
     protected virtual List<NavmeshNode2D> GetPath(Vector2 start, Vector2 end) {
         List<NavmeshNode2D> closedList = new List<NavmeshNode2D>();
         List<NavmeshNode2D> openList = new List<NavmeshNode2D>();
@@ -245,14 +249,6 @@ public class NavmeshAgent2D : MonoBehaviour {
         }
     }
 
-    private void OnDrawGizmos() {
-        if (!capsuleCollider) { capsuleCollider = GetComponent<CapsuleCollider2D>(); }
-        if (!Application.isPlaying)
-        {
-            capsuleCollider.size = new Vector2(width, height);
-        }
-    }
-
     protected void GroundCheck() {
         Collider2D ground = Physics2D.OverlapBox(new Vector2(transform.position.x, transform.position.y - (transform.localScale.y/2)), new Vector2(GetSize().x/2, 0.04f), 0f, 1 << LayerMask.NameToLayer("Environment"));
 
@@ -284,6 +280,14 @@ public class NavmeshAgent2D : MonoBehaviour {
         Debug.DrawLine(bottomRight, topRight, Color.yellow);
         Debug.DrawLine(bottomLeft, topLeft, Color.yellow);
         Debug.DrawLine(topLeft, topRight, Color.yellow);
+    }
+
+    private void OnDrawGizmos() {
+        if (!capsuleCollider) { capsuleCollider = GetComponent<CapsuleCollider2D>(); }
+        if (!Application.isPlaying)
+        {
+            capsuleCollider.size = new Vector2(width, height);
+        }
     }
 
     protected virtual void OnDrawGizmosSelected() {

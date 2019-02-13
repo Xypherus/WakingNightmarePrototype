@@ -277,6 +277,9 @@ public class NavmeshArea2D : MonoBehaviour {
     /// <param name="agent">Used to specify which mesh to use.</param>
     /// <returns></returns>
     public NavmeshNode2D NodeAtPoint(Vector2 position, NavmeshAgent2D agent) {
+        if (meshes == null) { return null; }
+        else if (meshes[agent] == null) { return null; }
+
         Vector2 gridPos = new Vector2(Mathf.RoundToInt((position.x - bounds.min.x)/resolution), Mathf.RoundToInt((position.y -bounds.min.y) / resolution));
         if (gridPos.x < 0) { gridPos.x = 0; }
         else if (gridPos.x >= xcount) { gridPos.x = xcount-1; }
