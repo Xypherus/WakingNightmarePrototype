@@ -111,17 +111,14 @@ public class Ladder : MonoBehaviour {
     }
 
     public void MountLadder(NavmeshAgent2D actor) {
+
         actor.ladder = this;
         if (ladderType == LadderType.Side)
         {
-            Vector2 position;
-            if (Vector2.Distance(actor.transform.position, top) < Vector2.Distance(actor.transform.position, bottom))
-            {
-                position = top;
-            }
-            else { position = bottom; }
+            float percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
+            Vector2 newPos = Vector2.Lerp(bottom, top, percent);
 
-            actor.MoveTo(position, () =>
+            actor.MoveTo(newPos, () =>
             {
                 actor.rigidbody.bodyType = RigidbodyType2D.Kinematic;
             });
