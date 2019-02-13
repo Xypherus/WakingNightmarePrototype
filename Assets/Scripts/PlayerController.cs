@@ -140,37 +140,35 @@ public class PlayerController : NavmeshAgent2D {
 
     private void MaxSpeedCheck()
     {
-        if(isProne)
+        if (isProne)
         {
             if (rigidbody.velocity.magnitude > maxSpeed / 2f)
-<<<<<<< HEAD
             {
                 rigidbody.velocity = rigidbody.velocity.normalized;
                 rigidbody.velocity = rigidbody.velocity * (maxSpeed / 2f);
-=======
-            {
-                rigidbody.velocity = rigidbody.velocity.normalized;
-                rigidbody.velocity = rigidbody.velocity * (maxSpeed / 2f);
+                {
+                    rigidbody.velocity = rigidbody.velocity.normalized;
+                    rigidbody.velocity = rigidbody.velocity * (maxSpeed / 2f);
+                }
             }
-        }
-        else if(sprinting)
-        {
-            if (rigidbody.velocity.magnitude > maxSpeed * 2f)
+            else if (sprinting)
             {
-                rigidbody.velocity = rigidbody.velocity.normalized;
-                rigidbody.velocity = rigidbody.velocity * (maxSpeed * 2f);
->>>>>>> 58fc9d0567239701ce64ea12e95e95d0800c564c
+                if (rigidbody.velocity.magnitude > maxSpeed * 2f)
+                {
+                    rigidbody.velocity = rigidbody.velocity.normalized;
+                    rigidbody.velocity = rigidbody.velocity * (maxSpeed * 2f);
+                }
             }
-        }
-        else
-        {
-            if (rigidbody.velocity.magnitude > maxSpeed)
+            else
             {
-                rigidbody.velocity = rigidbody.velocity.normalized;
-                rigidbody.velocity = rigidbody.velocity * maxSpeed;
+                if (rigidbody.velocity.magnitude > maxSpeed)
+                {
+                    rigidbody.velocity = rigidbody.velocity.normalized;
+                    rigidbody.velocity = rigidbody.velocity * maxSpeed;
+                }
             }
+
         }
-        
     }
 
     protected virtual void Jump() {
