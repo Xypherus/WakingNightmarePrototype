@@ -39,6 +39,8 @@ public class Rope : MonoBehaviour {
         {
             //Sets position of current rope segment
             Vector3 position = new Vector3(transform.position.x, (transform.position.y - (i * height)) - (height / 2));
+            Vector3 start = transform.position - new Vector3(0f, height / 2);
+            position = start - (transform.rotation * new Vector2(0f, (i * height)));
 
             //Instantiates current rope segment at correct position
             GameObject ladder = Instantiate(ropeSegment, position, transform.rotation, transform);

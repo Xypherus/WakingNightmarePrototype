@@ -16,6 +16,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     public bool isGrounded;
     public bool canGrab = true;
     public bool isProne = false;
+    public bool sprinting = false;
 
     public List<NavmeshNode2D> path = new List<NavmeshNode2D>();
     new public Rigidbody2D rigidbody;
@@ -37,19 +38,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     #endregion
 
     protected virtual void Update() {
-        if (Time.timeScale > 0)
-        {
-            if (Input.GetButton("Prone") && canGrab && ledge == null) { isProne = true; wasCrouched = true; GrabLedge(); }
-            else if (!Input.GetButton("Prone") && ledge == null)
-            {
-                Vector2 newSize = new Vector2(width * transform.localScale.x, height * transform.localScale.y);
-                Vector2 newPos = new Vector2(transform.position.x, (transform.position.y - (crouchHeight * transform.localScale.y) / 2 + (height * transform.localScale.y) / 2));
-                Collider2D ceiling = Physics2D.OverlapCapsule(newPos, newSize, CapsuleDirection2D.Vertical, 0f, 1 << LayerMask.NameToLayer("Environment"));
-
-                if (!ceiling) { isProne = false; wasCrouched = false; }
-                else if (wasCrouched) { isProne = true; wasCrouched = true; }
-            }
-        }
+        
     }
 
     public void MoveTo(Vector2 position, UnityEngine.Events.UnityAction callback) {
@@ -61,6 +50,7 @@ public class NavmeshAgent2D : MonoBehaviour {
         if (!canGrab || ladder) { return; }
         List<NavmeshNode2D> ledges = area.NodesOfTypeInRange(this, transform.position, new List<NavmeshNode2D.NodeType> { NavmeshNode2D.NodeType.Ledge}, maxReach*transform.localScale.x);
         if (ledges == null) { return; }
+        isProne = false;
 
         canGrab = false;
         NavmeshNode2D closest = ledges[0];
@@ -93,7 +83,7 @@ public class NavmeshAgent2D : MonoBehaviour {
             
             MoveTo(new Vector2(surface.point.x, surface.point.y + (height/2)), () => {
                 ledge = null;
-                rigidbody.AddForce(300 * (new Vector2(Input.GetAxisRaw("Horizontal"), 1f)));
+                rigidbody.AddForce(300 * (new Vector2(Input.GetAxisRaw("Horizontal"), .1f)));
             });
         }
         else { Debug.LogWarning("Can not climb this ledge."); }
@@ -115,9 +105,14 @@ public class NavmeshAgent2D : MonoBehaviour {
         if (!ladder) { Debug.LogWarning("Could not dismount ladder because it does not exist."); return; }
         if (ladder.CheckActorCollisions(this) > 0) { Debug.LogWarning("Could not dismount ladder because player is inside terrain!"); return; }
 
+        if (ladder.GetComponent<Rigidbody2D>()) {
+            rigidbody.velocity = ladder.GetComponent<Rigidbody2D>().velocity;
+        }
+
         ladder = null;
         rigidbody.bodyType = RigidbodyType2D.Dynamic;
         transform.parent = null;
+
     }
 
     public void LadderMountDismount(float radius) {
@@ -253,7 +248,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     protected void GroundCheck() {
         Collider2D ground = Physics2D.OverlapBox(new Vector2(transform.position.x, transform.position.y - (transform.localScale.y)), new Vector2(GetSize().x, 0.02f), 0f, 1 << LayerMask.NameToLayer("Environment"));
 
-        if (ground || ladder) { isGrounded = true; }
+        if (ground) { isGrounded = true; }
         else { isGrounded = false; }
     }
 
