@@ -123,7 +123,7 @@ GameObject:
   - component: {fileID: 112268465}
   - component: {fileID: 112268464}
   - component: {fileID: 112268463}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: New Sprite (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -224,7 +224,7 @@ GameObject:
   - component: {fileID: 291513232}
   - component: {fileID: 291513231}
   - component: {fileID: 291513230}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: New Sprite (7)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -315,6 +315,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 27.893002}
+--- !u!4 &299613753 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4861670924193674, guid: 23f972d680e86dd4da87e8a18548994e,
+    type: 2}
+  m_PrefabInternal: {fileID: 1097914993}
 --- !u!1 &525370919
 GameObject:
   m_ObjectHideFlags: 0
@@ -325,7 +330,7 @@ GameObject:
   - component: {fileID: 525370922}
   - component: {fileID: 525370921}
   - component: {fileID: 525370920}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: level2Platform1Large (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -426,7 +431,7 @@ GameObject:
   - component: {fileID: 554490758}
   - component: {fileID: 554490757}
   - component: {fileID: 554490756}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: New Sprite (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -517,7 +522,7 @@ GameObject:
   - component: {fileID: 723928450}
   - component: {fileID: 723928449}
   - component: {fileID: 723928448}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: level2Platform1Large (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -618,7 +623,7 @@ GameObject:
   - component: {fileID: 732097007}
   - component: {fileID: 732097006}
   - component: {fileID: 732097005}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: level2Platform1Large (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -719,7 +724,7 @@ GameObject:
   - component: {fileID: 808719670}
   - component: {fileID: 808719669}
   - component: {fileID: 808719668}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: New Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -820,7 +825,7 @@ GameObject:
   - component: {fileID: 836827772}
   - component: {fileID: 836827771}
   - component: {fileID: 836827770}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: New Sprite (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -911,7 +916,7 @@ GameObject:
   - component: {fileID: 1029226115}
   - component: {fileID: 1029226114}
   - component: {fileID: 1029226113}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: level2Platform1Large (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1011,6 +1016,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1041730076}
   - component: {fileID: 1041730075}
+  - component: {fileID: 1041730077}
   - component: {fileID: 1041730074}
   m_Layer: 0
   m_Name: Main Camera
@@ -1050,7 +1056,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 3.797615
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1073,12 +1079,26 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1041730073}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: -5.64213, y: -0.008620262, z: 0.3642578}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1041730077
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1041730073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8e5d99f06b820040a9dd0c7fa5f787c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 299613753}
+  speed: 0
+  offset: {x: 0, y: 0, z: 0}
 --- !u!1 &1093832803
 GameObject:
   m_ObjectHideFlags: 0
@@ -1089,7 +1109,7 @@ GameObject:
   - component: {fileID: 1093832806}
   - component: {fileID: 1093832805}
   - component: {fileID: 1093832804}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: level2Platform1Large (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1237,7 +1257,7 @@ GameObject:
   - component: {fileID: 1149503565}
   - component: {fileID: 1149503564}
   - component: {fileID: 1149503563}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: New Sprite (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1338,7 +1358,7 @@ GameObject:
   - component: {fileID: 1160659379}
   - component: {fileID: 1160659378}
   - component: {fileID: 1160659377}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: New Sprite (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1439,7 +1459,7 @@ GameObject:
   - component: {fileID: 1230061997}
   - component: {fileID: 1230061996}
   - component: {fileID: 1230061995}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: New Sprite (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1540,7 +1560,7 @@ GameObject:
   - component: {fileID: 1525909942}
   - component: {fileID: 1525909941}
   - component: {fileID: 1525909940}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: level2Platform1Large (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1641,7 +1661,7 @@ GameObject:
   - component: {fileID: 1779644180}
   - component: {fileID: 1779644179}
   - component: {fileID: 1779644178}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: level2Platform1Large (7)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1742,7 +1762,7 @@ GameObject:
   - component: {fileID: 1843331004}
   - component: {fileID: 1843331003}
   - component: {fileID: 1843331002}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: level2Platform1Large
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1843,7 +1863,7 @@ GameObject:
   - component: {fileID: 1997662981}
   - component: {fileID: 1997662980}
   - component: {fileID: 1997662979}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: New Sprite (8)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
