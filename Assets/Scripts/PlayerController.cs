@@ -7,7 +7,7 @@ public class PlayerController : NavmeshAgent2D {
     
     public float accelMultiplier;
     public float jumpForce;
-    public bool isProne = false;
+    
 
     private Rigidbody2D rb;
 
@@ -18,15 +18,21 @@ public class PlayerController : NavmeshAgent2D {
         rb = GetComponent<Rigidbody2D>();
 
         base.Start();
+
+        if (area == null) { Debug.LogWarning("There is no Navmesh set up in this scene. Not all movement features will be available."); }
     }
 
-    protected void Update() {
+    bool wasCrouched;
+    protected override void Update() {
+        base.Update();
+
         if (Time.timeScale > 0) {
+
             if (Input.GetButtonDown("Action")) {
                 LadderMountDismount(maxReach);
             }
 
-            if (!isProne && isGrounded && Input.GetButtonDown("Jump")) {
+            if (Input.GetButtonDown("Jump")) {
                 Jump();
             }
         }
@@ -35,32 +41,47 @@ public class PlayerController : NavmeshAgent2D {
     // Update is called once per frame
     protected override void FixedUpdate()
     {
-        isProne = Input.GetButton("Prone");
+        if (isProne) { capsuleCollider.size = new Vector2(width, crouchHeight); }
+        else { capsuleCollider.size = new Vector2(width, height); }
+
+        if (rb.velocity.y < 0 && Input.GetButton("Grab") && !ladder & ledge == null) {
+            GrabLedge();
+        }
+
+        if (ledge != null && Input.GetAxisRaw("Vertical") > 0) {
+            ClimbLedge();
+        }
+        if (ledge != null && Input.GetAxisRaw("Vertical") < 0 || Input.GetButton("Grab")) {
+            ReleaseLedge();
+        }
+
         Move();
 
         base.FixedUpdate();
     }
 
     protected virtual void Move() {
-        if (!ladder)
+        if (!ladder && ledge == null)
         {
-            if (isProne)
-            {
-                capsuleCollider.size = new Vector2(capsuleCollider.size.x, crouchHeight);
-                _sprite.localScale = new Vector3(_sprite.localScale.x, _initSpriteHeight / 2);
-            }
-            else {
-                capsuleCollider.size = new Vector2(capsuleCollider.size.x, height);
-                _sprite.localScale = new Vector3(_sprite.localScale.x, _initSpriteHeight);
-            }
-
             MoveHorizontal();
             MaxSpeedCheck();
             Decelerate();
         }
-        else {
-            _sprite.localScale = new Vector3(_sprite.localScale.x, _initSpriteHeight);
+        else if (ladder && ledge == null)
+        {
+            Vector3 movement = new Vector2(speed/4, 0f);
+            float direction = Mathf.Clamp(Input.GetAxis("Horizontal") * accelMultiplier, -1f, 1f);
+
             ladder.MoveOnLadder(GetComponent<NavmeshAgent2D>(), new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
+
+            if (isProne) {
+                Debug.Log("Applying force to ladder");
+                Rigidbody2D ladderBody = ladder.GetComponent<Rigidbody2D>();
+                if (ladderBody)
+                {
+                    ladderBody.AddRelativeForce(direction * movement);
+                }
+            }
         }
     }
 
@@ -73,10 +94,11 @@ public class PlayerController : NavmeshAgent2D {
         {
             movement = new Vector3(speed / 2, 0f);
         }
-        else {
+        else
+        {
             movement = new Vector3(speed, 0);
         }
-        
+
         rb.AddForce(direction * movement);
     }
 
@@ -102,13 +124,16 @@ public class PlayerController : NavmeshAgent2D {
     }
 
     protected virtual void Jump() {
+        if (ladder) { DismountLadder(); rb.AddForce(new Vector2(0f, jumpForce*2)); return; }
+        else if (ledge != null) { ReleaseLedge(); rb.AddForce(new Vector2(0f, jumpForce*2)); return; }
+
         if (isGrounded) {
-            DismountLadder();
             rb.AddForce(new Vector2(0f, jumpForce));
         }
     }
     
     protected virtual void Decelerate() {
+        if (!isGrounded) { return; }
         if (Input.GetAxisRaw("Horizontal") == 0) { StartCoroutine(Decelerator()); }
         else { StopCoroutine(Decelerator()); }
     }
@@ -116,6 +141,7 @@ public class PlayerController : NavmeshAgent2D {
     protected IEnumerator Decelerator() {
         float direction = Mathf.Abs(rb.velocity.x) / rb.velocity.x;
         while (rb.velocity.x != 0) {
+            if (Input.GetAxisRaw("Horizontal") != 0 || !isGrounded) { break; }
             Vector2 deceleration = new Vector2(direction * (1/accelMultiplier), 0);
             rb.velocity -= deceleration;
 
@@ -123,5 +149,9 @@ public class PlayerController : NavmeshAgent2D {
             yield return new WaitForEndOfFrame();
         }
     }
-    
+
+    protected override void OnDrawGizmosSelected()
+    {
+        base.OnDrawGizmosSelected();
+    }
 }

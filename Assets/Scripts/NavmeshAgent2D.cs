@@ -14,31 +14,116 @@ public class NavmeshAgent2D : MonoBehaviour {
     public float maxReach;
 
     public bool isGrounded;
+    public bool canGrab = true;
+    public bool isProne = false;
 
     public List<NavmeshNode2D> path = new List<NavmeshNode2D>();
     new public Rigidbody2D rigidbody;
     public Ladder ladder;
+    public NavmeshNode2D ledge;
 
     public bool isStopped;
     public bool pathing;
 
     protected CapsuleCollider2D capsuleCollider;
 
-    NavmeshArea2D area;
+    protected NavmeshArea2D area;
+
+    bool wasCrouched = false;
 
     #region Testing Variables
     protected Transform _sprite;
     protected float _initSpriteHeight;
     #endregion
 
+    protected virtual void Update() {
+        if (Time.timeScale > 0)
+        {
+            if (Input.GetButton("Prone") && canGrab && ledge == null) { isProne = true; wasCrouched = true; GrabLedge(); }
+            else if (!Input.GetButton("Prone") && ledge == null)
+            {
+                Vector2 newSize = new Vector2(width * transform.localScale.x, height * transform.localScale.y);
+                Vector2 newPos = new Vector2(transform.position.x, (transform.position.y - (crouchHeight * transform.localScale.y) / 2 + (height * transform.localScale.y) / 2));
+                Collider2D ceiling = Physics2D.OverlapCapsule(newPos, newSize, CapsuleDirection2D.Vertical, 0f, 1 << LayerMask.NameToLayer("Environment"));
+
+                if (!ceiling) { isProne = false; wasCrouched = false; }
+                else if (wasCrouched) { isProne = true; wasCrouched = true; }
+            }
+        }
+    }
+
     public void MoveTo(Vector2 position, UnityEngine.Events.UnityAction callback) {
         StartCoroutine(MoveToEnumerator(position, callback));
     }
 
+    public virtual void GrabLedge() {
+        if (area == null) { return; }
+        if (!canGrab || ladder) { return; }
+        List<NavmeshNode2D> ledges = area.NodesOfTypeInRange(this, transform.position, new List<NavmeshNode2D.NodeType> { NavmeshNode2D.NodeType.Ledge}, maxReach*transform.localScale.x);
+        if (ledges == null) { return; }
+        isProne = false;
+
+        canGrab = false;
+        NavmeshNode2D closest = ledges[0];
+        float closestDistance = Mathf.Infinity;
+        foreach (NavmeshNode2D ledge in ledges) {
+            float distance = Vector2.Distance(transform.position, ledge.worldPosition);
+            if ( distance <= closestDistance) { closest = ledge; closestDistance = distance; }
+        }
+
+        //Todo: change to hanging animation
+        MoveTo(closest.worldPosition, () =>
+        {
+            ledge = closest;
+            rigidbody.bodyType = RigidbodyType2D.Kinematic;
+            canGrab = true;
+        });
+    }
+
+    public virtual void ClimbLedge() {
+        if (ledge == null) { return; }
+
+        List<NavmeshNode2D.NavmeshNodeConnection2D> surfaces = new List<NavmeshNode2D.NavmeshNodeConnection2D>();
+        ledge.ConnectedToTypes(new List<NavmeshNode2D.NodeType> { NavmeshNode2D.NodeType.Walkable, NavmeshNode2D.NodeType.Crawlable}, out surfaces);
+        RaycastHit2D surface = Physics2D.Raycast(surfaces[0].b.worldPosition, Vector2.down, area.resolution, 1 << LayerMask.NameToLayer("Environment"));
+        Debug.DrawLine(surfaces[0].b.worldPosition, surface.point, Color.red, 3f);
+
+        if (surface)
+        {
+            Debug.Log("Climbing Ledge...");
+            
+            MoveTo(new Vector2(surface.point.x, surface.point.y + (height/2)), () => {
+                ledge = null;
+                rigidbody.AddForce(300 * (new Vector2(Input.GetAxisRaw("Horizontal"), .1f)));
+            });
+        }
+        else { Debug.LogWarning("Can not climb this ledge."); }
+    }
+
+    public virtual void ReleaseLedge() {
+        Debug.Log("Releasing ledge");
+        if (ledge == null) { return; }
+
+        ledge = null;
+        rigidbody.bodyType = RigidbodyType2D.Dynamic;
+    }
+
+    public Vector2 GetSize() {
+        return new Vector2(width * transform.localScale.x, height * transform.localScale.y);
+    }
+
     public void DismountLadder() {
-        Debug.Log("Dismounting Ladder");
+        if (!ladder) { Debug.LogWarning("Could not dismount ladder because it does not exist."); return; }
+        if (ladder.CheckActorCollisions(this) > 0) { Debug.LogWarning("Could not dismount ladder because player is inside terrain!"); return; }
+
+        if (ladder.GetComponent<Rigidbody2D>()) {
+            rigidbody.velocity = ladder.GetComponent<Rigidbody2D>().velocity;
+        }
+
         ladder = null;
         rigidbody.bodyType = RigidbodyType2D.Dynamic;
+        transform.parent = null;
+
     }
 
     public void LadderMountDismount(float radius) {
@@ -47,14 +132,25 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     public void MountNearestLadder(float radius) {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, radius, area.layerMask);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, radius, 1 << LayerMask.NameToLayer("Ladder"));
+        Collider2D closest = null;
+        float closestDistance = Mathf.Infinity;
 
         foreach (Collider2D collider in colliders) {
-            if (collider.GetComponent<Ladder>()) {
-                collider.GetComponent<Ladder>().MountLadder(this);
-                break;
+            if (closest == null) {
+                closest = collider;
+                closestDistance = Vector2.Distance(collider.transform.position, transform.position);
+                continue;
+            }
+
+            float distance = Vector2.Distance(collider.transform.position, transform.position);
+            if (distance <= closestDistance) {
+                closest = collider;
+                closestDistance = distance;
             }
         }
+
+        if (closest != null) { closest.GetComponent<Ladder>().MountLadder(this); }
     }
 
     protected virtual void Start() {
@@ -70,6 +166,12 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     protected virtual void FixedUpdate() {
+
+        if (capsuleCollider.size.y < capsuleCollider.size.x) { capsuleCollider.direction = CapsuleDirection2D.Horizontal; }
+        else { capsuleCollider.direction = CapsuleDirection2D.Vertical; }
+
+        _sprite.localScale = capsuleCollider.size;
+
         Orient();
         GroundCheck();
     }
@@ -134,7 +236,7 @@ public class NavmeshAgent2D : MonoBehaviour {
         {
             if (rigidbody.velocity.x != 0) {
                 float direction = Mathf.Abs(rigidbody.velocity.x) / rigidbody.velocity.x;
-                _sprite.localScale = new Vector3(direction, _sprite.localScale.y);
+                _sprite.localScale = new Vector3(direction * Mathf.Abs(_sprite.localScale.x), _sprite.localScale.y);
             }
             transform.up = ladder.GetUp();
         }
@@ -142,28 +244,22 @@ public class NavmeshAgent2D : MonoBehaviour {
             //Later: Get normal vector of the ground undernieth and set the tran's up to that.
             //transform.up = Vector3.up;
 
-            RaycastHit2D surfacePoint = Physics2D.Raycast(transform.position, Vector2.down, height, 1 << LayerMask.NameToLayer("Environment"));
-
-            if (surfacePoint)
-            {
-                Debug.Log("found the ground");
-                transform.up = Vector2.Lerp(transform.up, surfacePoint.normal, 10 * Time.deltaTime);
-            }
-            else {
-                transform.up = Vector2.Lerp(transform.up, Vector2.up, 10 * Time.deltaTime);
-            }
+            transform.up = Vector2.up;
         }
     }
 
     private void OnDrawGizmos() {
         if (!capsuleCollider) { capsuleCollider = GetComponent<CapsuleCollider2D>(); }
-        capsuleCollider.size = new Vector2(width, height);
+        if (!Application.isPlaying)
+        {
+            capsuleCollider.size = new Vector2(width, height);
+        }
     }
 
     protected void GroundCheck() {
-        RaycastHit2D ground = Physics2D.Raycast(transform.position, -transform.up, (capsuleCollider.size.y/2)+0.02f, 1 << LayerMask.NameToLayer("Environment"));
+        Collider2D ground = Physics2D.OverlapBox(new Vector2(transform.position.x, transform.position.y - (transform.localScale.y)), new Vector2(GetSize().x, 0.02f), 0f, 1 << LayerMask.NameToLayer("Environment"));
 
-        if (ground || ladder) { isGrounded = true; }
+        if (ground) { isGrounded = true; }
         else { isGrounded = false; }
     }
 
@@ -171,7 +267,7 @@ public class NavmeshAgent2D : MonoBehaviour {
         rigidbody.velocity = Vector2.zero;
         rigidbody.bodyType = RigidbodyType2D.Kinematic;
         if (pathing) { isStopped = true; }
-        for (float i = 0; i < 0.5; i += Time.deltaTime) {
+        for (float i = 0; i < 0.2; i += Time.deltaTime) {
             transform.position = Vector3.Lerp(transform.position, position, i);
             yield return new WaitForEndOfFrame();
         }
@@ -181,13 +277,27 @@ public class NavmeshAgent2D : MonoBehaviour {
         callback();
     }
 
-    private void OnDrawGizmosSelected() {
+    void DrawGroundedBox() {
+        Vector2 bottomLeft = new Vector2(transform.position.x - transform.localScale.x / 2 , transform.position.y - transform.localScale.y / 2 - 0.1f);
+        Vector2 bottomRight = new Vector2(transform.position.x + transform.localScale.x / 2, transform.position.y - transform.localScale.y / 2 - 0.1f);
+        Vector2 topRight = new Vector2(transform.position.x + transform.localScale.x / 2, transform.position.y - transform.localScale.y / 2 + 0.1f);
+        Vector2 topLeft = new Vector2(transform.position.x - transform.localScale.x / 2, transform.position.y - transform.localScale.y / 2 + 0.1f);
+
+        Debug.DrawLine(bottomLeft, bottomRight, Color.yellow);
+        Debug.DrawLine(bottomRight, topRight, Color.yellow);
+        Debug.DrawLine(bottomLeft, topLeft, Color.yellow);
+        Debug.DrawLine(topLeft, topRight, Color.yellow);
+    }
+
+    protected virtual void OnDrawGizmosSelected() {
         if (!area) { area = FindObjectOfType<NavmeshArea2D>(); }
 
         Gizmos.DrawCube(area.NodeAtPoint(transform.position, this).worldPosition, Vector3.one/4);
         for (int i = 1; i < path.Count; i++) {
             Debug.DrawLine(path[i-1].worldPosition, path[i].worldPosition, Color.green);
         }
+
+        DrawGroundedBox();
     }
 }
 
