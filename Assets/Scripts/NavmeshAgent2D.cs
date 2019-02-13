@@ -16,6 +16,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     public bool isGrounded;
     public bool canGrab = true;
     public bool isProne = false;
+    public bool sprinting = false;
 
     public List<NavmeshNode2D> path = new List<NavmeshNode2D>();
     new public Rigidbody2D rigidbody;
@@ -37,19 +38,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     #endregion
 
     protected virtual void Update() {
-        if (Time.timeScale > 0)
-        {
-            if (Input.GetButton("Prone") && canGrab && ledge == null) { isProne = true; wasCrouched = true; GrabLedge(); }
-            else if (!Input.GetButton("Prone") && ledge == null)
-            {
-                Vector2 newSize = new Vector2(width * transform.localScale.x, height * transform.localScale.y);
-                Vector2 newPos = new Vector2(transform.position.x, (transform.position.y - (crouchHeight * transform.localScale.y) / 2 + (height * transform.localScale.y) / 2));
-                Collider2D ceiling = Physics2D.OverlapCapsule(newPos, newSize, CapsuleDirection2D.Vertical, 0f, 1 << LayerMask.NameToLayer("Environment"));
-
-                if (!ceiling) { isProne = false; wasCrouched = false; }
-                else if (wasCrouched) { isProne = true; wasCrouched = true; }
-            }
-        }
+        
     }
 
     public void MoveTo(Vector2 position, UnityEngine.Events.UnityAction callback) {
