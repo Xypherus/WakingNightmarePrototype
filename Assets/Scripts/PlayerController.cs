@@ -48,8 +48,26 @@ public class PlayerController : NavmeshAgent2D {
     // Update is called once per frame
     protected override void FixedUpdate()
     {
+        if (Time.timeScale > 0)
+        {
+            if (Input.GetButton("Prone") && !Input.GetButton("Sprinting")&& canGrab && ledge == null) {
+                isProne = true;
+                wasCrouched = true;
+                GrabLedge();
+            }
+            else if (isProne && !Input.GetButton("Prone") && ledge == null)
+            {
+                Vector2 newSize = new Vector2(width * transform.localScale.x, height * transform.localScale.y);
+                Vector2 newPos = new Vector2(transform.position.x, (transform.position.y - (crouchHeight * transform.localScale.y) / 2 + (height * transform.localScale.y) / 2));
+                Collider2D ceiling = Physics2D.OverlapCapsule(newPos, newSize, CapsuleDirection2D.Vertical, 0f, 1 << LayerMask.NameToLayer("Environment"));
+
+                if (!ceiling) { isProne = false; wasCrouched = false; }
+                else if (wasCrouched) { isProne = true; wasCrouched = true; }
+            }
+        }
+
         if (isProne) { capsuleCollider.size = new Vector2(width, crouchHeight); }
-        else { capsuleCollider.size = new Vector2(width, height); }
+        else{ capsuleCollider.size = new Vector2(width, height); }
 
         if (rigidbody.velocity.y < 0 && Input.GetButton("Grab") && !ladder & ledge == null) {
             GrabLedge();
@@ -61,7 +79,14 @@ public class PlayerController : NavmeshAgent2D {
         if (ledge != null && Input.GetAxisRaw("Vertical") < 0 || Input.GetButton("Grab")) {
             ReleaseLedge();
         }
-
+        if(Input.GetButton("Sprinting")&& !Input.GetButton("Prone") && ! isProne)
+        {
+            sprinting = true;
+        }
+        else if (!Input.GetButton("Sprinting")&& sprinting )
+        {
+            sprinting = false;
+        }
         Move();
 
         base.FixedUpdate();
@@ -101,6 +126,10 @@ public class PlayerController : NavmeshAgent2D {
         {
             movement = new Vector3(speed / 2, 0f);
         }
+        else if(sprinting)
+        {
+            movement = new Vector3(speed * 2, 0f);
+        }
         else
         {
             movement = new Vector3(speed, 0);
@@ -114,9 +143,23 @@ public class PlayerController : NavmeshAgent2D {
         if(isProne)
         {
             if (rigidbody.velocity.magnitude > maxSpeed / 2f)
+<<<<<<< HEAD
             {
                 rigidbody.velocity = rigidbody.velocity.normalized;
                 rigidbody.velocity = rigidbody.velocity * (maxSpeed / 2f);
+=======
+            {
+                rigidbody.velocity = rigidbody.velocity.normalized;
+                rigidbody.velocity = rigidbody.velocity * (maxSpeed / 2f);
+            }
+        }
+        else if(sprinting)
+        {
+            if (rigidbody.velocity.magnitude > maxSpeed * 2f)
+            {
+                rigidbody.velocity = rigidbody.velocity.normalized;
+                rigidbody.velocity = rigidbody.velocity * (maxSpeed * 2f);
+>>>>>>> 58fc9d0567239701ce64ea12e95e95d0800c564c
             }
         }
         else
