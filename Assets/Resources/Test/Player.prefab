@@ -52,7 +52,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1532883761468236}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -17.41, y: 1.56, z: 0.3642578}
+  m_LocalPosition: {x: -22.1, y: -0.4, z: 0.3642578}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_Children:
   - {fileID: 4939784398955738}
@@ -127,13 +127,13 @@ MonoBehaviour:
   maxReach: 1
   isGrounded: 0
   canGrab: 1
+  isProne: 0
   rigidbody: {fileID: 0}
   ladder: {fileID: 0}
   isStopped: 0
   pathing: 0
   accelMultiplier: 10
-  jumpForce: 200
-  isProne: 0
+  jumpForce: 210
 --- !u!212 &212680948935643776
 SpriteRenderer:
   m_ObjectHideFlags: 1
