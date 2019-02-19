@@ -78,6 +78,7 @@ public class Rope : MonoBehaviour {
                 }
             }
 
+            /*
             for(int i = segmentCount - 1; i >= 0; i--)
             {
                 Ladder sections = segments[i];
@@ -88,6 +89,18 @@ public class Rope : MonoBehaviour {
                     //Sets each hinge joint to be connected to the segment before it
                     Hinge.connectedBody = segments[i + 1].GetComponent<Rigidbody2D>();
                 }
+
+            }
+            */
+
+            for (int i = segmentCount-2; i >= 0; i--)
+            {
+                Ladder sections = segments[i];
+                //Finds each segments hinge joint
+                HingeJoint2D Hinge = sections.GetComponent<HingeJoint2D>();
+
+                //Sets each hinge joint to be connected to the segment before it
+                Hinge.connectedBody = segments[i + 1].GetComponent<Rigidbody2D>();
 
             }
         }

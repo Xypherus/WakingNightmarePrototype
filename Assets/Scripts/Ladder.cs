@@ -9,11 +9,6 @@ public class Ladder : MonoBehaviour {
     public enum LadderType { Side, Background }
     public LadderType ladderType;
 
-    [Tooltip("The sprite of the ladder when the type is Side.")]
-    public Sprite sideSprite;
-    [Tooltip("The sprite of the ladder when it is the background type.")]
-    public Sprite BackgroundSprite;
-
     public Ladder next = null;
     public Ladder previous = null;
     public float height;
@@ -34,6 +29,12 @@ public class Ladder : MonoBehaviour {
         collider = GetComponent<BoxCollider2D>();
         renderer = GetComponent<SpriteRenderer>();
 
+        if (transform.localScale != Vector3.one)
+        {
+            renderer.size = transform.localScale;
+            transform.localScale = Vector3.one;
+        }
+
         lastPosition = transform.position;
         positionDelta = Vector2.zero;
     }
@@ -42,9 +43,14 @@ public class Ladder : MonoBehaviour {
     void Update () {
         height = Vector2.Distance(bottom, top);
         positionDelta = (Vector2) transform.position - lastPosition;
-
-        RenderSprite();
         OrientLadder();
+
+        if (transform.localScale != Vector3.one) {
+            renderer.size = transform.localScale;
+            transform.localScale = Vector3.one;
+        }
+
+        collider.size = renderer.size;
 
         lastPosition = transform.position;
 	}
@@ -180,11 +186,6 @@ public class Ladder : MonoBehaviour {
             top = ladderBottom;
             bottom = ladderTop;
         }
-    }
-
-    void RenderSprite() {
-        if (ladderType == LadderType.Side) { renderer.sprite = sideSprite; }
-        else if (ladderType == LadderType.Background) { renderer.sprite = BackgroundSprite; }
     }
 
     private void OnDrawGizmosSelected()
