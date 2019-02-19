@@ -19,6 +19,11 @@ public class AreaLog
     {
         fails += 1;
     }
+
+    public string GetName()
+    {
+        return areaName;
+    }
 }
 
 /// <summary>
@@ -28,12 +33,27 @@ public class LoggingScript : MonoBehaviour {
 
     public static LoggingScript LS;
 
+    List<AreaLog> areaLogs = new List<AreaLog>();
+
     private void Awake()
     {
-        if(LS != null) { GameObject.Destroy(LS); }
+        if(LS != null) { Destroy(gameObject); }
         else { LS = this; }
 
         DontDestroyOnLoad(LS);
+    }
+
+    public void LogFail(string name)
+    {
+        int logIndex = areaLogs.FindIndex(AreaLog => AreaLog.GetName() == name);
+        if(logIndex != -1)
+        {
+            areaLogs[logIndex].AddFail();
+        }
+        else
+        {
+            areaLogs.Add(new AreaLog(name));
+        }
     }
 
     // Use this for initialization
