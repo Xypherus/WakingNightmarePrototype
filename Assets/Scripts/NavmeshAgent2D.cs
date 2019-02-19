@@ -109,7 +109,7 @@ public class NavmeshAgent2D : MonoBehaviour {
             
             MoveTo(new Vector2(surface.point.x, surface.point.y + (height/2)), () => {
                 ledge = null;
-                rigidbody.AddForce(300 * (new Vector2(Input.GetAxisRaw("Horizontal"), .1f)));
+                rigidbody.AddForce((new Vector2(Input.GetAxisRaw("Horizontal"), .1f)));
             });
         }
         else { Debug.LogWarning("Can not climb this ledge."); }
@@ -178,6 +178,18 @@ public class NavmeshAgent2D : MonoBehaviour {
             capsuleCollider.size = new Vector2(width, height);
             capsuleCollider.offset = new Vector2(0f, height / 2);
         }
+    }
+
+    protected virtual Transform GetGround() {
+        if (!isGrounded) { return null; }
+
+        RaycastHit2D ground = Physics2D.Raycast(transform.position, Vector2.down, 0.02f, 1 << LayerMask.NameToLayer("Environment"));
+
+        if (ground)
+        {
+            return ground.transform;
+        }
+        else { return null; }
     }
 
     protected virtual List<NavmeshNode2D> GetPath(Vector2 start, Vector2 end) {

@@ -52,12 +52,23 @@ public class PlayerController : NavmeshAgent2D {
 
         //check for Prone release
         if (Input.GetAxisRaw("Prone") < 1 && isProne) {
-            Vector2 newSize = new Vector2(width * transform.localScale.x, height * transform.localScale.y);
-            Vector2 newPos = new Vector2(transform.position.x, transform.position.y);
-            Collider2D ceiling = Physics2D.OverlapCapsule(newPos, newSize, CapsuleDirection2D.Vertical, 0f, 1 << LayerMask.NameToLayer("Environment"));
+            Vector2 newSize = new Vector2(width * transform.localScale.x, 0.02f);
+            Vector2 newPos = new Vector2(transform.position.x, transform.position.y + (transform.localScale.y /2));
+            Collider2D[] ceilings = Physics2D.OverlapCapsuleAll(newPos, newSize, CapsuleDirection2D.Vertical, 0f, 1 << LayerMask.NameToLayer("Environment"));
+            Transform ground = GetGround();
+            Collider2D ceiling = null;
 
-            if (!ceiling) { isProne = false; wasCrouched = false; }
-            else if (wasCrouched) { isProne = true; wasCrouched = true; }
+            foreach (Collider2D collider in ceilings) {
+                Debug.Log("got ceiling", collider.transform);
+                if (ground)
+                {
+                    if (collider.transform != ground) { ceiling = collider; }
+                }
+                else { ceiling = collider; }
+            }
+
+            if (!ceiling) { isProne = false; }
+            else { isProne = true; Debug.Log("Cant Uncrouch", ceiling.transform); }
         }
 
         //check for sprint release
@@ -70,7 +81,9 @@ public class PlayerController : NavmeshAgent2D {
             if (ladder || ledge != null)
             {
                 if (ladder) { DismountLadder(); }
-                else if (ledge != null) { ReleaseLedge(); }
+                else if (ledge != null) {
+                    ReleaseLedge();
+                }
             }
             else {
                 MountNearestLadder(maxReach);
@@ -116,7 +129,6 @@ public class PlayerController : NavmeshAgent2D {
 
         MoveHorizontal();
         Decelerate();
-        Debug.Log("Horizontal Movement: " + Input.GetAxisRaw("Horizontal"));
     }
 
     private void MoveHorizontal()
