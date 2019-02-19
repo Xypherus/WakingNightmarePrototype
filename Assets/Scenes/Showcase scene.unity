@@ -3906,7 +3906,7 @@ Prefab:
     - target: {fileID: 114495443886058440, guid: 23f972d680e86dd4da87e8a18548994e,
         type: 2}
       propertyPath: maxSpeed
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 114495443886058440, guid: 23f972d680e86dd4da87e8a18548994e,
         type: 2}
