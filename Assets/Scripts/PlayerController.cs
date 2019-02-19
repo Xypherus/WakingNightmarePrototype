@@ -40,20 +40,20 @@ public class PlayerController : NavmeshAgent2D {
     }
 
     protected virtual void ParseInput() {
+
         //Test For Crouching OR sprinting (can not be both)
-        if (Input.GetButton("Prone") && ledge == null)
+        if (Input.GetAxisRaw("Prone") > 0 && ledge == null)
         {
             isProne = true;
-            wasCrouched = true;
         }
-        else if (Input.GetButton("Sprinting") && ledge == null) {
+        else if (Input.GetAxisRaw("Sprinting") > 0 && ledge == null) {
             sprinting = true;
         }
 
         //check for Prone release
-        if (Input.GetButtonUp("Prone") && isProne) {
+        if (Input.GetAxisRaw("Prone") < 1 && isProne) {
             Vector2 newSize = new Vector2(width * transform.localScale.x, height * transform.localScale.y);
-            Vector2 newPos = new Vector2(transform.position.x, (transform.position.y - (crouchHeight * transform.localScale.y) / 2 + (height * transform.localScale.y) / 2));
+            Vector2 newPos = new Vector2(transform.position.x, transform.position.y);
             Collider2D ceiling = Physics2D.OverlapCapsule(newPos, newSize, CapsuleDirection2D.Vertical, 0f, 1 << LayerMask.NameToLayer("Environment"));
 
             if (!ceiling) { isProne = false; wasCrouched = false; }
@@ -61,17 +61,7 @@ public class PlayerController : NavmeshAgent2D {
         }
 
         //check for sprint release
-        if (Input.GetButtonUp("Sprinting") && sprinting) {
-            sprinting = false;
-        }
-
-        //Test for sprinting
-        if (Input.GetButton("Sprinting") && !Input.GetButton("Prone") && !isProne)
-        {
-            sprinting = true;
-        }
-        else if (!Input.GetButton("Sprinting") && sprinting)
-        {
+        if (Input.GetAxisRaw("Sprinting") < 1 && sprinting) {
             sprinting = false;
         }
 
@@ -126,6 +116,7 @@ public class PlayerController : NavmeshAgent2D {
 
         MoveHorizontal();
         Decelerate();
+        Debug.Log("Horizontal Movement: " + Input.GetAxisRaw("Horizontal"));
     }
 
     private void MoveHorizontal()
