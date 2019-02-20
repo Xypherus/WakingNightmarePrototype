@@ -32,15 +32,7 @@ public class PlayerController : NavmeshAgent2D {
             //Test for grabbing ladders/ledges
             if (Input.GetButtonDown("Grab"))
             {
-                if (ladder || ledge != null)
-                {
-                    if (ladder) { DismountLadder(); }
-                    else if (ledge != null)
-                    {
-                        ReleaseLedge();
-                    }
-                }
-                else
+                if (!ladder && ledge == null)
                 {
                     MountNearestLadder(maxReach);
                     if (!ladder)
@@ -54,6 +46,11 @@ public class PlayerController : NavmeshAgent2D {
             if (Input.GetButtonDown("Jump"))
             {
                 Jump();
+            }
+
+            if (Input.GetButtonDown("Prone") && (ladder || ledge != null)) {
+                if (ladder) { DismountLadder(); }
+                else { ReleaseLedge(); }
             }
         }
     }
@@ -103,8 +100,9 @@ public class PlayerController : NavmeshAgent2D {
             sprinting = false;
         }
 
-        
-
+        if (!ladder && ledge == null && Input.GetAxisRaw("Vertical") != 0) {
+            MountNearestLadder(maxReach);
+        }
         
         Move();
     }
@@ -203,15 +201,12 @@ public class PlayerController : NavmeshAgent2D {
         if (ladder) {
             DismountLadder();
             rigidbody.AddForce(new Vector2(jumpForce/2 * Input.GetAxisRaw("Horizontal"), jumpForce));
-            return;
         }
         else if (ledge != null) {
             ReleaseLedge();
             rigidbody.AddForce(new Vector2(jumpForce / 2 * Input.GetAxisRaw("Horizontal"), jumpForce / 2) * Mathf.Sqrt(2));
-            return;
         }
-
-        if (isGrounded) {
+        else if (isGrounded) {
             rigidbody.AddForce(new Vector2(0f, jumpForce));
         }
     }

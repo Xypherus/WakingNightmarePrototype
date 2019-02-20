@@ -131,14 +131,14 @@ public class NavmeshAgent2D : MonoBehaviour {
         if (!ladder) { Debug.LogWarning("Could not dismount ladder because it does not exist."); return; }
         if (ladder.CheckActorCollisions(this) > 0) { Debug.LogWarning("Could not dismount ladder because player is inside terrain!"); return; }
 
+        ladder.percent = 0;
+
         if (ladder.GetComponent<Rigidbody2D>()) {
             rigidbody.velocity = ladder.GetComponent<Rigidbody2D>().velocity;
         }
 
         ladder = null;
         rigidbody.bodyType = RigidbodyType2D.Dynamic;
-        transform.parent = null;
-
     }
 
     public void LadderMountDismount(float radius) {

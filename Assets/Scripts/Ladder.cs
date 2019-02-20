@@ -24,7 +24,8 @@ public class Ladder : MonoBehaviour {
     Vector2 lastPosition;
     Vector2 positionDelta;
 
-    float percent;
+    [HideInInspector]
+    public float percent;
 
     private void Start()
     {
@@ -55,7 +56,9 @@ public class Ladder : MonoBehaviour {
         collider.size = renderer.size;
         
         lastPosition = transform.position;
-	}
+
+        Debug.Log(percent + " percent up the ladder", this);
+    }
 
     public Vector3 GetUp() {
         return ((Vector3)top - transform.position).normalized;
@@ -77,14 +80,29 @@ public class Ladder : MonoBehaviour {
 
             percent += (actor.speed / 4 / height) * Time.deltaTime * direction;
 
-            if (percent <= 0 && previous) {
-                actor.transform.position = previous.top;
-                actor.ladder = previous;
+            if (percent <= 0 ) {
+                if (previous)
+                {
+                    actor.transform.position = previous.top;
+                    actor.ladder = previous;
+                }
+                else {
+                    actor.transform.position = bottom;
+                    percent = 0;
+                }
             }
-            else if (percent >= 1 && next) {
-                actor.transform.position = next.bottom;
-                actor.ladder = next;
+            else if (percent >= 1) {
+                if (next)
+                {
+                    actor.transform.position = next.bottom;
+                    actor.ladder = next;
+                }
+                else {
+                    actor.transform.position = top;
+                    percent = 1;
+                }
             }
+
 
             actor.transform.position = GetPositionOnLadder();
 
@@ -106,10 +124,10 @@ public class Ladder : MonoBehaviour {
 
             if (!avoidCollCheck) { HandleActorCollisions(actor, previousPos); }
         } 
+            
     }
 
     public void MountLadder(NavmeshAgent2D actor) {
-
         actor.ladder = this;
         if (ladderType == LadderType.Side)
         {
@@ -117,7 +135,13 @@ public class Ladder : MonoBehaviour {
 
             actor.MoveTo(GetPositionOnLadder(), () =>
             {
-                actor.rigidbody.bodyType = RigidbodyType2D.Kinematic;
+                if (actor.ladder)
+                {
+                    actor.rigidbody.bodyType = RigidbodyType2D.Kinematic;
+                }
+                else {
+                    actor.rigidbody.bodyType = RigidbodyType2D.Dynamic;
+                }
             });
         }
         else {
