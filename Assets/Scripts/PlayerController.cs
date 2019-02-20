@@ -29,7 +29,29 @@ public class PlayerController : NavmeshAgent2D {
         base.Update();
 
         if (Time.timeScale > 0) {
-            ParseInput();
+            //Test for grabbing ladders/ledges
+            if (Input.GetButtonDown("Grab"))
+            {
+                if (!ladder && ledge == null)
+                {
+                    MountNearestLadder(maxReach);
+                    if (!ladder)
+                    {
+                        GrabLedge();
+                    }
+                }
+            }
+
+            //Test for Jumping
+            if (Input.GetButtonDown("Jump"))
+            {
+                Jump();
+            }
+
+            if (Input.GetButtonDown("Prone") && (ladder || ledge != null)) {
+                if (ladder) { DismountLadder(); }
+                else { ReleaseLedge(); }
+            }
         }
     }
 
@@ -37,6 +59,8 @@ public class PlayerController : NavmeshAgent2D {
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
+
+        ParseInput();
     }
 
     protected virtual void ParseInput() {
@@ -76,28 +100,9 @@ public class PlayerController : NavmeshAgent2D {
             sprinting = false;
         }
 
-        //Test for grabbing ladders/ledges
-        if (Input.GetButtonDown("Grab")) {
-            if (ladder || ledge != null)
-            {
-                if (ladder) { DismountLadder(); }
-                else if (ledge != null) {
-                    ReleaseLedge();
-                }
-            }
-            else {
-                MountNearestLadder(maxReach);
-                if (!ladder) {
-                    GrabLedge();
-                }
-            }
+        if (!ladder && ledge == null && Input.GetAxisRaw("Vertical") != 0) {
+            MountNearestLadder(maxReach);
         }
-
-        //Test for Jumping
-        if (Input.GetButtonDown("Jump")) {
-            Jump();
-        }
-
         
         Move();
     }
@@ -195,16 +200,13 @@ public class PlayerController : NavmeshAgent2D {
     protected virtual void Jump() {
         if (ladder) {
             DismountLadder();
-            rigidbody.AddForce(new Vector2(jumpForce/2 * Input.GetAxisRaw("Horizontal"), jumpForce/2) * Mathf.Sqrt(2));
-            return;
+            rigidbody.AddForce(new Vector2(jumpForce/2 * Input.GetAxisRaw("Horizontal"), jumpForce));
         }
         else if (ledge != null) {
             ReleaseLedge();
             rigidbody.AddForce(new Vector2(jumpForce / 2 * Input.GetAxisRaw("Horizontal"), jumpForce / 2) * Mathf.Sqrt(2));
-            return;
         }
-
-        if (isGrounded) {
+        else if (isGrounded) {
             rigidbody.AddForce(new Vector2(0f, jumpForce));
         }
     }

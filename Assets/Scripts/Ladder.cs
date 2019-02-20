@@ -24,6 +24,9 @@ public class Ladder : MonoBehaviour {
     Vector2 lastPosition;
     Vector2 positionDelta;
 
+    [HideInInspector]
+    public float percent;
+
     private void Start()
     {
         collider = GetComponent<BoxCollider2D>();
@@ -51,9 +54,11 @@ public class Ladder : MonoBehaviour {
         }
 
         collider.size = renderer.size;
-
+        
         lastPosition = transform.position;
-	}
+
+        Debug.Log(percent + " percent up the ladder", this);
+    }
 
     public Vector3 GetUp() {
         return ((Vector3)top - transform.position).normalized;
@@ -61,14 +66,13 @@ public class Ladder : MonoBehaviour {
 
     public void MoveOnLadder(NavmeshAgent2D actor, Vector2 movement) {
         //TODO: Reprogram to move to a point that is a percentage the distance to top;
+        actor.transform.position = GetPositionOnLadder();
         Vector3 previousPos = actor.transform.position;
 
         bool avoidCollCheck = false;
         if (CheckActorCollisions(actor) > 0) { avoidCollCheck = true; }
         if (ladderType == LadderType.Side)
         {
-            actor.transform.position = GetPointOnLadder(actor.transform.position);
-            float percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
             previousPos = actor.transform.position;
             if (actor.isProne) { return; }
 
@@ -76,16 +80,31 @@ public class Ladder : MonoBehaviour {
 
             percent += (actor.speed / 4 / height) * Time.deltaTime * direction;
 
-            if (percent <= 0 && previous) {
-                actor.transform.position = previous.top;
-                actor.ladder = previous;
+            if (percent <= 0 ) {
+                if (previous)
+                {
+                    actor.transform.position = previous.top;
+                    actor.ladder = previous;
+                }
+                else {
+                    actor.transform.position = bottom;
+                    percent = 0;
+                }
             }
-            else if (percent >= 1 && next) {
-                actor.transform.position = next.bottom;
-                actor.ladder = next;
+            else if (percent >= 1) {
+                if (next)
+                {
+                    actor.transform.position = next.bottom;
+                    actor.ladder = next;
+                }
+                else {
+                    actor.transform.position = top;
+                    percent = 1;
+                }
             }
 
-            actor.transform.position = Vector2.Lerp(bottom, top, percent);
+
+            actor.transform.position = GetPositionOnLadder();
 
 
             if (!avoidCollCheck) { HandleActorCollisions(actor, previousPos); }
@@ -105,19 +124,24 @@ public class Ladder : MonoBehaviour {
 
             if (!avoidCollCheck) { HandleActorCollisions(actor, previousPos); }
         } 
+            
     }
 
     public void MountLadder(NavmeshAgent2D actor) {
-
         actor.ladder = this;
         if (ladderType == LadderType.Side)
         {
-            float percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
-            Vector2 newPos = Vector2.Lerp(bottom, top, percent);
+            percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
 
-            actor.MoveTo(newPos, () =>
+            actor.MoveTo(GetPositionOnLadder(), () =>
             {
-                actor.rigidbody.bodyType = RigidbodyType2D.Kinematic;
+                if (actor.ladder)
+                {
+                    actor.rigidbody.bodyType = RigidbodyType2D.Kinematic;
+                }
+                else {
+                    actor.rigidbody.bodyType = RigidbodyType2D.Dynamic;
+                }
             });
         }
         else {
@@ -145,6 +169,11 @@ public class Ladder : MonoBehaviour {
             int discrepencies = agent.GetComponent<Collider2D>().OverlapCollider(filter, contacts);
             return discrepencies;
         }
+    }
+
+    Vector2 GetPositionOnLadder() {
+        Vector2 newPos = Vector2.Lerp(bottom, top, percent);
+        return newPos;
     }
 
     void OrientLadder() {
