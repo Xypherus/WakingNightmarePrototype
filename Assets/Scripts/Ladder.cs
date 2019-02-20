@@ -67,8 +67,8 @@ public class Ladder : MonoBehaviour {
         if (CheckActorCollisions(actor) > 0) { avoidCollCheck = true; }
         if (ladderType == LadderType.Side)
         {
+            actor.transform.position = GetPointOnLadder(actor.transform.position);
             float percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
-            actor.transform.position = Vector2.Lerp(bottom, top, percent);
             previousPos = actor.transform.position;
             if (actor.isProne) { return; }
 
@@ -86,6 +86,7 @@ public class Ladder : MonoBehaviour {
             }
 
             actor.transform.position = Vector2.Lerp(bottom, top, percent);
+
 
             if (!avoidCollCheck) { HandleActorCollisions(actor, previousPos); }
 
@@ -156,6 +157,12 @@ public class Ladder : MonoBehaviour {
         ladderRight = transform.TransformPoint(new Vector3(collider.offset.x + (collider.size.x / 2), 0));
         ladderLeft = transform.TransformPoint(new Vector3(collider.offset.x - (collider.size.x / 2), 0));
 
+        top = ladderTop;
+        bottom = ladderBottom;
+        right = ladderRight;
+        left = ladderLeft;
+
+        /*
         if (ladderTop.y == ladderBottom.y)
         {
             if (ladderBottom.x > ladderTop.x)
@@ -186,6 +193,11 @@ public class Ladder : MonoBehaviour {
             top = ladderBottom;
             bottom = ladderTop;
         }
+        */
+    }
+
+    public Vector2 GetPointOnLadder(Vector2 position) {
+        return (Vector2) Vector3.Project((position-bottom), top-bottom)+bottom;
     }
 
     private void OnDrawGizmosSelected()
