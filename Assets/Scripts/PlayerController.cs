@@ -14,9 +14,7 @@ public class PlayerController : NavmeshAgent2D {
     [Tooltip("The force used to propell the player upward. Higher values for objects with higher mass.")]
     public float jumpForce;
     #endregion
-
-    bool wasCrouched;
-
+    
     protected override void Start()
     {
         //Call start on the base NavmeshAgent2D
@@ -30,91 +28,107 @@ public class PlayerController : NavmeshAgent2D {
         //Call the Update function in the base NavmeshAgent2D
         base.Update();
 
-        //Some Inputs can not be parsed in FixedUpdate due to input loss.
-        //Fixed update happens every physics step, and thus drops input that does not
-        //happen within that physics step. Update calls every frame.
         if (Time.timeScale > 0) {
-            //
-            if (Input.GetButtonDown("Action")) {
-                LadderMountDismount(maxReach);
-            }
-
-            if (Input.GetButtonDown("Jump")) {
-                Jump();
-            }
+            ParseInput();
         }
     }
 
     // Update is called once per frame
     protected override void FixedUpdate()
     {
-        if (Time.timeScale > 0)
-        {
-            if (Input.GetButton("Prone") && !Input.GetButton("Sprinting")&& canGrab && ledge == null) {
-                isProne = true;
-                wasCrouched = true;
-                GrabLedge();
-            }
-            else if (isProne && !Input.GetButton("Prone") && ledge == null)
-            {
-                Vector2 newSize = new Vector2(width * transform.localScale.x, height * transform.localScale.y);
-                Vector2 newPos = new Vector2(transform.position.x, (transform.position.y - (crouchHeight * transform.localScale.y) / 2 + (height * transform.localScale.y) / 2));
-                Collider2D ceiling = Physics2D.OverlapCapsule(newPos, newSize, CapsuleDirection2D.Vertical, 0f, 1 << LayerMask.NameToLayer("Environment"));
-
-                if (!ceiling) { isProne = false; wasCrouched = false; }
-                else if (wasCrouched) { isProne = true; wasCrouched = true; }
-            }
-        }
-
-        if (isProne) { capsuleCollider.size = new Vector2(width, crouchHeight); }
-        else{ capsuleCollider.size = new Vector2(width, height); }
-
-        if (rigidbody.velocity.y < 0 && Input.GetButton("Grab") && !ladder & ledge == null) {
-            GrabLedge();
-        }
-
-        if (ledge != null && Input.GetAxisRaw("Vertical") > 0) {
-            ClimbLedge();
-        }
-        if (ledge != null && Input.GetAxisRaw("Vertical") < 0 || Input.GetButton("Grab")) {
-            ReleaseLedge();
-        }
-        if(Input.GetButton("Sprinting")&& !Input.GetButton("Prone") && ! isProne)
-        {
-            sprinting = true;
-        }
-        else if (!Input.GetButton("Sprinting")&& sprinting )
-        {
-            sprinting = false;
-        }
-        Move();
-
         base.FixedUpdate();
     }
 
-    protected virtual void Move() {
-        if (!ladder && ledge == null)
+    protected virtual void ParseInput() {
+
+        //Test For Crouching OR sprinting (can not be both)
+        if (Input.GetAxisRaw("Prone") > 0 && ledge == null)
         {
-            MoveHorizontal();
-            MaxSpeedCheck();
-            Decelerate();
+            isProne = true;
         }
-        else if (ladder && ledge == null)
-        {
-            Vector3 movement = new Vector2(speed/4, 0f);
+        else if (Input.GetAxisRaw("Sprinting") > 0 && ledge == null) {
+            sprinting = true;
+        }
+
+        //check for Prone release
+        if (Input.GetAxisRaw("Prone") < 1 && isProne) {
+            Vector2 newSize = new Vector2(width * transform.localScale.x, 0.02f);
+            Vector2 newPos = new Vector2(transform.position.x, transform.position.y + (transform.localScale.y /2));
+            Collider2D[] ceilings = Physics2D.OverlapCapsuleAll(newPos, newSize, CapsuleDirection2D.Vertical, 0f, 1 << LayerMask.NameToLayer("Environment"));
+            Transform ground = GetGround();
+            Collider2D ceiling = null;
+
+            foreach (Collider2D collider in ceilings) {
+                Debug.Log("got ceiling", collider.transform);
+                if (ground)
+                {
+                    if (collider.transform != ground) { ceiling = collider; }
+                }
+                else { ceiling = collider; }
+            }
+
+            if (!ceiling) { isProne = false; }
+            else { isProne = true; Debug.Log("Cant Uncrouch", ceiling.transform); }
+        }
+
+        //check for sprint release
+        if (Input.GetAxisRaw("Sprinting") < 1 && sprinting) {
+            sprinting = false;
+        }
+
+        //Test for grabbing ladders/ledges
+        if (Input.GetButtonDown("Grab")) {
+            if (ladder || ledge != null)
+            {
+                if (ladder) { DismountLadder(); }
+                else if (ledge != null) {
+                    ReleaseLedge();
+                }
+            }
+            else {
+                MountNearestLadder(maxReach);
+                if (!ladder) {
+                    GrabLedge();
+                }
+            }
+        }
+
+        //Test for Jumping
+        if (Input.GetButtonDown("Jump")) {
+            Jump();
+        }
+
+        
+        Move();
+    }
+
+    protected virtual void Move() {
+        Crouch();
+
+        if (Input.GetAxisRaw("Vertical") != 0 && ledge != null) {
+            ClimbLedge();
+        }
+
+        if (ladder) {
+            Vector3 movement = new Vector2(speed / 4, 0f);
             float direction = Mathf.Clamp(Input.GetAxis("Horizontal") * accelMultiplier, -1f, 1f);
 
             ladder.MoveOnLadder(GetComponent<NavmeshAgent2D>(), new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
 
-            if (isProne) {
+            if (Input.GetAxisRaw("Horizontal") != 0)
+            {
                 Debug.Log("Applying force to ladder");
                 Rigidbody2D ladderigidbodyody = ladder.GetComponent<Rigidbody2D>();
                 if (ladderigidbodyody)
                 {
                     ladderigidbodyody.AddRelativeForce(direction * movement);
+
                 }
             }
         }
+
+        MoveHorizontal();
+        Decelerate();
     }
 
     private void MoveHorizontal()
@@ -122,17 +136,24 @@ public class PlayerController : NavmeshAgent2D {
         Vector3 movement = Vector3.zero;
         float direction = Mathf.Clamp(Input.GetAxis("Horizontal") * accelMultiplier, -1f, 1f);
 
-        if (isProne)
+        if (!isGrounded)
         {
             movement = new Vector3(speed / 2, 0f);
         }
-        else if(sprinting)
-        {
-            movement = new Vector3(speed * 2, 0f);
-        }
         else
         {
-            movement = new Vector3(speed, 0);
+            if (isProne)
+            {
+                movement = new Vector3(speed / 2, 0f);
+            }
+            else if (sprinting)
+            {
+                movement = new Vector3(speed * 2, 0f);
+            }
+            else
+            {
+                movement = new Vector3(speed, 0);
+            }
         }
 
         rigidbody.AddForce(direction * movement);
@@ -140,36 +161,48 @@ public class PlayerController : NavmeshAgent2D {
 
     private void MaxSpeedCheck()
     {
-        if(isProne)
+        if (isProne)
         {
             if (rigidbody.velocity.magnitude > maxSpeed / 2f)
             {
                 rigidbody.velocity = rigidbody.velocity.normalized;
                 rigidbody.velocity = rigidbody.velocity * (maxSpeed / 2f);
+                {
+                    rigidbody.velocity = rigidbody.velocity.normalized;
+                    rigidbody.velocity = rigidbody.velocity * (maxSpeed / 2f);
+                }
             }
-        }
-        else if(sprinting)
-        {
-            if (rigidbody.velocity.magnitude > maxSpeed * 2f)
+            else if (sprinting)
             {
-                rigidbody.velocity = rigidbody.velocity.normalized;
-                rigidbody.velocity = rigidbody.velocity * (maxSpeed * 2f);
+                if (rigidbody.velocity.magnitude > maxSpeed * 2f)
+                {
+                    rigidbody.velocity = rigidbody.velocity.normalized;
+                    rigidbody.velocity = rigidbody.velocity * (maxSpeed * 2f);
+                }
             }
-        }
-        else
-        {
-            if (rigidbody.velocity.magnitude > maxSpeed)
+            else
             {
-                rigidbody.velocity = rigidbody.velocity.normalized;
-                rigidbody.velocity = rigidbody.velocity * maxSpeed;
+                if (rigidbody.velocity.magnitude > maxSpeed)
+                {
+                    rigidbody.velocity = rigidbody.velocity.normalized;
+                    rigidbody.velocity = rigidbody.velocity * maxSpeed;
+                }
             }
+
         }
-        
     }
 
     protected virtual void Jump() {
-        if (ladder) { DismountLadder(); rigidbody.AddForce(new Vector2(0f, jumpForce*2)); return; }
-        else if (ledge != null) { ReleaseLedge(); rigidbody.AddForce(new Vector2(0f, jumpForce*2)); return; }
+        if (ladder) {
+            DismountLadder();
+            rigidbody.AddForce(new Vector2(jumpForce/2 * Input.GetAxisRaw("Horizontal"), jumpForce/2) * Mathf.Sqrt(2));
+            return;
+        }
+        else if (ledge != null) {
+            ReleaseLedge();
+            rigidbody.AddForce(new Vector2(jumpForce / 2 * Input.GetAxisRaw("Horizontal"), jumpForce / 2) * Mathf.Sqrt(2));
+            return;
+        }
 
         if (isGrounded) {
             rigidbody.AddForce(new Vector2(0f, jumpForce));
@@ -184,8 +217,8 @@ public class PlayerController : NavmeshAgent2D {
 
     protected IEnumerator Decelerator() {
         float direction = Mathf.Abs(rigidbody.velocity.x) / rigidbody.velocity.x;
-        while (rigidbody.velocity.x != 0) {
-            if (Input.GetAxisRaw("Horizontal") != 0 || !isGrounded) { break; }
+
+        while (rigidbody.velocity.x != 0 && isGrounded) {
             Vector2 deceleration = new Vector2(direction * (1/accelMultiplier), 0);
             rigidbody.velocity -= deceleration;
 

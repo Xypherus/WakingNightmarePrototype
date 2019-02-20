@@ -36,9 +36,9 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1239582218602212}
-  m_LocalRotation: {x: -0, y: -0, z: -0.22738254, w: 0.97380555}
-  m_LocalPosition: {x: -2.975, y: -1.749, z: 0}
-  m_LocalScale: {x: 0.28925568, y: 3.0989451, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0.008053634, w: 0.9999676}
+  m_LocalPosition: {x: -7.955, y: 5.059, z: 1.3621612}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -57,16 +57,16 @@ BoxCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
+    border: {x: 0.11328125, y: 0.05078125, z: 0.11328125, w: 0.05078125}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 0.16, y: 0.16}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
+    oldSize: {x: 1, y: 0.359375}
+    newSize: {x: 1, y: 7.693927}
+    adaptiveTilingThreshold: 0.469
+    drawMode: 2
+    adaptiveTiling: 1
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1, y: 7.693927}
   m_EdgeRadius: 0
 --- !u!114 &114011952686388016
 MonoBehaviour:
@@ -93,10 +93,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ladderType: 0
-  sideSprite: {fileID: 21300000, guid: d9f7f0620668a70478e48b88d58a7128, type: 3}
-  BackgroundSprite: {fileID: 21300000, guid: d9f7f0620668a70478e48b88d58a7128, type: 3}
   next: {fileID: 0}
   previous: {fileID: 0}
+  height: 7.6939263
 --- !u!212 &212134823590043886
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -132,14 +131,14 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: d9f7f0620668a70478e48b88d58a7128, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 017a58338b49e0844acffc8341324f8f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 0.16, y: 0.16}
-  m_AdaptiveModeThreshold: 0.5
-  m_SpriteTileMode: 0
+  m_DrawMode: 2
+  m_Size: {x: 1, y: 7.693927}
+  m_AdaptiveModeThreshold: 0.469
+  m_SpriteTileMode: 1
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
