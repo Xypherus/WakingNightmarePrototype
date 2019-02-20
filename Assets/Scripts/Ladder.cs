@@ -9,11 +9,6 @@ public class Ladder : MonoBehaviour {
     public enum LadderType { Side, Background }
     public LadderType ladderType;
 
-    [Tooltip("The sprite of the ladder when the type is Side.")]
-    public Sprite sideSprite;
-    [Tooltip("The sprite of the ladder when it is the background type.")]
-    public Sprite BackgroundSprite;
-
     public Ladder next = null;
     public Ladder previous = null;
     public float height;
@@ -36,6 +31,12 @@ public class Ladder : MonoBehaviour {
         collider = GetComponent<BoxCollider2D>();
         renderer = GetComponent<SpriteRenderer>();
 
+        if (transform.localScale != Vector3.one)
+        {
+            renderer.size = transform.localScale;
+            transform.localScale = Vector3.one;
+        }
+
         lastPosition = transform.position;
         positionDelta = Vector2.zero;
     }
@@ -44,10 +45,19 @@ public class Ladder : MonoBehaviour {
     void Update () {
         height = Vector2.Distance(bottom, top);
         positionDelta = (Vector2) transform.position - lastPosition;
-
-        RenderSprite();
         OrientLadder();
+<<<<<<< HEAD
         
+=======
+
+        if (transform.localScale != Vector3.one) {
+            renderer.size = transform.localScale;
+            transform.localScale = Vector3.one;
+        }
+
+        collider.size = renderer.size;
+
+>>>>>>> 322870e722570796b3561d92d8601bc94079f63f
         lastPosition = transform.position;
 	}
 
@@ -64,21 +74,17 @@ public class Ladder : MonoBehaviour {
         if (CheckActorCollisions(actor) > 0) { avoidCollCheck = true; }
         if (ladderType == LadderType.Side)
         {
+<<<<<<< HEAD
+=======
+            actor.transform.position = GetPointOnLadder(actor.transform.position);
+            float percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
+            previousPos = actor.transform.position;
+>>>>>>> 322870e722570796b3561d92d8601bc94079f63f
             if (actor.isProne) { return; }
 
-            float direction = movement.x;
-            if (direction == 0) { direction = movement.y; }
+            float direction = movement.y;
 
-            if (direction > 0 )
-            {
-                percent += (actor.speed/4 / height) * Time.deltaTime;
-                //actor.transform.position = Vector3.MoveTowards(actor.transform.position, top, actor.speed / 4 * Time.deltaTime);
-            }
-            else if (direction < 0 )
-            {
-                percent -= (actor.speed/4 / height) * Time.deltaTime;
-                //actor.transform.position = Vector3.MoveTowards(actor.transform.position, bottom, actor.speed / 4 * Time.deltaTime);
-            }
+            percent += (actor.speed / 4 / height) * Time.deltaTime * direction;
 
             if (percent <= 0 && previous) {
                 actor.transform.position = previous.top;
@@ -90,6 +96,7 @@ public class Ladder : MonoBehaviour {
             }
 
             actor.transform.position = GetPositionOnLadder();
+
 
             if (!avoidCollCheck) { HandleActorCollisions(actor, previousPos); }
 
@@ -134,11 +141,19 @@ public class Ladder : MonoBehaviour {
     }
 
     public int CheckActorCollisions(NavmeshAgent2D agent) {
-        Collider2D[] contacts = new Collider2D[100];
-        ContactFilter2D filter = new ContactFilter2D();
-        filter.SetLayerMask(1 << LayerMask.NameToLayer("Environment"));
-        int discrepencies = agent.GetComponent<Collider2D>().OverlapCollider(filter, contacts);
-        return discrepencies;
+        if (ladderType == LadderType.Side)
+        {
+            Collider2D[] contacts = Physics2D.OverlapBoxAll(agent.transform.position, new Vector2(0.01f, agent.GetSize().y), transform.eulerAngles.z, 1 << LayerMask.NameToLayer("Environment"));
+            return contacts.Length;
+        }
+        else
+        {
+            Collider2D[] contacts = new Collider2D[100];
+            ContactFilter2D filter = new ContactFilter2D();
+            filter.SetLayerMask(1 << LayerMask.NameToLayer("Environment"));
+            int discrepencies = agent.GetComponent<Collider2D>().OverlapCollider(filter, contacts);
+            return discrepencies;
+        }
     }
 
     Vector2 GetPositionOnLadder() {
@@ -156,6 +171,12 @@ public class Ladder : MonoBehaviour {
         ladderRight = transform.TransformPoint(new Vector3(collider.offset.x + (collider.size.x / 2), 0));
         ladderLeft = transform.TransformPoint(new Vector3(collider.offset.x - (collider.size.x / 2), 0));
 
+        top = ladderTop;
+        bottom = ladderBottom;
+        right = ladderRight;
+        left = ladderLeft;
+
+        /*
         if (ladderTop.y == ladderBottom.y)
         {
             if (ladderBottom.x > ladderTop.x)
@@ -186,11 +207,11 @@ public class Ladder : MonoBehaviour {
             top = ladderBottom;
             bottom = ladderTop;
         }
+        */
     }
 
-    void RenderSprite() {
-        if (ladderType == LadderType.Side) { renderer.sprite = sideSprite; }
-        else if (ladderType == LadderType.Background) { renderer.sprite = BackgroundSprite; }
+    public Vector2 GetPointOnLadder(Vector2 position) {
+        return (Vector2) Vector3.Project((position-bottom), top-bottom)+bottom;
     }
 
     private void OnDrawGizmosSelected()
