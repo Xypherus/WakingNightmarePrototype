@@ -46,9 +46,6 @@ public class Ladder : MonoBehaviour {
         height = Vector2.Distance(bottom, top);
         positionDelta = (Vector2) transform.position - lastPosition;
         OrientLadder();
-<<<<<<< HEAD
-        
-=======
 
         if (transform.localScale != Vector3.one) {
             renderer.size = transform.localScale;
@@ -56,8 +53,7 @@ public class Ladder : MonoBehaviour {
         }
 
         collider.size = renderer.size;
-
->>>>>>> 322870e722570796b3561d92d8601bc94079f63f
+        
         lastPosition = transform.position;
 	}
 
@@ -74,12 +70,7 @@ public class Ladder : MonoBehaviour {
         if (CheckActorCollisions(actor) > 0) { avoidCollCheck = true; }
         if (ladderType == LadderType.Side)
         {
-<<<<<<< HEAD
-=======
-            actor.transform.position = GetPointOnLadder(actor.transform.position);
-            float percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
             previousPos = actor.transform.position;
->>>>>>> 322870e722570796b3561d92d8601bc94079f63f
             if (actor.isProne) { return; }
 
             float direction = movement.y;
@@ -122,7 +113,7 @@ public class Ladder : MonoBehaviour {
         actor.ladder = this;
         if (ladderType == LadderType.Side)
         {
-            float percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
+            percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
 
             actor.MoveTo(GetPositionOnLadder(), () =>
             {
