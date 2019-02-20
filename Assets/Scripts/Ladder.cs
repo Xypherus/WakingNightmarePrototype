@@ -24,6 +24,8 @@ public class Ladder : MonoBehaviour {
     Vector2 lastPosition;
     Vector2 positionDelta;
 
+    float percent;
+
     private void Start()
     {
         collider = GetComponent<BoxCollider2D>();
@@ -51,7 +53,7 @@ public class Ladder : MonoBehaviour {
         }
 
         collider.size = renderer.size;
-
+        
         lastPosition = transform.position;
 	}
 
@@ -61,14 +63,13 @@ public class Ladder : MonoBehaviour {
 
     public void MoveOnLadder(NavmeshAgent2D actor, Vector2 movement) {
         //TODO: Reprogram to move to a point that is a percentage the distance to top;
+        actor.transform.position = GetPositionOnLadder();
         Vector3 previousPos = actor.transform.position;
 
         bool avoidCollCheck = false;
         if (CheckActorCollisions(actor) > 0) { avoidCollCheck = true; }
         if (ladderType == LadderType.Side)
         {
-            float percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
-            actor.transform.position = Vector2.Lerp(bottom, top, percent);
             previousPos = actor.transform.position;
             if (actor.isProne) { return; }
 
@@ -85,7 +86,8 @@ public class Ladder : MonoBehaviour {
                 actor.ladder = next;
             }
 
-            actor.transform.position = Vector2.Lerp(bottom, top, percent);
+            actor.transform.position = GetPositionOnLadder();
+
 
             if (!avoidCollCheck) { HandleActorCollisions(actor, previousPos); }
 
@@ -111,10 +113,9 @@ public class Ladder : MonoBehaviour {
         actor.ladder = this;
         if (ladderType == LadderType.Side)
         {
-            float percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
-            Vector2 newPos = Vector2.Lerp(bottom, top, percent);
+            percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
 
-            actor.MoveTo(newPos, () =>
+            actor.MoveTo(GetPositionOnLadder(), () =>
             {
                 actor.rigidbody.bodyType = RigidbodyType2D.Kinematic;
             });
@@ -146,6 +147,11 @@ public class Ladder : MonoBehaviour {
         }
     }
 
+    Vector2 GetPositionOnLadder() {
+        Vector2 newPos = Vector2.Lerp(bottom, top, percent);
+        return newPos;
+    }
+
     void OrientLadder() {
         Vector2 ladderTop;
         Vector2 ladderBottom;
@@ -156,6 +162,12 @@ public class Ladder : MonoBehaviour {
         ladderRight = transform.TransformPoint(new Vector3(collider.offset.x + (collider.size.x / 2), 0));
         ladderLeft = transform.TransformPoint(new Vector3(collider.offset.x - (collider.size.x / 2), 0));
 
+        top = ladderTop;
+        bottom = ladderBottom;
+        right = ladderRight;
+        left = ladderLeft;
+
+        /*
         if (ladderTop.y == ladderBottom.y)
         {
             if (ladderBottom.x > ladderTop.x)
@@ -186,6 +198,11 @@ public class Ladder : MonoBehaviour {
             top = ladderBottom;
             bottom = ladderTop;
         }
+        */
+    }
+
+    public Vector2 GetPointOnLadder(Vector2 position) {
+        return (Vector2) Vector3.Project((position-bottom), top-bottom)+bottom;
     }
 
     private void OnDrawGizmosSelected()
