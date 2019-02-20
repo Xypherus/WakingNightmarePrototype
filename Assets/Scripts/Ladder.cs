@@ -29,6 +29,8 @@ public class Ladder : MonoBehaviour {
     Vector2 lastPosition;
     Vector2 positionDelta;
 
+    float percent;
+
     private void Start()
     {
         collider = GetComponent<BoxCollider2D>();
@@ -45,7 +47,7 @@ public class Ladder : MonoBehaviour {
 
         RenderSprite();
         OrientLadder();
-
+        
         lastPosition = transform.position;
 	}
 
@@ -55,15 +57,13 @@ public class Ladder : MonoBehaviour {
 
     public void MoveOnLadder(NavmeshAgent2D actor, Vector2 movement) {
         //TODO: Reprogram to move to a point that is a percentage the distance to top;
+        actor.transform.position = GetPositionOnLadder();
         Vector3 previousPos = actor.transform.position;
 
         bool avoidCollCheck = false;
         if (CheckActorCollisions(actor) > 0) { avoidCollCheck = true; }
         if (ladderType == LadderType.Side)
         {
-            float percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
-            actor.transform.position = Vector2.Lerp(bottom, top, percent);
-            previousPos = actor.transform.position;
             if (actor.isProne) { return; }
 
             float direction = movement.x;
@@ -89,7 +89,7 @@ public class Ladder : MonoBehaviour {
                 actor.ladder = next;
             }
 
-            actor.transform.position = Vector2.Lerp(bottom, top, percent);
+            actor.transform.position = GetPositionOnLadder();
 
             if (!avoidCollCheck) { HandleActorCollisions(actor, previousPos); }
 
@@ -116,9 +116,8 @@ public class Ladder : MonoBehaviour {
         if (ladderType == LadderType.Side)
         {
             float percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
-            Vector2 newPos = Vector2.Lerp(bottom, top, percent);
 
-            actor.MoveTo(newPos, () =>
+            actor.MoveTo(GetPositionOnLadder(), () =>
             {
                 actor.rigidbody.bodyType = RigidbodyType2D.Kinematic;
             });
@@ -140,6 +139,11 @@ public class Ladder : MonoBehaviour {
         filter.SetLayerMask(1 << LayerMask.NameToLayer("Environment"));
         int discrepencies = agent.GetComponent<Collider2D>().OverlapCollider(filter, contacts);
         return discrepencies;
+    }
+
+    Vector2 GetPositionOnLadder() {
+        Vector2 newPos = Vector2.Lerp(bottom, top, percent);
+        return newPos;
     }
 
     void OrientLadder() {
