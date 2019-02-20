@@ -195,7 +195,7 @@ public class PlayerController : NavmeshAgent2D {
     protected virtual void Jump() {
         if (ladder) {
             DismountLadder();
-            rigidbody.AddForce(new Vector2(jumpForce/2 * Input.GetAxisRaw("Horizontal"), jumpForce/2) * Mathf.Sqrt(2));
+            rigidbody.AddForce(new Vector2(jumpForce/2 * Input.GetAxisRaw("Horizontal"), jumpForce));
             return;
         }
         else if (ledge != null) {
