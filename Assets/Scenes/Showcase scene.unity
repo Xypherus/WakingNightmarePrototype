@@ -2934,6 +2934,12 @@ Prefab:
       propertyPath: segmentCount
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 114616843799235722, guid: e8f25a27e26204372b9f8956b84f71bf,
+        type: 2}
+      propertyPath: ropeSegment
+      value: 
+      objectReference: {fileID: 1744389014700046, guid: 97be06c23fcba514babae83a7371a813,
+        type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e8f25a27e26204372b9f8956b84f71bf, type: 2}
   m_IsPrefabAsset: 0

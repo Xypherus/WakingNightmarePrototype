@@ -53,5 +53,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   length: 5
   segmentCount: 8
-  ropeSegment: {fileID: 1863153879985350, guid: 550eab1975c9c4e6c8e3e60bd045166e,
+  ropeSegment: {fileID: 1744389014700046, guid: 97be06c23fcba514babae83a7371a813,
     type: 2}
