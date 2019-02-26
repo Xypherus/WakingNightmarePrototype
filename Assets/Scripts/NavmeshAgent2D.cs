@@ -45,10 +45,6 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     protected virtual void FixedUpdate() {
-
-        if (capsuleCollider.size.y < capsuleCollider.size.x) { capsuleCollider.direction = CapsuleDirection2D.Horizontal; }
-        else { capsuleCollider.direction = CapsuleDirection2D.Vertical; }
-
         _sprite.localScale = capsuleCollider.size;
 
         Orient();
@@ -61,14 +57,32 @@ public class NavmeshAgent2D : MonoBehaviour {
         path = new List<NavmeshNode2D>();
         capsuleCollider = GetComponent<CapsuleCollider2D>();
         crouchHeight = height / 2;
-        capsuleCollider.size = new Vector2(width, height);
+        SetSize(new Vector2(width, height));
 
         _sprite = transform.Find("Sprite");
         _initSpriteHeight = _sprite.localScale.y;
     }
 
+    public void SetSize(Vector2 newSize) {
+        if (newSize.y < newSize.x) { capsuleCollider.direction = CapsuleDirection2D.Horizontal; }
+        else { capsuleCollider.direction = CapsuleDirection2D.Vertical; }
+
+        capsuleCollider.size = newSize;
+        capsuleCollider.offset = new Vector2(0f, capsuleCollider.size.y / 2);
+    }
+
     public void MoveTo(Vector2 position, UnityEngine.Events.UnityAction callback) {
         StartCoroutine(MoveToEnumerator(position, callback));
+    }
+
+    public void PushToGround(float distance = 100f) {
+        RaycastHit2D ground = Physics2D.Raycast(transform.position, Vector2.down, distance, 1 << LayerMask.NameToLayer("Environment"));
+
+        if (ground)
+        {
+            transform.position = ground.point;
+        }
+        else { Debug.Log("No ground found"); }
     }
 
     public virtual void GrabLedge() {
@@ -171,12 +185,10 @@ public class NavmeshAgent2D : MonoBehaviour {
     protected virtual void Crouch() {
         if (isProne)
         {
-            capsuleCollider.size = new Vector2(width, height / 2);
-            capsuleCollider.offset = new Vector2(0f, height / 4);
+            SetSize(new Vector2(width, height / 2));
         }
         else {
-            capsuleCollider.size = new Vector2(width, height);
-            capsuleCollider.offset = new Vector2(0f, height / 2);
+            SetSize(new Vector2(width, height));
         }
     }
 
@@ -301,7 +313,7 @@ public class NavmeshAgent2D : MonoBehaviour {
         if (!capsuleCollider) { capsuleCollider = GetComponent<CapsuleCollider2D>(); }
         if (!Application.isPlaying)
         {
-            capsuleCollider.size = new Vector2(width, height);
+            SetSize(new Vector2(width, height));
         }
     }
 
