@@ -59,7 +59,6 @@ public class PlayerController : NavmeshAgent2D {
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
-
         ParseInput();
     }
 
@@ -69,7 +68,7 @@ public class PlayerController : NavmeshAgent2D {
         if (Input.GetAxisRaw("Prone") > 0 && ledge == null)
         {
             if (Input.GetButtonDown("Prone"))
-                transform.position = new Vector2(transform.position.x, transform.position.y - (transform.localScale.y / 4));
+                transform.position = new Vector2(transform.position.x, transform.position.y - ((transform.localScale.y / 2) - (transform.localScale.y / 4)));
             isProne = true;
         }
         else if (Input.GetAxisRaw("Sprinting") > 0 && ledge == null) {
@@ -79,7 +78,7 @@ public class PlayerController : NavmeshAgent2D {
         //check for Prone release
         if (Input.GetAxisRaw("Prone") < 1 && isProne) {
             Vector2 newSize = new Vector2(width * transform.localScale.x, 0.02f);
-            Vector2 newPos = new Vector2(transform.position.x, transform.position.y + (transform.localScale.y /2));
+            Vector2 newPos = new Vector2(transform.position.x, transform.position.y + (transform.position.y/2));
             Collider2D[] ceilings = Physics2D.OverlapCapsuleAll(newPos, newSize, CapsuleDirection2D.Vertical, 0f, 1 << LayerMask.NameToLayer("Environment"));
             Transform ground = GetGround();
             Collider2D ceiling = null;
