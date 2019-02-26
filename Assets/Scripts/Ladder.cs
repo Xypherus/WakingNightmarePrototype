@@ -64,9 +64,18 @@ public class Ladder : MonoBehaviour {
         return ((Vector3)top - transform.position).normalized;
     }
 
+    public Vector3 GetAveragedUp() {
+        Vector3 totalUp = transform.up;
+        int count = 1;
+        if (next) { totalUp += next.transform.up; count++; }
+        else if (previous) { totalUp += previous.transform.up; count++; }
+
+        return totalUp / count;
+    }
+
     public void MoveOnLadder(NavmeshAgent2D actor, Vector2 movement) {
         //TODO: Reprogram to move to a point that is a percentage the distance to top;
-        actor.transform.position = GetPositionOnLadder();
+        actor.transform.position = GetPositionOnLadder(actor.transform.position);
         Vector3 previousPos = actor.transform.position;
 
         bool avoidCollCheck = false;
@@ -104,7 +113,7 @@ public class Ladder : MonoBehaviour {
             }
 
 
-            actor.transform.position = GetPositionOnLadder();
+            actor.transform.position = GetPositionOnLadder(actor.transform.position);
 
 
             if (!avoidCollCheck) { HandleActorCollisions(actor, previousPos); }
@@ -133,7 +142,7 @@ public class Ladder : MonoBehaviour {
         {
             percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
 
-            actor.MoveTo(GetPositionOnLadder(), () =>
+            actor.MoveTo(GetPositionOnLadder(actor.transform.position), () =>
             {
                 if (actor.ladder)
                 {
@@ -156,24 +165,19 @@ public class Ladder : MonoBehaviour {
     }
 
     public int CheckActorCollisions(NavmeshAgent2D agent) {
-        if (ladderType == LadderType.Side)
-        {
-            Collider2D[] contacts = Physics2D.OverlapBoxAll(agent.transform.position, new Vector2(0.01f, agent.GetSize().y), transform.eulerAngles.z, 1 << LayerMask.NameToLayer("Environment"));
-            return contacts.Length;
-        }
-        else
-        {
-            Collider2D[] contacts = new Collider2D[100];
-            ContactFilter2D filter = new ContactFilter2D();
-            filter.SetLayerMask(1 << LayerMask.NameToLayer("Environment"));
-            int discrepencies = agent.GetComponent<Collider2D>().OverlapCollider(filter, contacts);
-            return discrepencies;
-        }
+        Collider2D[] contacts = Physics2D.OverlapBoxAll(agent.transform.position, new Vector2(0.01f, agent.GetSize().y), transform.eulerAngles.z, 1 << LayerMask.NameToLayer("Environment"));
+        return contacts.Length;
     }
 
-    Vector2 GetPositionOnLadder() {
-        Vector2 newPos = Vector2.Lerp(bottom, top, percent);
-        return newPos;
+    Vector2 GetPositionOnLadder(Vector2 actorPos) {
+        if (ladderType == LadderType.Side)
+        {
+            Vector2 newPos = Vector2.Lerp(bottom, top, percent);
+            return newPos;
+        }
+        else {
+            return actorPos;
+        }
     }
 
     void OrientLadder() {
