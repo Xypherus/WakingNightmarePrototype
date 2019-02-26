@@ -57,7 +57,7 @@ public class Ladder : MonoBehaviour {
         
         lastPosition = transform.position;
 
-        Debug.Log(percent + " percent up the ladder", this);
+
     }
 
     public Vector3 GetUp() {

@@ -11,7 +11,7 @@ public class KillScript : MonoBehaviour {
     {
 
     }
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         Debug.Log("Player Has Triggered");
         if (other.gameObject.CompareTag("Player"))
