@@ -68,6 +68,8 @@ public class PlayerController : NavmeshAgent2D {
         //Test For Crouching OR sprinting (can not be both)
         if (Input.GetAxisRaw("Prone") > 0 && ledge == null)
         {
+            if (Input.GetButtonDown("Prone"))
+                transform.position = new Vector2(transform.position.x, transform.position.y - (transform.localScale.y / 4));
             isProne = true;
         }
         else if (Input.GetAxisRaw("Sprinting") > 0 && ledge == null) {

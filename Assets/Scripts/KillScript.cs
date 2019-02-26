@@ -5,13 +5,16 @@ using UnityEngine;
 
 public class KillScript : MonoBehaviour {
     private Scene Currentscene;
+    private BoxCollider Kill;
 	// Use this for initialization
-	void Start () {
-	}
+	void Start ()
+    {
+
+    }
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("Player Has Triggered");
-        if (other.gameObject.tag == "Player")
+        if (other.gameObject.CompareTag("Player"))
         {
             Currentscene = SceneManager.GetActiveScene();
             SceneManager.LoadScene(Currentscene.name);
