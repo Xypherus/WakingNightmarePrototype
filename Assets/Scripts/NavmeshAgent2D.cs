@@ -254,7 +254,7 @@ public class NavmeshAgent2D : MonoBehaviour {
                 float direction = Mathf.Abs(rigidbody.velocity.x) / rigidbody.velocity.x;
                 _sprite.localScale = new Vector3(direction * Mathf.Abs(_sprite.localScale.x), _sprite.localScale.y);
             }
-            transform.up = ladder.GetUp();
+            transform.up = Vector2.Lerp(transform.up, ladder.GetAveragedUp(), Time.deltaTime * 10).normalized;
         }
         else {
             //Later: Get normal vector of the ground undernieth and set the tran's up to that.
