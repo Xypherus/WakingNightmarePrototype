@@ -6,6 +6,7 @@ using UnityEngine;
 /// PlayerController contains implemented methods of NavmeshAgent and responds to Key input accordingly.
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(PlayerFearController))]
 public class PlayerController : NavmeshAgent2D {
 
     #region Editor Variables
@@ -14,6 +15,10 @@ public class PlayerController : NavmeshAgent2D {
     [Tooltip("The force used to propell the player upward. Higher values for objects with higher mass.")]
     public float jumpForce;
     #endregion
+
+    //Added code for accessing fear system - 2019-02-26 <Ben Shackman>
+    //Will be used later to alter movement speed
+    PlayerFearController fearController;
     
     protected override void Start()
     {
@@ -22,6 +27,9 @@ public class PlayerController : NavmeshAgent2D {
 
         //Warn the user if the NavmeshArea2D object is not set up in the scene
         if (area == null) { Debug.LogWarning("There is no Navmesh set up in this scene. Not all movement features will be available."); }
+
+        //Gets the fear controller - 2019-02-26 <Ben Shackman>
+        fearController = gameObject.GetComponent<PlayerFearController>();
     }
 
     protected override void Update() {
