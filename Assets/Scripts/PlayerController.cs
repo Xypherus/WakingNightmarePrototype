@@ -160,7 +160,7 @@ public class PlayerController : NavmeshAgent2D {
         {
             if (isProne)
             {
-                movement = new Vector3(speed / 2, 0f);
+                movement = new Vector3(speed / 1.5f, 0f);
             }
             else if (sprinting)
             {
@@ -182,11 +182,7 @@ public class PlayerController : NavmeshAgent2D {
             if (rigidbody.velocity.magnitude > maxSpeed / 2f)
             {
                 rigidbody.velocity = rigidbody.velocity.normalized;
-                rigidbody.velocity = rigidbody.velocity * (maxSpeed / 2f);
-                {
-                    rigidbody.velocity = rigidbody.velocity.normalized;
-                    rigidbody.velocity = rigidbody.velocity * (maxSpeed / 2f);
-                }
+                rigidbody.velocity = rigidbody.velocity * (maxSpeed / 1.5f);
             }
             else if (sprinting)
             {
@@ -209,7 +205,8 @@ public class PlayerController : NavmeshAgent2D {
     }
 
     protected virtual void Jump() {
-        if (ladder) {
+        if (isProne) { return; }
+        else if (ladder) {
             DismountLadder();
             rigidbody.AddForce(new Vector2(jumpForce/2 * Input.GetAxisRaw("Horizontal"), jumpForce));
         }

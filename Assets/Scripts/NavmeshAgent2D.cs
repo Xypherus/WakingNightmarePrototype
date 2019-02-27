@@ -287,7 +287,7 @@ public class NavmeshAgent2D : MonoBehaviour {
         rigidbody.velocity = Vector2.zero;
         rigidbody.bodyType = RigidbodyType2D.Kinematic;
         if (pathing) { isStopped = true; }
-        for (float i = 0; i < 0.2; i += Time.deltaTime) {
+        for (float i = 0; i < 0.5; i += Time.deltaTime) {
             transform.position = Vector3.Lerp(transform.position, position, i);
             yield return new WaitForEndOfFrame();
         }
