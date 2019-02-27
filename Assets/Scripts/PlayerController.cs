@@ -55,11 +55,6 @@ public class PlayerController : NavmeshAgent2D {
             {
                 Jump();
             }
-
-            if (Input.GetButtonDown("Prone") && (ladder || ledge != null)) {
-                if (ladder) { DismountLadder(); }
-                else { ReleaseLedge(); }
-            }
         }
     }
 
@@ -73,7 +68,7 @@ public class PlayerController : NavmeshAgent2D {
     protected virtual void ParseInput() {
 
         //Test For Crouching OR sprinting (can not be both)
-        if (Input.GetAxisRaw("Prone") > 0 && ledge == null)
+        if (Input.GetAxisRaw("Prone") > 0 && ledge == null && !ladder)
         {
             if (Input.GetButtonDown("Prone"))
             {
@@ -81,7 +76,7 @@ public class PlayerController : NavmeshAgent2D {
             }
             isProne = true;
         }
-        else if (Input.GetAxisRaw("Sprinting") > 0 && ledge == null) {
+        else if (Input.GetAxisRaw("Sprinting") > 0 && ledge == null && !ladder) {
             sprinting = true;
         }
 
@@ -111,8 +106,11 @@ public class PlayerController : NavmeshAgent2D {
             sprinting = false;
         }
 
-        if (!ladder && ledge == null && Input.GetAxisRaw("Vertical") != 0) {
+        if (!ladder && ledge == null && Input.GetAxisRaw("Vertical") != 0 && canWalkGrab) {
             MountNearestLadder(maxReach);
+            if (!ladder) { GrabLedge(); }
+
+            if (ladder || ledge != null) { canWalkGrab = false; }
         }
         
         Move();
@@ -120,10 +118,6 @@ public class PlayerController : NavmeshAgent2D {
 
     protected virtual void Move() {
         Crouch();
-
-        if (Input.GetAxisRaw("Vertical") != 0 && ledge != null) {
-            ClimbLedge();
-        }
 
         if (ladder) {
             Vector3 movement = new Vector2(speed / 4, 0f);
@@ -138,7 +132,6 @@ public class PlayerController : NavmeshAgent2D {
                 if (ladderigidbodyody)
                 {
                     ladderigidbodyody.AddRelativeForce(direction * movement);
-
                 }
             }
         }
@@ -160,7 +153,7 @@ public class PlayerController : NavmeshAgent2D {
         {
             if (isProne)
             {
-                movement = new Vector3(speed / 2, 0f);
+                movement = new Vector3(speed / 1.5f, 0f);
             }
             else if (sprinting)
             {
@@ -182,11 +175,7 @@ public class PlayerController : NavmeshAgent2D {
             if (rigidbody.velocity.magnitude > maxSpeed / 2f)
             {
                 rigidbody.velocity = rigidbody.velocity.normalized;
-                rigidbody.velocity = rigidbody.velocity * (maxSpeed / 2f);
-                {
-                    rigidbody.velocity = rigidbody.velocity.normalized;
-                    rigidbody.velocity = rigidbody.velocity * (maxSpeed / 2f);
-                }
+                rigidbody.velocity = rigidbody.velocity * (maxSpeed / 1.5f);
             }
             else if (sprinting)
             {
@@ -209,7 +198,8 @@ public class PlayerController : NavmeshAgent2D {
     }
 
     protected virtual void Jump() {
-        if (ladder) {
+        if (isProne) { return; }
+        else if (ladder) {
             DismountLadder();
             rigidbody.AddForce(new Vector2(jumpForce/2 * Input.GetAxisRaw("Horizontal"), jumpForce));
         }
