@@ -34,6 +34,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     protected NavmeshArea2D area;
 
     protected bool wasCrouched = false;
+    protected bool canWalkGrab = false;
 
     #region Testing Variables
     protected Transform _sprite;
@@ -179,7 +180,9 @@ public class NavmeshAgent2D : MonoBehaviour {
             }
         }
 
-        if (closest != null) { closest.GetComponent<Ladder>().MountLadder(this); }
+        if (closest != null) {
+            closest.GetComponent<Ladder>().MountLadder(this);
+        }
     }
 
     protected virtual void Crouch() {
@@ -279,7 +282,10 @@ public class NavmeshAgent2D : MonoBehaviour {
     protected void GroundCheck() {
         Collider2D ground = Physics2D.OverlapBox(new Vector2(transform.position.x, transform.position.y ), new Vector2(GetSize().x/2, 0.04f), 0f, 1 << LayerMask.NameToLayer("Environment"));
 
-        if (ground) { isGrounded = true; }
+        if (ground) {
+            isGrounded = true;
+            canWalkGrab = true;
+        }
         else { isGrounded = false; }
     }
 
@@ -287,10 +293,12 @@ public class NavmeshAgent2D : MonoBehaviour {
         rigidbody.velocity = Vector2.zero;
         rigidbody.bodyType = RigidbodyType2D.Kinematic;
         if (pathing) { isStopped = true; }
+
         for (float i = 0; i < 0.2; i += Time.deltaTime) {
             transform.position = Vector3.Lerp(transform.position, position, i);
             yield return new WaitForEndOfFrame();
         }
+
         transform.position = position;
         rigidbody.bodyType = RigidbodyType2D.Dynamic;
         if (pathing) { isStopped = false; }
