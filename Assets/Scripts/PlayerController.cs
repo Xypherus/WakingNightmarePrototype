@@ -14,6 +14,8 @@ public class PlayerController : NavmeshAgent2D {
     [Tooltip("The force used to propell the player upward. Higher values for objects with higher mass.")]
     public float jumpForce;
     #endregion
+
+    public bool grabbed;
     
     protected override void Start()
     {
@@ -198,6 +200,17 @@ public class PlayerController : NavmeshAgent2D {
             }
 
         }
+    }
+
+    public bool LedgeNearby() {
+        //TODO: find nearest ledge
+        return false;
+    }
+
+    public bool LadderNearby()
+    {
+        //TODO: find nearest ladder
+        return false;
     }
 
     protected virtual void Jump() {
