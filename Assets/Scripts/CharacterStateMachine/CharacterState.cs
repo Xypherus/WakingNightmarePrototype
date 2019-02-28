@@ -17,11 +17,7 @@ public abstract class CharacterState {
         network.AddStateToNetwork(this);
     }
 
-    public virtual void OnStateEnter() {
-        if (network) {
-            network.activeState = this;
-        }
-    }
+    public abstract void OnStateEnter();
     public abstract void OnStateExit();
     public abstract void Subject();
     public abstract void Update();
@@ -69,6 +65,8 @@ public class StateTransition {
     public void Transition() {
         to.OnStateEnter();
         from.OnStateExit();
+
+        to.network.activeState = to;
 
         continueWith();
     }

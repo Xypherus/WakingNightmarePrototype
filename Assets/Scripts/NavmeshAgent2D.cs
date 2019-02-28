@@ -76,30 +76,33 @@ public class NavmeshAgent2D : MonoBehaviour {
         StartCoroutine(MoveToEnumerator(position, callback));
     }
 
-    public void PushToGround(float distance = 100f) {
-        RaycastHit2D ground = Physics2D.Raycast(transform.position, Vector2.down, distance, 1 << LayerMask.NameToLayer("Environment"));
-
-        if (ground)
-        {
-            transform.position = ground.point;
-        }
-        else { Debug.Log("No ground found"); }
-    }
-
-    public virtual void GrabLedge() {
-        if (area == null) { return; }
-        if (!canGrab || ladder) { return; }
-        List<NavmeshNode2D> ledges = area.NodesOfTypeInRange(this, transform.position, new List<NavmeshNode2D.NodeType> { NavmeshNode2D.NodeType.Ledge}, maxReach*transform.localScale.x);
-        if (ledges == null) { return; }
+    public NavmeshNode2D GetClosestLedge() {
+        if (area == null) { return null; }
+        List<NavmeshNode2D> ledges = area.NodesOfTypeInRange(this, transform.position, new List<NavmeshNode2D.NodeType> { NavmeshNode2D.NodeType.Ledge }, maxReach * transform.localScale.x);
+        if (ledges == null) { return null; }
         isProne = false;
 
         canGrab = false;
         NavmeshNode2D closest = ledges[0];
         float closestDistance = Mathf.Infinity;
-        foreach (NavmeshNode2D ledge in ledges) {
+        foreach (NavmeshNode2D ledge in ledges)
+        {
             float distance = Vector2.Distance(transform.position, ledge.worldPosition);
-            if ( distance <= closestDistance) { closest = ledge; closestDistance = distance; }
+            if (distance <= closestDistance) { closest = ledge; closestDistance = distance; }
         }
+
+        return closest;
+    }
+
+    public bool LedgeNearby() {
+        if (GetClosestLedge() != null) { return true; }
+        else { return false; }
+    }
+
+    public virtual void GrabLedge() {
+        if (area == null) { return; }
+        if (!canGrab || ladder) { return; }
+        NavmeshNode2D closest = GetClosestLedge();
 
         //Todo: change to hanging animation
         MoveTo(closest.worldPosition, () =>
@@ -161,28 +164,41 @@ public class NavmeshAgent2D : MonoBehaviour {
         else { DismountLadder(); }
     }
 
-    public void MountNearestLadder(float radius) {
+    public Ladder GetNearestLadder(float radius) {
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, radius, 1 << LayerMask.NameToLayer("Ladder"));
         Collider2D closest = null;
         float closestDistance = Mathf.Infinity;
 
-        foreach (Collider2D collider in colliders) {
-            if (closest == null) {
+        foreach (Collider2D collider in colliders)
+        {
+            if (closest == null)
+            {
                 closest = collider;
                 closestDistance = Vector2.Distance(collider.transform.position, transform.position);
                 continue;
             }
 
             float distance = Vector2.Distance(collider.transform.position, transform.position);
-            if (distance <= closestDistance) {
+            if (distance <= closestDistance)
+            {
                 closest = collider;
                 closestDistance = distance;
             }
         }
 
-        if (closest != null) {
-            closest.GetComponent<Ladder>().MountLadder(this);
-        }
+        if (closest) { return closest.GetComponent<Ladder>(); }
+        else { return null; }
+    }
+
+    public bool LadderNearby() {
+        if (GetNearestLadder(maxReach)) { return true; }
+        else { return false; }
+    }
+
+    public void MountNearestLadder(float radius) {
+        Ladder newLadder = GetNearestLadder(radius);
+
+        if (newLadder) { newLadder.MountLadder(this); }
     }
 
     protected virtual void Crouch() {

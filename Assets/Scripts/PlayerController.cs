@@ -15,14 +15,13 @@ public class PlayerController : NavmeshAgent2D {
     [Tooltip("The force used to propell the player upward. Higher values for objects with higher mass.")]
     public float jumpForce;
     #endregion
-
-<<<<<<< HEAD
+    
     public bool grabbed;
-=======
+    public bool jumpped;
+    public float crouchSpeed;
     //Added code for accessing fear system - 2019-02-26 <Ben Shackman>
     //Will be used later to alter movement speed
     PlayerFearController fearController;
->>>>>>> affeeeab54256e857a39e6f48877c44d110e24ab
     
     protected override void Start()
     {
@@ -201,17 +200,6 @@ public class PlayerController : NavmeshAgent2D {
         }
     }
 
-    public bool LedgeNearby() {
-        //TODO: find nearest ledge
-        return false;
-    }
-
-    public bool LadderNearby()
-    {
-        //TODO: find nearest ladder
-        return false;
-    }
-
     protected virtual void Jump() {
         if (isProne) { return; }
         else if (ladder) {
@@ -227,7 +215,7 @@ public class PlayerController : NavmeshAgent2D {
         }
     }
     
-    protected virtual void Decelerate() {
+    public virtual void Decelerate() {
         if (!isGrounded) { return; }
         if (Input.GetAxisRaw("Horizontal") == 0) { StartCoroutine(Decelerator()); }
         else { StopCoroutine(Decelerator()); }
