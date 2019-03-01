@@ -8,6 +8,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
     public PlayerWalking walking;
     public PlayerCrawling crawling;
     public PlayerJumping jumping;
+    public PlayerJumpFromGrab jumpFromGrab;
     public PlayerOnLadder onLadder;
     public PlayerOnLedge onLedge;
     public PlayerRising rising;
@@ -20,6 +21,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
         walking = new PlayerWalking(this, player);
         crawling = new PlayerCrawling(this, player);
         jumping = new PlayerJumping(this, player, 0.5f);
+        jumpFromGrab = new PlayerJumpFromGrab(this, player, 0.5f);
         onLadder = new PlayerOnLadder(this, player);
         onLedge = new PlayerOnLedge(this, player);
         rising = new PlayerRising(this, player);
@@ -44,10 +46,16 @@ public class PlayerStateMachine : CharacterStateNetwork {
         jumping.AddTransition(onLedge);
         jumping.AddTransition(walking);
 
-        onLadder.AddTransition(jumping);
+        jumpFromGrab.AddTransition(rising);
+        jumpFromGrab.AddTransition(falling);
+        jumpFromGrab.AddTransition(onLadder);
+        jumpFromGrab.AddTransition(onLedge);
+        jumpFromGrab.AddTransition(walking);
+
+        onLadder.AddTransition(jumpFromGrab);
         onLadder.AddTransition(falling);
 
-        onLedge.AddTransition(jumping);
+        onLedge.AddTransition(jumpFromGrab);
         onLedge.AddTransition(falling);
 
         rising.AddTransition(onLedge);
@@ -144,7 +152,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void OnStateEnter()
         {
-            player.rigidbody.AddForce(new Vector2(Input.GetAxis("Horizontal") * (player.jumpForce), player.jumpForce));
+            player.rigidbody.AddForce(new Vector2(0f, player.jumpForce));
         }
 
         public override void Update()
@@ -168,7 +176,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
         {
             //TODO: add a state condition for death when fear is implemented
             if (player.grabbed || !player.ladder) { Transition("Player Falling"); Debug.Log("tests: " + player.grabbed + " OR " + !player.ladder); }
-            else if (player.jumpped) { Transition("Player Jumping"); }
+            else if (player.jumpped) { Transition("Player Jump From Grab"); }
         }
 
         public override void OnStateEnter()
@@ -206,7 +214,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
         {
             //TODO: add a state condition for death when fear is implemented
             if (player.grabbed || player.ledge == null) { Transition("Player Falling"); }
-            else if (player.jumpped) { Transition("Player Jumping"); }
+            else if (player.jumpped) { Transition("Player Jump From Grab"); }
         }
 
         public override void OnStateEnter()
@@ -266,6 +274,35 @@ public class PlayerStateMachine : CharacterStateNetwork {
         public override void Update()
         {
             player.rigidbody.AddForce(new Vector2((player.speed / 1.5f) * Input.GetAxis("Horizontal"), 0f));
+        }
+    }
+    public class PlayerJumpFromGrab : PlayerCharacterState
+    {
+        PlayerController player;
+        float elapsedTime;
+        float maxTime;
+
+        public PlayerJumpFromGrab(CharacterStateNetwork network, PlayerController player, float maxTime) : base("Player Jump From Grab", network)
+        { this.player = player; this.maxTime = maxTime; }
+
+        public override void Subject()
+        {
+            //TODO: add a state condition for death when fear is implemented
+            if (player.isGrounded) { Transition("Player Walking"); }
+            else if (!player.isGrounded && player.rigidbody.velocity.y > 0 && elapsedTime >= maxTime) { Transition("Player Rising"); }
+            else if (!player.isGrounded && player.rigidbody.velocity.y < 0 && elapsedTime >= maxTime) { Transition("Player Falling"); }
+            else if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
+            else if (player.grabbed && player.LedgeNearby()) { Transition("Player On Ledge"); }
+        }
+
+        public override void OnStateEnter()
+        {
+            player.rigidbody.AddForce(new Vector2(Input.GetAxis("Horizontal") * (player.jumpForce), player.jumpForce));
+        }
+
+        public override void Update()
+        {
+            elapsedTime += Time.deltaTime;
         }
     }
     #endregion
