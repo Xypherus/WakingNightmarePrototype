@@ -16,10 +16,12 @@ public class CharacterStateNetwork : MonoBehaviour{
         foreach (CharacterState state in network) {
             state.network = this;
         }
+        activeState = network[0];
     }
 
-    public void Update()
+    public void FixedUpdate()
     {
+        activeState.Subject();
         activeState.Update();
     }
 

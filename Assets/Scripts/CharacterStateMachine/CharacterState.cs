@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public abstract class CharacterState {
     public List<StateTransition> transitions;
     public string name;
@@ -9,12 +10,14 @@ public abstract class CharacterState {
 
     public CharacterState(string name) {
         this.name = name;
+        transitions = new List<StateTransition>();
     }
 
     public CharacterState(string name, CharacterStateNetwork network) {
         this.name = name;
         this.network = network;
         network.AddStateToNetwork(this);
+        transitions = new List<StateTransition>();
     }
 
     public abstract void OnStateEnter();
@@ -24,33 +27,39 @@ public abstract class CharacterState {
 
     public void AddTransition(CharacterState to, UnityEngine.Events.UnityAction callback = null) {
         StateTransition transition = new StateTransition(this, to, callback);
+        transitions.Add(transition);
     }
 
     public void Transition(string stateName) {
         foreach (StateTransition transition in transitions) {
             if (transition.to.name == stateName) {
                 transition.Transition();
-                break;
+                return;
             }
         }
+
+        Debug.LogError("Could not find transition to state '" + stateName + "' from state '" + name + "'");
     }
     public void Transition(CharacterState to) {
         foreach (StateTransition transition in transitions) {
             if (transition.to == to) {
                 transition.Transition();
-                break;
+                return;
             }
         }
+
+        Debug.LogError("Could not find transition to state '" + to.name + "' from state '" + name + "'");
     }
     public static implicit operator bool(CharacterState state) {
         if (state.network != null)
         {
-            return !object.ReferenceEquals(state, null);
+            return (!object.ReferenceEquals(state, null) && state.network.activeState == state);
         }
         else { return false; }
     }
 }
 
+[System.Serializable]
 public class StateTransition {
     public CharacterState from;
     public CharacterState to;
@@ -63,11 +72,14 @@ public class StateTransition {
     }
 
     public void Transition() {
-        to.OnStateEnter();
         from.OnStateExit();
+        to.OnStateEnter();
 
         to.network.activeState = to;
 
-        continueWith();
+        if (continueWith != null)
+        {
+            continueWith();
+        }
     }
 }
