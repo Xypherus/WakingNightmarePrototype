@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(PlayerFearController))]
+[RequireComponent(typeof(PlayerStateMachine))]
 public class PlayerController : NavmeshAgent2D {
 
     #region Editor Variables
@@ -22,6 +23,7 @@ public class PlayerController : NavmeshAgent2D {
     //Added code for accessing fear system - 2019-02-26 <Ben Shackman>
     //Will be used later to alter movement speed
     PlayerFearController fearController;
+    PlayerStateMachine stateMachine;
     
     protected override void Start()
     {
@@ -33,6 +35,7 @@ public class PlayerController : NavmeshAgent2D {
 
         //Gets the fear controller - 2019-02-26 <Ben Shackman>
         fearController = gameObject.GetComponent<PlayerFearController>();
+        stateMachine = GetComponent<PlayerStateMachine>();
     }
 
     protected override void Update() {
@@ -41,24 +44,23 @@ public class PlayerController : NavmeshAgent2D {
 
         if (Time.timeScale > 0) {
             //Test for grabbing ladders/ledges
-            if (Input.GetButtonDown("Grab"))
+            
+            if (!stateMachine.rising && !stateMachine.onLadder && !stateMachine.onLedge && Input.GetAxisRaw("Vertical") != 0f)
             {
-                if (!ladder && ledge == null)
-                {
-                    MountNearestLadder(maxReach);
-                    if (!ladder)
-                    {
-                        GrabLedge();
-                    }
-                }
+                grabbed = true;
             }
+            else if (Input.GetButtonDown("Grab")) { grabbed = true; }
+            else { grabbed = false; }
 
             //Test for Jumping
-            if (Input.GetButtonDown("Jump"))
+            if (Input.GetButtonDown("Jump") && (isGrounded || stateMachine.onLadder || stateMachine.onLedge))
             {
-                Jump();
+                jumpped = true;
             }
+            else { jumpped = false; }
         }
+
+        Debug.Log("The Active state is " + stateMachine.activeState.name);
     }
 
     // Update is called once per frame
@@ -108,15 +110,6 @@ public class PlayerController : NavmeshAgent2D {
         if (Input.GetAxisRaw("Sprinting") < 1 && sprinting) {
             sprinting = false;
         }
-
-        if (!ladder && ledge == null && Input.GetAxisRaw("Vertical") != 0 && canWalkGrab) {
-            MountNearestLadder(maxReach);
-            if (!ladder) { GrabLedge(); }
-
-            if (ladder || ledge != null) { canWalkGrab = false; }
-        }
-        
-        Move();
     }
 
     protected virtual void Move() {

@@ -5,17 +5,25 @@ using UnityEngine;
 public class PlayerStateMachine : CharacterStateNetwork {
     public PlayerController player;
 
-	// Use this for initialization
-	void Start () {
+    public PlayerWalking walking;
+    public PlayerCrawling crawling;
+    public PlayerJumping jumping;
+    public PlayerOnLadder onLadder;
+    public PlayerOnLedge onLedge;
+    public PlayerRising rising;
+    public PlayerFalling falling;
+
+    // Use this for initialization
+    void Start () {
         player = GetComponent<PlayerController>();
 
-        PlayerWalking walking = new PlayerWalking(this, player);
-        PlayerCrawling crawling = new PlayerCrawling(this, player);
-        PlayerJumping jumping = new PlayerJumping(this, player, 0.5f);
-        PlayerOnLadder onLadder = new PlayerOnLadder(this, player);
-        PlayerOnLedge onLedge = new PlayerOnLedge(this, player);
-        PlayerRising rising = new PlayerRising(this, player);
-        PlayerFalling falling = new PlayerFalling(this, player);
+        walking = new PlayerWalking(this, player);
+        crawling = new PlayerCrawling(this, player);
+        jumping = new PlayerJumping(this, player, 0.5f);
+        onLadder = new PlayerOnLadder(this, player);
+        onLedge = new PlayerOnLedge(this, player);
+        rising = new PlayerRising(this, player);
+        falling = new PlayerFalling(this, player);
 
         walking.AddTransition(crawling);
         walking.AddTransition(falling);
@@ -52,10 +60,11 @@ public class PlayerStateMachine : CharacterStateNetwork {
         falling.AddTransition(rising);
         falling.AddTransition(walking);
 
+        activeState = falling;
     }
 
     #region Player States
-    class PlayerWalking : PlayerCharacterState {
+    public class PlayerWalking : PlayerCharacterState {
         PlayerController player;
 
         public PlayerWalking(CharacterStateNetwork network, PlayerController player) : base("Player Walking", network)
@@ -68,17 +77,19 @@ public class PlayerStateMachine : CharacterStateNetwork {
             else if (!player.isGrounded && player.rigidbody.velocity.y > 0) { Transition("Player Rising"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y < 0) { Transition("Player Falling"); }
             else if (player.isGrounded && player.isProne) { Transition("Player Crawling"); }
-            else if (player.grabbed && player.LedgeNearby()) { Transition("Player On Ledge"); }
             else if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
+            else if (player.grabbed && player.LedgeNearby()) { Transition("Player On Ledge"); }
         }
 
         public override void Update() {
-            player.rigidbody.AddForce(new Vector2(Mathf.Clamp(Input.GetAxis("Horizontal")*player.accelMultiplier, -1, 1) * player.speed, 0f));
+            float speed = player.speed;
+            if (player.sprinting) { speed = player.speed * 2; }
+            player.rigidbody.AddForce(new Vector2(Mathf.Clamp(Input.GetAxis("Horizontal")*player.accelMultiplier, -1, 1) * speed, 0f));
 
             player.Decelerate();
         }
     }
-    class PlayerCrawling : PlayerCharacterState
+    public class PlayerCrawling : PlayerCharacterState
     {
         PlayerController player;
 
@@ -91,8 +102,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
             if (!player.isGrounded && player.rigidbody.velocity.y > 0) { Transition("Player Rising"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y < 0) { Transition("Player Falling"); }
             else if (player.isGrounded && !player.isProne) { Transition("Player Walking"); }
-            else if (player.grabbed && player.LedgeNearby()) { Transition("Player On Ledge"); }
             else if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
+            else if (player.grabbed && player.LedgeNearby()) { Transition("Player On Ledge"); }
         }
 
         public override void OnStateEnter()
@@ -112,7 +123,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
             player.SetSize(new Vector2(player.width, player.height));
         }
     }
-    class PlayerJumping : PlayerCharacterState
+    public class PlayerJumping : PlayerCharacterState
     {
         PlayerController player;
         float elapsedTime;
@@ -127,13 +138,13 @@ public class PlayerStateMachine : CharacterStateNetwork {
             if (player.isGrounded) { Transition("Player Walking"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y > 0 && elapsedTime >= maxTime) { Transition("Player Rising"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y < 0 && elapsedTime >= maxTime) { Transition("Player Falling"); }
-            else if (player.grabbed && player.LedgeNearby()) { Transition("Player On Ledge"); }
             else if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
+            else if (player.grabbed && player.LedgeNearby()) { Transition("Player On Ledge"); }
         }
 
         public override void OnStateEnter()
         {
-            player.rigidbody.AddForce(new Vector2(Input.GetAxis("Horizontal") * (player.jumpForce / 2), player.jumpForce));
+            player.rigidbody.AddForce(new Vector2(Input.GetAxis("Horizontal") * (player.jumpForce), player.jumpForce));
         }
 
         public override void Update()
@@ -146,7 +157,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
             elapsedTime = 0f;
         }
     }
-    class PlayerOnLadder : PlayerCharacterState
+    public class PlayerOnLadder : PlayerCharacterState
     {
         PlayerController player;
 
@@ -156,7 +167,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
         public override void Subject()
         {
             //TODO: add a state condition for death when fear is implemented
-            if (player.grabbed || !player.ladder) { Transition("Player Falling"); }
+            if (player.grabbed || !player.ladder) { Transition("Player Falling"); Debug.Log("tests: " + player.grabbed + " OR " + !player.ladder); }
             else if (player.jumpped) { Transition("Player Jumping"); }
         }
 
@@ -167,7 +178,16 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void Update()
         {
-            player.ladder.MoveOnLadder(player, new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
+            if (player.ladder)
+            {
+                player.ladder.MoveOnLadder(player, new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
+
+                if (player.ladder.ladderType == Ladder.LadderType.Side) {
+                    if (player.ladder.GetComponent<Rigidbody2D>() != null) {
+                        player.ladder.GetComponent<Rigidbody2D>().AddForce(new Vector2(player.speed /4 * Input.GetAxis("Horizontal"), 0f));
+                    }
+                }
+            }
         }
 
         public override void OnStateExit()
@@ -175,7 +195,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
             if (player.ladder) { player.DismountLadder(); }
         }
     }
-    class PlayerOnLedge : PlayerCharacterState
+    public class PlayerOnLedge : PlayerCharacterState
     {
         PlayerController player;
 
@@ -203,10 +223,10 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void OnStateExit()
         {
-            if (player.ledge == null) { player.ReleaseLedge(); }
+            if (player.ledge != null) { player.ReleaseLedge(); }
         }
     }
-    class PlayerFalling : PlayerCharacterState
+    public class PlayerFalling : PlayerCharacterState
     {
         PlayerController player;
 
@@ -221,8 +241,13 @@ public class PlayerStateMachine : CharacterStateNetwork {
             else if (player.isGrounded) { Transition("Player Walking"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y > 0) { Transition("Player Rising"); }
         }
+
+        public override void Update()
+        {
+            player.rigidbody.AddForce(new Vector2((player.speed / 1.5f) * Input.GetAxis("Horizontal"), 0f));
+        }
     }
-    class PlayerRising : PlayerCharacterState
+    public class PlayerRising : PlayerCharacterState
     {
         PlayerController player;
 
@@ -237,10 +262,16 @@ public class PlayerStateMachine : CharacterStateNetwork {
             else if (player.isGrounded) { Transition("Player Walking"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y < 0) { Transition("Player Falling"); }
         }
+
+        public override void Update()
+        {
+            player.rigidbody.AddForce(new Vector2((player.speed / 1.5f) * Input.GetAxis("Horizontal"), 0f));
+        }
     }
     #endregion
 }
 
+[System.Serializable]
 public class PlayerCharacterState : CharacterState {
     public PlayerCharacterState(string name, CharacterStateNetwork network) : base(name,network) { }
 

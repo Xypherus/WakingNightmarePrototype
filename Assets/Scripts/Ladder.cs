@@ -113,7 +113,6 @@ public class Ladder : MonoBehaviour {
 
 
             actor.transform.position = GetPositionOnLadder(actor.transform.position);
-            Debug.Log("Percent up ladder " + percent);
 
             if (!avoidCollCheck) { HandleActorCollisions(actor, previousPos); }
 
@@ -136,24 +135,21 @@ public class Ladder : MonoBehaviour {
     }
 
     public void MountLadder(NavmeshAgent2D actor) {
+        actor.canMove = false;
         if (ladderType == LadderType.Side)
         {
             percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
 
+            actor.ladder = this;
             actor.MoveTo(GetPositionOnLadder(actor.transform.position), () =>
             {
-                actor.ladder = this;
-                if (actor.ladder)
-                {
-                    actor.rigidbody.bodyType = RigidbodyType2D.Kinematic;
-                    actor.rigidbody.velocity = Vector2.zero;
-                }
-                else {
-                    actor.rigidbody.bodyType = RigidbodyType2D.Dynamic;
-                }
+                actor.canMove = true;
+                actor.rigidbody.bodyType = RigidbodyType2D.Kinematic;
+                actor.rigidbody.velocity = Vector2.zero;
             });
         }
         else {
+            actor.canMove = true;
             actor.ladder = this;
             actor.rigidbody.bodyType = RigidbodyType2D.Kinematic;
             actor.rigidbody.velocity = Vector3.zero;

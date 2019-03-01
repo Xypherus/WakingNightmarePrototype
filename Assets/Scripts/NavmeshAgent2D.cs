@@ -35,6 +35,7 @@ public class NavmeshAgent2D : MonoBehaviour {
 
     protected bool wasCrouched = false;
     protected bool canWalkGrab = false;
+    public bool canMove = true;
 
     #region Testing Variables
     protected Transform _sprite;
@@ -82,7 +83,6 @@ public class NavmeshAgent2D : MonoBehaviour {
         if (ledges == null) { return null; }
         isProne = false;
 
-        canGrab = false;
         NavmeshNode2D closest = ledges[0];
         float closestDistance = Mathf.Infinity;
         foreach (NavmeshNode2D ledge in ledges)
@@ -104,10 +104,13 @@ public class NavmeshAgent2D : MonoBehaviour {
         if (!canGrab || ladder) { return; }
         NavmeshNode2D closest = GetClosestLedge();
 
+        canMove = false;
+        canGrab = false;
+        ledge = closest;
         //Todo: change to hanging animation
         MoveTo(closest.worldPosition, () =>
         {
-            ledge = closest;
+            canMove = true;
             rigidbody.bodyType = RigidbodyType2D.Kinematic;
             canGrab = true;
         });
