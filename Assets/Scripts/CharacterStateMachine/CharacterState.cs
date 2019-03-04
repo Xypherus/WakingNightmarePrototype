@@ -24,6 +24,7 @@ public abstract class CharacterState {
     public abstract void OnStateExit();
     public abstract void Subject();
     public abstract void Update();
+    public abstract void FixedUpdate();
 
     public void AddTransition(CharacterState to, UnityEngine.Events.UnityAction callback = null) {
         StateTransition transition = new StateTransition(this, to, callback);

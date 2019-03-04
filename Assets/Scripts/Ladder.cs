@@ -95,7 +95,6 @@ public class Ladder : MonoBehaviour {
                 else {
                     actor.transform.position = bottom;
                     percent = 0;
-                    actor.DismountLadder();
                 }
             }
             else if (percent >= 1) {
@@ -107,7 +106,6 @@ public class Ladder : MonoBehaviour {
                 else {
                     actor.transform.position = top;
                     percent = 1;
-                    actor.DismountLadder();
                 }
             }
 

@@ -19,10 +19,16 @@ public class CharacterStateNetwork : MonoBehaviour{
         activeState = network[0];
     }
 
-    public void FixedUpdate()
+    public void Update()
     {
         activeState.Subject();
         activeState.Update();
+    }
+
+    public void FixedUpdate()
+    {
+        activeState.Subject();
+        activeState.FixedUpdate();
     }
 
     public void AddStateToNetwork(CharacterState state) {

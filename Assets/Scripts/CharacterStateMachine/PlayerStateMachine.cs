@@ -89,7 +89,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
             else if (player.grabbed && player.LedgeNearby()) { Transition("Player On Ledge"); }
         }
 
-        public override void Update() {
+        public override void FixedUpdate() {
             float speed = player.speed;
             if (player.sprinting) { speed = player.speed * 2; }
             player.rigidbody.AddForce(new Vector2(Mathf.Clamp(Input.GetAxis("Horizontal")*player.accelMultiplier, -1, 1) * speed, 0f));
@@ -119,7 +119,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
             player.SetSize(new Vector2(player.width, player.crouchHeight));
         }
 
-        public override void Update()
+        public override void FixedUpdate()
         {
             player.rigidbody.AddForce(new Vector2(Mathf.Clamp(Input.GetAxis("Horizontal") * player.accelMultiplier, -1, 1) * player.crouchSpeed, 0f));
 
@@ -155,7 +155,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
             player.rigidbody.AddForce(new Vector2(0f, player.jumpForce));
         }
 
-        public override void Update()
+        public override void FixedUpdate()
         {
             elapsedTime += Time.deltaTime;
         }
@@ -184,7 +184,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
             player.MountNearestLadder(player.maxReach);
         }
 
-        public override void Update()
+        public override void FixedUpdate()
         {
             if (player.ladder)
             {
@@ -222,7 +222,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
             player.GrabLedge();
         }
 
-        public override void Update()
+        public override void FixedUpdate()
         {
             if (Input.GetAxis("Vertical") > 0) {
                 player.ClimbLedge();
@@ -250,7 +250,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
             else if (!player.isGrounded && player.rigidbody.velocity.y > 0) { Transition("Player Rising"); }
         }
 
-        public override void Update()
+        public override void FixedUpdate()
         {
             player.rigidbody.AddForce(new Vector2((player.speed / 1.5f) * Input.GetAxis("Horizontal"), 0f));
         }
@@ -271,7 +271,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
             else if (!player.isGrounded && player.rigidbody.velocity.y < 0) { Transition("Player Falling"); }
         }
 
-        public override void Update()
+        public override void FixedUpdate()
         {
             player.rigidbody.AddForce(new Vector2((player.speed / 1.5f) * Input.GetAxis("Horizontal"), 0f));
         }
@@ -300,7 +300,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
             player.rigidbody.AddForce(new Vector2(Input.GetAxis("Horizontal") * (player.jumpForce), player.jumpForce));
         }
 
-        public override void Update()
+        public override void FixedUpdate()
         {
             elapsedTime += Time.deltaTime;
         }
@@ -316,4 +316,5 @@ public class PlayerCharacterState : CharacterState {
     public override void Update() { }
     public override void OnStateExit() { }
     public override void Subject() { }
+    public override void FixedUpdate() { }
 }
