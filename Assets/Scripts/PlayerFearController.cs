@@ -13,6 +13,7 @@ public class PlayerFearController : MonoBehaviour {
 
     /// <summary>
     /// Only visable for testing purposes, should never be manualy changed. Represents the player's current fear.
+    /// Use ChangeFear to change this value whenever possable
     /// </summary>
     [Tooltip("Only visable for testing purposes, should never be manualy changed. Represents the player's current fear.")]
     public int currentFear;
@@ -45,6 +46,16 @@ public class PlayerFearController : MonoBehaviour {
     private Collider2D[] inRange;
     private LayerMask enemyMask;
 
+    /// <summary>
+    /// Changes the character's fear
+    /// </summary>
+    /// <param name="fearChange">The ammount of fear to change, Positive adds fear, negitive removes it</param>
+    private void ChangeFear(int fearChange)
+    {
+        int newFear = currentFear + fearChange;
+        currentFear = Mathf.Clamp(newFear, 0, maxFear);
+    }
+
     private void Start()
     {
         currentFear = 0;
@@ -66,9 +77,12 @@ public class PlayerFearController : MonoBehaviour {
         {
             foreach (Collider2D enemy in inRange)
             {
+                EnemyClass enemyClass = enemy.GetComponent<EnemyClass>();
                 float distance = Vector2.Distance(enemy.transform.position, transform.position);
-                float fearMod = (fearRange - distance) / fearRange;
+                float fearMod = Mathf.Clamp((fearRange - distance) / fearRange, 0f, .9f) + .1f;
                 //Debug.Log("FearMod = " + fearMod);
+
+                ChangeFear((int)(enemyClass.fearDOT * fearMod));
             }
         }
     }
