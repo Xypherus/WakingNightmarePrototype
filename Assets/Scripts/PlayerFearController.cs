@@ -61,14 +61,14 @@ public class PlayerFearController : MonoBehaviour {
     private void FearTicker()
     {
         inRange = Physics2D.OverlapCircleAll(transform.position, fearRange, enemyMask);
-        Debug.Log("Inrange.length = " + inRange.Length);
+        //Debug.Log("Inrange.length = " + inRange.Length);
         if(inRange.Length != 0)
         {
             foreach (Collider2D enemy in inRange)
             {
                 float distance = Vector2.Distance(enemy.transform.position, transform.position);
                 float fearMod = (fearRange - distance) / fearRange;
-                Debug.Log("FearMod = " + fearMod);
+                //Debug.Log("FearMod = " + fearMod);
             }
         }
     }
