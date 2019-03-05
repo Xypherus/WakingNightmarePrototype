@@ -48,7 +48,7 @@ public class PlayerFearController : MonoBehaviour {
     private void Start()
     {
         currentFear = 0;
-        enemyMask = LayerMask.GetMask("Enemy");
+        enemyMask = 1 << LayerMask.NameToLayer("Enemy");
         InvokeRepeating("FearTicker", 1, fearTickTime);
     }
     private void Update()
@@ -61,6 +61,16 @@ public class PlayerFearController : MonoBehaviour {
     private void FearTicker()
     {
         inRange = Physics2D.OverlapCircleAll(transform.position, fearRange, enemyMask);
+        //Debug.Log("Inrange.length = " + inRange.Length);
+        if(inRange.Length != 0)
+        {
+            foreach (Collider2D enemy in inRange)
+            {
+                float distance = Vector2.Distance(enemy.transform.position, transform.position);
+                float fearMod = (fearRange - distance) / fearRange;
+                //Debug.Log("FearMod = " + fearMod);
+            }
+        }
     }
 
     public void FearUpdater()

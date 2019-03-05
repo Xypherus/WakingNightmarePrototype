@@ -7,6 +7,7 @@ TagManager:
   - Target
   - Environment
   - SafeZone
+  - FearObject
   layers:
   - Default
   - TransparentFX
