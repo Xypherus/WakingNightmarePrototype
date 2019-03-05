@@ -39,6 +39,7 @@ public class PlayerFearController : MonoBehaviour {
 
     #endregion
     //This is just a place holder, I need to figure out how to find wether or not the player is in fear range first
+    //I've set this variable up. It's true when out of fear range, false when in - Ben
     public bool outOfRange;
     //Tells wether player uses normal fear depletion or safezone fear depletion
     public bool safe = false;
@@ -66,15 +67,21 @@ public class PlayerFearController : MonoBehaviour {
     {
         if (outOfRange == true)
         {
-            StartCoroutine("FearFade");
+            //StartCoroutine("FearFade");
         }
     }
-    private void FearTicker()
+
+    /// <summary>
+    /// Performs all operations related to passive fear gain.
+    /// </summary>
+    /// <returns>Returns true if passive fear is being applied, false if not.</returns>
+    private bool ApplyPassiveFear()
     {
         inRange = Physics2D.OverlapCircleAll(transform.position, fearRange, enemyMask);
         //Debug.Log("Inrange.length = " + inRange.Length);
-        if(inRange.Length != 0)
+        if (inRange.Length != 0)
         {
+            outOfRange = false;
             foreach (Collider2D enemy in inRange)
             {
                 EnemyClass enemyClass = enemy.GetComponent<EnemyClass>();
@@ -84,7 +91,38 @@ public class PlayerFearController : MonoBehaviour {
 
                 ChangeFear((int)(enemyClass.fearDOT * fearMod));
             }
+            return true;
         }
+        else
+        {
+            outOfRange = true;
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Performs all operations related to fear decay.
+    /// </summary>
+    private void ApplyFearDecay()
+    {
+        //Moved code from FearFade to A function. Same effect, just prevents from having multiple coroutines running - Ben
+        if (outOfRange && currentFear > 0)
+        {
+            if (safe == true)
+            {
+                ChangeFear(-safezoneFearFade);
+            }
+            else
+            {
+                ChangeFear(-normalFearFade);
+            }
+        }
+    }
+
+    private void FearTicker()
+    {
+        ApplyPassiveFear();
+        ApplyFearDecay();
     }
 
     public void FearUpdater()
