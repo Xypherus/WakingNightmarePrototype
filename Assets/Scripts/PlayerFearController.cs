@@ -29,7 +29,18 @@ public class PlayerFearController : MonoBehaviour {
     [Tooltip("How frequently the fear tick checks.")]
     public float fearTickTime = .5f;
 
+    //How Much Fear Depletes
+    [Tooltip("The value at which the player's fear depletes")]
+    public int normalFearFade = 1;
+
+    [Tooltip("The value at which the player's fear depletes while in a safe zone")]
+    public int safezoneFearFade = 15;
+
     #endregion
+    //This is just a place holder, I need to figure out how to find wether or not the player is in fear range first
+    public bool outOfRange;
+    //Tells wether player uses normal fear depletion or safezone fear depletion
+    public bool safe = false;
 
     private Collider2D[] inRange;
     private LayerMask enemyMask;
@@ -40,7 +51,13 @@ public class PlayerFearController : MonoBehaviour {
         enemyMask = LayerMask.GetMask("Enemy");
         InvokeRepeating("FearTicker", 1, fearTickTime);
     }
-
+    private void Update()
+    {
+        if (outOfRange == true)
+        {
+            StartCoroutine("FearFade");
+        }
+    }
     private void FearTicker()
     {
         inRange = Physics2D.OverlapCircleAll(transform.position, fearRange, enemyMask);
@@ -49,6 +66,32 @@ public class PlayerFearController : MonoBehaviour {
     public void FearUpdater()
     {
 
+    }
+
+    //Subtracts values from currentfear every [Fearticker] seconds
+    IEnumerator FearFade()
+    { 
+        if(currentFear > 0)
+        {
+            if(safe == true)
+            {
+                currentFear = currentFear - safezoneFearFade;
+            }
+            else
+            {
+                currentFear = currentFear - normalFearFade;
+            }
+        }
+        yield return new WaitForSeconds(fearTickTime);
+    }
+
+    //Sets the safe zone variable to true if the player is in a safezone
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("SafeZone"))
+        {
+            safe = true;
+        }
     }
 
 }

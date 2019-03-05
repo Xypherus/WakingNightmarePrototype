@@ -16,7 +16,8 @@ public class PlayerController : NavmeshAgent2D {
     [Tooltip("The force used to propell the player upward. Higher values for objects with higher mass.")]
     public float jumpForce;
     #endregion
-    
+
+   
     public bool grabbed;
     public bool jumpped;
     public float crouchSpeed;
@@ -37,7 +38,6 @@ public class PlayerController : NavmeshAgent2D {
         fearController = gameObject.GetComponent<PlayerFearController>();
         stateMachine = GetComponent<PlayerStateMachine>();
     }
-
     protected override void Update() {
         //Call the Update function in the base NavmeshAgent2D
         base.Update();
@@ -225,6 +225,8 @@ public class PlayerController : NavmeshAgent2D {
             yield return new WaitForEndOfFrame();
         }
     }
+
+
 
     protected override void OnDrawGizmosSelected()
     {
