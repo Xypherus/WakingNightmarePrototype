@@ -60,7 +60,7 @@ public class PlayerController : NavmeshAgent2D {
             else { jumpped = false; }
         }
 
-        Debug.Log("The Active state is " + stateMachine.activeState.name);
+        //Debug.Log("The Active state is " + stateMachine.activeState.name);
     }
 
     // Update is called once per frame
