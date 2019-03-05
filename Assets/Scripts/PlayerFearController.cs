@@ -1,6 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+
+/// <summary>
+/// Types of fear
+/// </summary>
+public enum FearTypes { FearTypeA, FearTypeB, FearTypeC, FearTypeD };
 
 public class PlayerFearController : MonoBehaviour {
 
@@ -36,6 +42,13 @@ public class PlayerFearController : MonoBehaviour {
 
     [Tooltip("The value at which the player's fear depletes while in a safe zone")]
     public int safezoneFearFade = 15;
+
+    //What this person is afraid of
+    /// <summary>
+    /// Add all fears that this character is afraid of here
+    /// </summary>
+    [Tooltip("Add all fears that this character is afraid of here")]
+    public FearTypes[] fears;
 
     #endregion
     //This is just a place holder, I need to figure out how to find wether or not the player is in fear range first
@@ -79,25 +92,25 @@ public class PlayerFearController : MonoBehaviour {
     {
         inRange = Physics2D.OverlapCircleAll(transform.position, fearRange, enemyMask);
         //Debug.Log("Inrange.length = " + inRange.Length);
+        outOfRange = true;
         if (inRange.Length != 0)
         {
-            outOfRange = false;
             foreach (Collider2D enemy in inRange)
             {
-                EnemyClass enemyClass = enemy.GetComponent<EnemyClass>();
-                float distance = Vector2.Distance(enemy.transform.position, transform.position);
-                float fearMod = Mathf.Clamp((fearRange - distance) / fearRange, 0f, .9f) + .1f;
-                //Debug.Log("FearMod = " + fearMod);
+                if(fears.Contains(enemy.GetComponent<EnemyClass>().fearType))
+                {
+                    outOfRange = false;
+                    EnemyClass enemyClass = enemy.GetComponent<EnemyClass>();
+                    float distance = Vector2.Distance(enemy.transform.position, transform.position);
+                    float fearMod = Mathf.Clamp((fearRange - distance) / fearRange, 0f, .9f) + .1f;
+                    //Debug.Log("FearMod = " + fearMod);
 
-                ChangeFear((int)(enemyClass.fearDOT * fearMod));
+                    ChangeFear((int)(enemyClass.fearDOT * fearMod));
+                }
             }
             return true;
         }
-        else
-        {
-            outOfRange = true;
-            return false;
-        }
+        else { return false; }
     }
 
     /// <summary>

@@ -1878,6 +1878,7 @@ MonoBehaviour:
   fearTickTime: 0.5
   normalFearFade: 1
   safezoneFearFade: 15
+  fears: 00000000
   outOfRange: 0
   safe: 0
 --- !u!1001 &651628705
@@ -5350,6 +5351,7 @@ MonoBehaviour:
   agroDistance: 0
   trackDistance: 0
   enemyHealth: 0
+  fearType: 0
 --- !u!1001 &1502919936
 Prefab:
   m_ObjectHideFlags: 0

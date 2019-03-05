@@ -22,4 +22,11 @@ public class EnemyClass : MonoBehaviour {
     //Enemies total health
     public int enemyHealth;
 
+    //Added to support fear types - Ben
+    /// <summary>
+    /// The type fear that this enemy emits.
+    /// </summary>
+    [Tooltip("The type fear that this enemy emits.")]
+    public FearTypes fearType;
+
 }
