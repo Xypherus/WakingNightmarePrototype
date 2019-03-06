@@ -42,11 +42,17 @@ public class PlayerFearController : MonoBehaviour {
     [Tooltip("The value at which the player's fear depletes")]
     public int normalFearFade = 1;
 
-    // <summary>
-    // The rate at which the players fear depletes normally
-    // <summary>
+    /// <summary>
+    /// The rate at which the players fear depletes normally
+    /// </summary>
     [Tooltip("The value at which the player's fear depletes while in a safe zone")]
     public int safezoneFearFade = 15;
+
+    /// <summary>
+    /// Changes the delay between when a player gets hit and when they can start recovering fear. Set to 0 to disable.
+    /// </summary>
+    [Tooltip("Changes the delay between when a player gets hit and when they can start recovering fear. Set to 0 to disable.")]
+    public float fearDecayCooldown = 0;
 
     //What this person is afraid of
     /// <summary>
@@ -61,6 +67,16 @@ public class PlayerFearController : MonoBehaviour {
     public bool outOfRange;
     //Tells wether player uses normal fear depletion or safezone fear depletion
     public bool safe = false;
+
+    /// <summary>
+    /// Serves to allow for fear decay to go on cooldown. Should not be change manualy. See fearDecayCooldown variable to change functionality.
+    /// </summary>
+    public bool fearCanDecay;
+
+    /// <summary>
+    /// The actual time until fear can decay again.
+    /// </summary>
+    private float fearCooldownTime;
 
     private Collider2D[] inRange;
     private LayerMask enemyMask;
@@ -80,6 +96,7 @@ public class PlayerFearController : MonoBehaviour {
         currentFear = 0;
         enemyMask = 1 << LayerMask.NameToLayer("Enemy");
         InvokeRepeating("FearTicker", 1, fearTickTime);
+        fearCanDecay = true;
     }
     /// <summary>
     /// Performs all operations related to passive fear gain.
@@ -122,7 +139,7 @@ public class PlayerFearController : MonoBehaviour {
             {
                 ChangeFear(-safezoneFearFade);
             }
-            else
+            else if(fearCanDecay)
             {
                 ChangeFear(-normalFearFade);
             }
@@ -133,6 +150,34 @@ public class PlayerFearController : MonoBehaviour {
     {
         ApplyPassiveFear();
         ApplyFearDecay();
+    }
+
+    //This event applies active fear (On Collision Fear)
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+        {
+            ChangeFear(collision.gameObject.GetComponent<EnemyClass>().fearDealt);
+
+            //Handles the cooldown
+            fearCooldownTime = fearDecayCooldown;
+            if(fearCanDecay)
+            {
+                fearCanDecay = false;
+                StartCoroutine(SetDecayCooldown());
+            }
+        }
+    }
+
+    IEnumerator SetDecayCooldown()
+    {
+        while(fearCooldownTime != 0)
+        {
+            yield return new WaitForSeconds(1f);
+            fearCooldownTime--;
+        }
+
+        fearCanDecay = true;
     }
 
     public void FearUpdater()
