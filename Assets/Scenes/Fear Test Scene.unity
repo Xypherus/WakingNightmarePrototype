@@ -1878,9 +1878,11 @@ MonoBehaviour:
   fearTickTime: 0.5
   normalFearFade: 1
   safezoneFearFade: 15
+  fearDecayCooldown: 3
   fears: 00000000
   outOfRange: 0
   safe: 0
+  fearCanDecay: 0
 --- !u!1001 &651628705
 Prefab:
   m_ObjectHideFlags: 0
@@ -5345,7 +5347,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42b80122cf515de4c8d6cbc144f77e39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fearDealt: 0
+  fearDealt: 10
   fearDistance: 0
   fearDOT: 5
   agroDistance: 0
