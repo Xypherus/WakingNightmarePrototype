@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 70666627772198322}
   - component: {fileID: 50859852658705908}
   - component: {fileID: 114495443886058440}
+  - component: {fileID: 114604768576215224}
   m_Layer: 10
   m_Name: Player
   m_TagString: Untagged
@@ -133,8 +134,26 @@ MonoBehaviour:
   ladder: {fileID: 0}
   isStopped: 0
   pathing: 0
+  canMove: 1
   accelMultiplier: 10
   jumpForce: 210
+  grabbed: 0
+  jumpped: 0
+  crouchSpeed: 0
+--- !u!114 &114604768576215224
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1532883761468236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8e5d99f06b820040a9dd0c7fa5f787c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  speed: 0
+  offset: {x: 0, y: 0, z: 0}
 --- !u!212 &212680948935643776
 SpriteRenderer:
   m_ObjectHideFlags: 1
