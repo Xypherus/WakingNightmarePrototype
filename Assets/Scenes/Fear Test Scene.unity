@@ -1469,6 +1469,23 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4046284244731342, guid: 5999c160d521963439a09b9c7f9cdc02,
     type: 2}
   m_PrefabInternal: {fileID: 390880125}
+--- !u!1 &450434277 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1929700489804194, guid: 7e83a31aff7cd8a4e8bb21a29dddd407,
+    type: 2}
+  m_PrefabInternal: {fileID: 1825829406}
+--- !u!114 &450434282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 450434277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7df1c4533643c344cb822909f9d954c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameManger: {fileID: 1614739130903878, guid: 2dba9ea5a89777449bdeb21615d3084e, type: 2}
 --- !u!1001 &454596762
 Prefab:
   m_ObjectHideFlags: 0
@@ -2909,6 +2926,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 114087522974943790, guid: 23f972d680e86dd4da87e8a18548994e,
+        type: 2}
+      propertyPath: fears.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4861670924193674, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
       propertyPath: m_LocalPosition.x
       value: 9.48
@@ -2940,6 +2962,11 @@ Prefab:
     - target: {fileID: 4861670924193674, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
       propertyPath: m_RootOrder
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114087522974943790, guid: 23f972d680e86dd4da87e8a18548994e,
+        type: 2}
+      propertyPath: fears.Array.data[1]
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
