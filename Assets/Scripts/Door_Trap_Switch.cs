@@ -3,24 +3,34 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Door_Trap_Switch : MonoBehaviour{
-    triggerscript trigger;
+    Triggerscript trigger;
     private Animator open;
+    private Rigidbody2D trap;
     public string switch_key = "v";
 
     private void Start()
     {
-        gameObject.GetComponent<Animator>();
+        trap = gameObject.GetComponent<Rigidbody2D>();
+        if(gameObject.GetComponent<Animator>() != null)
+        {
+            Debug.Log("Door animation found.");
+            open = gameObject.GetComponent<Animator>();
+        }
     }
+
     private void Update()
     {
+
         if(trigger.triggered == true && gameObject.CompareTag("Door"))
         {
             open.SetBool("isopen", true);
         }
+
         if(trigger.triggered == true && gameObject.CompareTag("Trap"))
         {
-            gameObject.SetActive(true);
+            trap.isKinematic = false;
         }
+
         if (trigger.triggered == true && gameObject.CompareTag("Switch"))
         {
             if (Input.GetKeyDown(switch_key))
@@ -28,7 +38,7 @@ public class Door_Trap_Switch : MonoBehaviour{
                 open.SetBool("isopen", true);
             }
         }
-        else
+        if (trigger.triggered == false)
         {
             open.SetBool("isopen", false);
         }
