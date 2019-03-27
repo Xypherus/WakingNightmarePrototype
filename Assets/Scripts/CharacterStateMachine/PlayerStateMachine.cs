@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerStateMachine : CharacterStateNetwork {
     public PlayerController player;
 
+    public PlayerIncappacitated incappacitated;
     public PlayerWalking walking;
     public PlayerCrawling crawling;
     public PlayerJumping jumping;
@@ -18,6 +19,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
     void Start () {
         player = GetComponent<PlayerController>();
 
+        incappacitated = new PlayerIncappacitated(this, player);
         walking = new PlayerWalking(this, player);
         crawling = new PlayerCrawling(this, player);
         jumping = new PlayerJumping(this, player, 0.5f);
@@ -27,6 +29,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
         rising = new PlayerRising(this, player);
         falling = new PlayerFalling(this, player);
 
+        walking.AddTransition(incappacitated);
         walking.AddTransition(crawling);
         walking.AddTransition(falling);
         walking.AddTransition(rising);
@@ -34,35 +37,42 @@ public class PlayerStateMachine : CharacterStateNetwork {
         walking.AddTransition(onLadder);
         walking.AddTransition(onLedge);
 
+        crawling.AddTransition(incappacitated);
         crawling.AddTransition(walking);
         crawling.AddTransition(rising);
         crawling.AddTransition(falling);
         crawling.AddTransition(onLedge);
         crawling.AddTransition(onLadder);
 
+        jumping.AddTransition(incappacitated);
         jumping.AddTransition(rising);
         jumping.AddTransition(falling);
         jumping.AddTransition(onLadder);
         jumping.AddTransition(onLedge);
         jumping.AddTransition(walking);
 
+        jumpFromGrab.AddTransition(incappacitated);
         jumpFromGrab.AddTransition(rising);
         jumpFromGrab.AddTransition(falling);
         jumpFromGrab.AddTransition(onLadder);
         jumpFromGrab.AddTransition(onLedge);
         jumpFromGrab.AddTransition(walking);
 
+        onLadder.AddTransition(incappacitated);
         onLadder.AddTransition(jumpFromGrab);
         onLadder.AddTransition(falling);
 
+        onLedge.AddTransition(incappacitated);
         onLedge.AddTransition(jumpFromGrab);
         onLedge.AddTransition(falling);
 
+        rising.AddTransition(incappacitated);
         rising.AddTransition(onLedge);
         rising.AddTransition(onLadder);
         rising.AddTransition(falling);
         rising.AddTransition(walking);
 
+        falling.AddTransition(incappacitated);
         falling.AddTransition(onLedge);
         falling.AddTransition(onLadder);
         falling.AddTransition(rising);
@@ -72,6 +82,28 @@ public class PlayerStateMachine : CharacterStateNetwork {
     }
 
     #region Player States
+    public class PlayerIncappacitated : PlayerCharacterState {
+        PlayerController player;
+
+        public PlayerIncappacitated(CharacterStateNetwork network, PlayerController player) : base("Player Incappacitated", network) {
+            this.player = player;
+        }
+
+        public override void Subject()
+        {
+            if (player.fearController.currentFear < player.fearController.maxFear) { Transition("Player Walking"); }
+        }
+
+        public override void OnStateEnter()
+        {
+            player.animator.SetBool("Dead", true);
+        }
+
+        public override void OnStateExit()
+        {
+            player.animator.SetBool("Dead", false);
+        }
+    }
     public class PlayerWalking : PlayerCharacterState {
         PlayerController player;
 
@@ -80,8 +112,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void Subject()
         {
-            //TODO: add a state condition for death when fear is implemented
-            if (player.isGrounded && player.jumpped) { Transition("Player Jumping"); }
+            if (player.fearController.currentFear >= player.fearController.maxFear) { Transition("Player Incappacitated"); }
+            else if (player.isGrounded && player.jumpped) { Transition("Player Jumping"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y > 0) { Transition("Player Rising"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y < 0) { Transition("Player Falling"); }
             else if (player.isGrounded && player.isProne) { Transition("Player Crawling"); }
@@ -92,7 +124,9 @@ public class PlayerStateMachine : CharacterStateNetwork {
         public override void FixedUpdate() {
             float speed = player.speed;
             if (player.sprinting) { speed = player.speed * 2; }
-            player.rigidbody.AddForce(new Vector2(Mathf.Clamp(Input.GetAxis("Horizontal")*player.accelMultiplier, -1, 1) * speed, 0f));
+
+            if (player.pathing) { player.Move(new Vector2 (player.GetWalkDirection(), 0f)); }
+            else { player.Move(new Vector2 (Input.GetAxis("Horizontal"), 0f)); }
 
             player.Decelerate();
         }
@@ -106,8 +140,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void Subject()
         {
-            //TODO: add a state condition for death when fear is implemented
-            if (!player.isGrounded && player.rigidbody.velocity.y > 0) { Transition("Player Rising"); }
+            if (player.fearController.currentFear >= player.fearController.maxFear) { Transition("Player Incappacitated"); }
+            else if (!player.isGrounded && player.rigidbody.velocity.y > 0) { Transition("Player Rising"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y < 0) { Transition("Player Falling"); }
             else if (player.isGrounded && !player.isProne) { Transition("Player Walking"); }
             else if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
@@ -142,8 +176,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void Subject()
         {
-            //TODO: add a state condition for death when fear is implemented
-            if (player.isGrounded) { Transition("Player Walking"); }
+            if (player.fearController.currentFear >= player.fearController.maxFear) { Transition("Player Incappacitated"); }
+            else if (player.isGrounded) { Transition("Player Walking"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y > 0 && elapsedTime >= maxTime) { Transition("Player Rising"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y < 0 && elapsedTime >= maxTime) { Transition("Player Falling"); }
             else if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
@@ -152,7 +186,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void OnStateEnter()
         {
-            player.rigidbody.AddForce(new Vector2(0f, player.jumpForce));
+            player.Jump(0f);
         }
 
         public override void FixedUpdate()
@@ -174,8 +208,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void Subject()
         {
-            //TODO: add a state condition for death when fear is implemented
-            if (player.grabbed || !player.ladder) { Transition("Player Falling"); Debug.Log("tests: " + player.grabbed + " OR " + !player.ladder); }
+            if (player.fearController.currentFear >= player.fearController.maxFear) { Transition("Player Incappacitated"); }
+            else if (player.grabbed || !player.ladder) { Transition("Player Falling"); Debug.Log("tests: " + player.grabbed + " OR " + !player.ladder); }
             else if (player.jumpped) { Transition("Player Jump From Grab"); }
         }
 
@@ -212,8 +246,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void Subject()
         {
-            //TODO: add a state condition for death when fear is implemented
-            if (player.grabbed || player.ledge == null) { Transition("Player Falling"); }
+            if (player.fearController.currentFear >= player.fearController.maxFear) { Transition("Player Incappacitated"); }
+            else if (player.grabbed || player.ledge == null) { Transition("Player Falling"); }
             else if (player.jumpped) { Transition("Player Jump From Grab"); }
         }
 
@@ -243,8 +277,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void Subject()
         {
-            //TODO: add a state condition for death when fear is implemented
-            if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
+            if (player.fearController.currentFear >= player.fearController.maxFear) { Transition("Player Incappacitated"); }
+            else if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
             else if (player.grabbed && player.LedgeNearby()) { Transition("Player On Ledge"); }
             else if (player.isGrounded) { Transition("Player Walking"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y > 0) { Transition("Player Rising"); }
@@ -264,8 +298,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void Subject()
         {
-            //TODO: add a state condition for death when fear is implemented
-            if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
+            if (player.fearController.currentFear >= player.fearController.maxFear) { Transition("Player Incappacitated"); }
+            else if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
             else if (player.grabbed && player.LedgeNearby()) { Transition("Player On Ledge"); }
             else if (player.isGrounded) { Transition("Player Walking"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y < 0) { Transition("Player Falling"); }
@@ -287,8 +321,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void Subject()
         {
-            //TODO: add a state condition for death when fear is implemented
-            if (player.isGrounded) { Transition("Player Walking"); }
+            if (player.fearController.currentFear >= player.fearController.maxFear) { Transition("Player Incappacitated"); }
+            else if (player.isGrounded) { Transition("Player Walking"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y > 0 && elapsedTime >= maxTime) { Transition("Player Rising"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y < 0 && elapsedTime >= maxTime) { Transition("Player Falling"); }
             else if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
@@ -297,7 +331,13 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void OnStateEnter()
         {
-            player.rigidbody.AddForce(new Vector2(Input.GetAxis("Horizontal") * (player.jumpForce), player.jumpForce));
+            if (player.pathing)
+            {
+                player.Jump(player.GetWalkDirection());
+            }
+            else {
+                player.Jump(Input.GetAxisRaw("Horizontal"));
+            }
         }
 
         public override void FixedUpdate()

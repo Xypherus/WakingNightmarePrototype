@@ -19,6 +19,7 @@ public class NavmeshArea2D : MonoBehaviour {
     public List<NavmeshAgent2D> agents;
     [Tooltip("The 2D box to limit the creation of the navmesh.")]
     public Bounds bounds;
+    public int debugIndex;
     public bool showDebug;
     #endregion
 
@@ -62,14 +63,14 @@ public class NavmeshArea2D : MonoBehaviour {
         {
             for(int x = 0; x < xcount; x++)
             {
-                foreach (NavmeshNode2D.NavmeshNodeConnection2D connection in meshes[agents[0]][x,y].connections)
+                foreach (NavmeshNode2D.NavmeshNodeConnection2D connection in meshes[agents[ debugIndex]][x,y].connections)
                 {
                     if (connection.a.type == NavmeshNode2D.NodeType.None || 
                         connection.b.type == NavmeshNode2D.NodeType.None || 
                         connection.b.type == NavmeshNode2D.NodeType.Air  ||
                         connection.jump) { continue; }
                     Color lineColor = Color.white;
-                    switch (meshes[agents[0]][x,y].type)
+                    switch (meshes[agents[debugIndex]][x,y].type)
                     {
                         case NavmeshNode2D.NodeType.Walkable:
                             lineColor = Color.blue;
@@ -296,16 +297,18 @@ public class NavmeshArea2D : MonoBehaviour {
             InitializeGrid();
         }
 
+        DrawDebugLines();
+
         for (int x = 0; x < xcount || showDebug; x++)
         {
             for (int y = 0; y < ycount; y++)
             {
-                if (meshes[agents[0]][x, y].type == NavmeshNode2D.NodeType.Air) { continue; }
+                if (meshes[agents[debugIndex]][x, y].type == NavmeshNode2D.NodeType.Air) { continue; }
 
-                switch (meshes[agents[0]][x, y].type)
+                switch (meshes[agents[debugIndex]][x, y].type)
                 {
                     case NavmeshNode2D.NodeType.None:
-                        Gizmos.color = Color.black;
+                        Gizmos.color = Color.red;
                         break;
                     case NavmeshNode2D.NodeType.Walkable:
                         Gizmos.color = Color.green;
@@ -314,13 +317,13 @@ public class NavmeshArea2D : MonoBehaviour {
                         Gizmos.color = Color.yellow;
                         break;
                     case NavmeshNode2D.NodeType.Ledge:
-                        Gizmos.color = Color.magenta;
+                        Gizmos.color = Color.blue;
                         break;
                     case NavmeshNode2D.NodeType.Ladder:
                         Gizmos.color = Color.magenta;
                         break;
                 }
-                Gizmos.DrawSphere(meshes[agents[0]][x, y].worldPosition, resolution / 4);
+                Gizmos.DrawSphere(meshes[agents[debugIndex]][x, y].worldPosition, resolution / 4);
             }
         }
     }
@@ -411,6 +414,12 @@ public class NavmeshNode2D
     public void Connect(NavmeshNode2D destination, bool jump = false)
     {
         UnityEngine.Profiling.Profiler.BeginSample("Creating Connection");
+
+        for(int i = 0; i < connections.Count; i++)
+        {
+            if (connections[i].b == destination) { UnityEngine.Profiling.Profiler.EndSample(); return; }
+        }
+
         if (jump)
         {
             if ((type == NodeType.None || type == NodeType.Air) && (destination.type == NodeType.Air || destination.type == NodeType.None) )
@@ -419,13 +428,7 @@ public class NavmeshNode2D
                 return;
             }
         }
-        
-        for(int i = 0; i < connections.Count; i++)
-        {
-            if (connections[i].b == destination) { UnityEngine.Profiling.Profiler.EndSample(); return; }
-        }
-
-        
+                
         NavmeshNodeConnection2D connection = new NavmeshNodeConnection2D(this, destination, jump);
         connections.Add(connection);
         UnityEngine.Profiling.Profiler.EndSample();
@@ -470,6 +473,14 @@ public class NavmeshNode2D
                 i--;
             }
         }
+    }
+
+    public NavmeshNode2D.NavmeshNodeConnection2D GetConnection(NavmeshNode2D destination) {
+        foreach (NavmeshNodeConnection2D connection in connections) {
+            if (connection.b == destination) { return connection; }
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -539,7 +550,7 @@ public class NavmeshNode2D
                 asset = selection;
                 break;
             }
-            else if (layerName == "Ladder") { asset = selection; }
+            else if (layerName == "Ladder") { asset = selection;  }
         }
 
         if (asset)
@@ -572,6 +583,8 @@ public class NavmeshNode2D
     /// </summary>
     public void DetectSurface()
     {
+        NavmeshNode2D.NodeType oldType = type;
+
         UnityEngine.Profiling.Profiler.BeginSample("Surface Detection");
         if (type == NodeType.Air || type == NodeType.Ladder)
         {
@@ -588,7 +601,7 @@ public class NavmeshNode2D
                     if (clearence <= agent.GetSize().y)
                     {
                         //check if it is less than or equal to the agent's crouch height. if that is true, the NodeType is NodeType.None. 
-                        if (clearence <= agent.crouchHeight) { type = NodeType.Air; }
+                        if (clearence <= agent.crouchHeight) { type = oldType; }
                         //If not, the NodeType is NodeType.Crawlable.
                         else { type = NodeType.Crawlable; }
                     }
@@ -600,7 +613,7 @@ public class NavmeshNode2D
             }
         }
 
-        if (type == NodeType.Walkable || type == NodeType.Crawlable || type == NodeType.Ladder) {
+        if (type == NodeType.Walkable || type == NodeType.Crawlable ) {
             List<NavmeshNodeConnection2D> connections = new List<NavmeshNodeConnection2D>();
             ConnectedToTypes(new List<NodeType> { NodeType.Air, NodeType.Ladder}, out connections);
 
@@ -615,6 +628,8 @@ public class NavmeshNode2D
     void DetectLedge() {
         UnityEngine.Profiling.Profiler.BeginSample("Ledge Detection");
         if (type != NodeType.Air && type != NodeType.Ladder) { UnityEngine.Profiling.Profiler.EndSample(); return; }
+
+        NavmeshNode2D.NodeType oldType = type;
 
         List<NavmeshNodeConnection2D> connections = new List<NavmeshNodeConnection2D>();
 
@@ -635,7 +650,7 @@ public class NavmeshNode2D
             }
         }
 
-        type = NodeType.Air;
+        type = oldType;
         UnityEngine.Profiling.Profiler.EndSample();
     }
 

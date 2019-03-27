@@ -25,7 +25,7 @@ public class Door_Trap_Switch : MonoBehaviour{
         {
             if (Input.GetKeyDown(switch_key))
             {
-                open.SetBool("isopen", true)
+                open.SetBool("isopen", true);
             }
         }
         else

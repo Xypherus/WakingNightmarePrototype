@@ -13,6 +13,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     public float speed;
     public float maxSpeed;
     public float maxReach;
+    public float stoppingDistance;
     #endregion
 
     #region Movement Bools
@@ -20,6 +21,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     public bool canGrab = true;
     public bool isProne;
     public bool sprinting = false;
+    public bool isDead;
     #endregion
 
     public List<NavmeshNode2D> path = new List<NavmeshNode2D>();
@@ -214,6 +216,60 @@ public class NavmeshAgent2D : MonoBehaviour {
         }
     }
 
+    public virtual float GetWalkDirection() {
+        if (!pathing || path.Count == 0) { return 0; }
+
+        NavmeshNode2D targetNode = GetTargetNodeInPath();
+        Vector2 heading = targetNode.worldPosition - transform.position;
+        float xdirection = heading.x / Mathf.Abs(heading.x);
+        return xdirection;
+    }
+
+    public virtual Vector2 GetWalkVector() {
+        if (!pathing || path.Count == 0) { return Vector2.zero; }
+
+        NavmeshNode2D targetNode = GetTargetNodeInPath();
+        Vector2 heading = targetNode.worldPosition - transform.position;
+        float distance = heading.magnitude;
+        Vector2 direction = heading / distance;
+
+        return direction;
+    }
+
+    public void FindPathTo(Vector3 position) {
+        path = GetPath(transform.position, position);
+    }
+
+    public virtual NavmeshNode2D GetTargetNodeInPath() {
+        NavmeshNode2D closestNode = GetClosestNodeInPath();
+        if (path.Count == 0 || closestNode == null) {
+            return null;
+        }
+
+        if (Vector2.Distance(closestNode.worldPosition, transform.position) > stoppingDistance) { return closestNode; }
+        else {
+            for (int i = path.IndexOf(closestNode); i < path.Count; i++) {
+                if (Vector2.Distance(path[i].worldPosition, transform.position) > stoppingDistance) { return path[i]; }
+            }
+        }
+
+        return closestNode;
+    }
+
+    public virtual NavmeshNode2D GetClosestNodeInPath() {
+        if (path.Count == 0) { return null; }
+
+        NavmeshNode2D currentNode = area.NodeAtPoint(transform.position, this);
+        NavmeshNode2D nearest = path[0];
+        float nearestDistance = Vector2.Distance(nearest.worldPosition, transform.position);
+        foreach (NavmeshNode2D node in path) {
+            float distance = Vector2.Distance(node.worldPosition, transform.position);
+            if (distance < nearestDistance) { nearest = node; nearestDistance = distance; }
+        }
+
+        return nearest;
+    }
+
     protected virtual Transform GetGround() {
         if (!isGrounded) { return null; }
 
@@ -232,7 +288,7 @@ public class NavmeshAgent2D : MonoBehaviour {
         NavmeshNode2D startNode = area.NodeAtPoint(start, this);
         NavmeshNode2D endNode = area.NodeAtPoint(end, this);
         NavmeshNode2D currentNode = startNode;
-        
+
 
         if (startNode.type == NavmeshNode2D.NodeType.None || startNode == null) { return closedList; }
 
@@ -240,12 +296,16 @@ public class NavmeshAgent2D : MonoBehaviour {
         TotalCost(startNode, startNode, endNode);
 
         int count = 0;
-        while (currentNode != endNode && count < 1000) {
+        while (currentNode != endNode && count < 1000)
+        {
             NavmeshNode2D best = currentNode.connections[0].b;
             TotalCost(currentNode, best, endNode);
-            foreach (NavmeshNode2D.NavmeshNodeConnection2D connection in currentNode.connections) {
+            foreach (NavmeshNode2D.NavmeshNodeConnection2D connection in currentNode.connections)
+            {
+                if (connection.b.connections.Count == 0 || connection.b.type == NavmeshNode2D.NodeType.None) { continue; }
                 TotalCost(connection.a, connection.b, endNode);
-                if (connection.b.fcost <= best.fcost) {
+                if (connection.b.fcost <= best.fcost)
+                {
                     best = connection.b;
                 }
             }
@@ -253,9 +313,10 @@ public class NavmeshAgent2D : MonoBehaviour {
             currentNode = best;
             count++;
         }
-        if (currentNode != endNode && jumpDistance > 0) {
+        if (currentNode != endNode)
+        {
             //could do something here if path is not found
-
+            Debug.LogWarning("Couldn't find a complete path");
         }
 
         return closedList;
@@ -272,7 +333,7 @@ public class NavmeshAgent2D : MonoBehaviour {
 
     protected virtual float Gcost(NavmeshNode2D parent, NavmeshNode2D n) {
         if (n.type == NavmeshNode2D.NodeType.None) { n.gcost = Mathf.Infinity; }
-        else if (parent == n) { n.gcost = 0; }
+        else if (n.type == NavmeshNode2D.NodeType.Air) { n.gcost = parent.gcost + Vector2.Distance(parent.worldPosition, n.worldPosition) * 2; }
         else
         {
             n.gcost = parent.gcost + Vector2.Distance(parent.worldPosition, n.worldPosition);
@@ -347,9 +408,13 @@ public class NavmeshAgent2D : MonoBehaviour {
     protected virtual void OnDrawGizmosSelected() {
         if (!area) { area = FindObjectOfType<NavmeshArea2D>(); }
 
-        Gizmos.DrawCube(area.NodeAtPoint(transform.position, this).worldPosition, Vector3.one/4);
-        for (int i = 1; i < path.Count; i++) {
-            Debug.DrawLine(path[i-1].worldPosition, path[i].worldPosition, Color.green);
+        if (Application.isPlaying && path.Count >0)
+        {
+            Gizmos.DrawCube(area.NodeAtPoint(transform.position, this).worldPosition, Vector3.one / 4);
+            for (int i = 1; i < path.Count; i++)
+            {
+                Debug.DrawLine(path[i - 1].worldPosition, path[i].worldPosition, Color.green);
+            }
         }
 
         DrawGroundedBox();
