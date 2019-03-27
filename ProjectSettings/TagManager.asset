@@ -8,6 +8,8 @@ TagManager:
   - Environment
   - SafeZone
   - FearObject
+  - FearZone
+  - Door
   layers:
   - Default
   - TransparentFX
