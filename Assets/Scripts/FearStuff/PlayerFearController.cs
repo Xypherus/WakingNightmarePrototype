@@ -4,9 +4,9 @@ using UnityEngine;
 using System.Linq;
 
 /// <summary>
-/// Types of fear
+/// Types of fear. Darkness is here for convience, should not be applied directly as a fear that a character has.
 /// </summary>
-public enum FearTypes { FearTypeA, FearTypeB, FearTypeC, FearTypeD };
+public enum FearTypes { FearTypeA, FearTypeB, FearTypeC, FearTypeD, Darkness };
 
 public class PlayerFearController : MonoBehaviour {
 
@@ -54,6 +54,12 @@ public class PlayerFearController : MonoBehaviour {
     [Tooltip("Changes the delay between when a player gets hit and when they can start recovering fear. Set to 0 to disable.")]
     public float fearDecayCooldown = 0;
 
+    /// <summary>
+    /// The fear modifier applied by darkness. Set to 1.0f for no modifier.
+    /// </summary>
+    [Tooltip("The fear modifier applied by darkness. Set to 1.0f for no modifier.")]
+    public float darknessFearChange = 1.5f;
+
     //What this person is afraid of
     /// <summary>
     /// Add all fears that this character is afraid of here
@@ -86,6 +92,11 @@ public class PlayerFearController : MonoBehaviour {
     public int appliedAreaFear;
 
     /// <summary>
+    /// Modifier which is applied to all fear changes. Used primarly for darkness. Visable for debug
+    /// </summary>
+    public float currentFearModifier;
+
+    /// <summary>
     /// The actual time until fear can decay again.
     /// </summary>
     private float fearCooldownTime;
@@ -104,7 +115,7 @@ public class PlayerFearController : MonoBehaviour {
     /// <param name="fearChange">The ammount of fear to change, Positive adds fear, negitive removes it</param>
     private void ChangeFear(int fearChange)
     {
-        int newFear = currentFear + fearChange;
+        int newFear = currentFear + (int)(fearChange * currentFearModifier);
         currentFear = Mathf.Clamp(newFear, 0, maxFear);
 
         if(currentFear == maxFear)
@@ -116,6 +127,7 @@ public class PlayerFearController : MonoBehaviour {
     private void Start()
     {
         currentFear = 0;
+        currentFearModifier = 1.0f;
         enemyMask = 1 << LayerMask.NameToLayer("Enemy");
         InvokeRepeating("FearTicker", 1, fearTickTime);
         fearCanDecay = true;
@@ -157,15 +169,17 @@ public class PlayerFearController : MonoBehaviour {
     private bool ApplyZoneFear()
     {
         outOfZone = true;
+        currentFearModifier = 1.0f;
         if(withinFearZones.Count != 0)
         {
             foreach(FearZone aFear in withinFearZones)
             {
-                if(fears.Contains(aFear.fearType))
+                if(fears.Contains(aFear.fearType) && aFear.fearApplied != 0)
                 {
                     outOfZone = false;
                     ChangeFear(aFear.fearApplied);
                 }
+                if(aFear.fearType == FearTypes.Darkness) { currentFearModifier = darknessFearChange; }
             }
             return true;
         }

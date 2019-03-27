@@ -9,6 +9,9 @@ TagManager:
   - SafeZone
   - FearObject
   - FearZone
+  - Door
+  - Trap
+  - Switch
   layers:
   - Default
   - TransparentFX
