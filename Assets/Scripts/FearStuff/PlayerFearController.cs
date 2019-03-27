@@ -62,9 +62,16 @@ public class PlayerFearController : MonoBehaviour {
     public FearTypes[] fears;
 
     #endregion
+    
     //This is just a place holder, I need to figure out how to find wether or not the player is in fear range first
     //I've set this variable up. It's true when out of fear range, false when in - Ben
     public bool outOfRange;
+
+    /// <summary>
+    /// Same Function as outOfRange for for passive fear zones rather than active
+    /// </summary>
+    public bool outOfZone;
+
     //Tells wether player uses normal fear depletion or safezone fear depletion
     public bool safe = false;
 
@@ -74,21 +81,36 @@ public class PlayerFearController : MonoBehaviour {
     public bool fearCanDecay;
 
     /// <summary>
+    /// Total fear that will be applied via area fear per tick.
+    /// </summary>
+    public int appliedAreaFear;
+
+    /// <summary>
     /// The actual time until fear can decay again.
     /// </summary>
     private float fearCooldownTime;
+
+    /// <summary>
+    /// Fear zones that the player is in. Only visable for debug, should not be manualy changed.
+    /// </summary>
+    public List<FearZone> withinFearZones;
 
     private Collider2D[] inRange;
     private LayerMask enemyMask;
 
     /// <summary>
-    /// Changes the character's fear
+    /// Changes the character's fear. Please use this function in liu of directly changing fear, as this includes several checks.
     /// </summary>
     /// <param name="fearChange">The ammount of fear to change, Positive adds fear, negitive removes it</param>
     private void ChangeFear(int fearChange)
     {
         int newFear = currentFear + fearChange;
         currentFear = Mathf.Clamp(newFear, 0, maxFear);
+
+        if(currentFear == maxFear)
+        {
+            TriggerDeath();
+        }
     }
 
     private void Start()
@@ -127,13 +149,53 @@ public class PlayerFearController : MonoBehaviour {
         else { return false; }
     }
 
+    #region ZoneFear
+    /// <summary>
+    /// Carries out all operations related to Zone Fear
+    /// </summary>
+    /// <returns>Returns true if zone fear is being applied, false if not</returns>
+    private bool ApplyZoneFear()
+    {
+        outOfZone = true;
+        if(withinFearZones.Count != 0)
+        {
+            foreach(FearZone aFear in withinFearZones)
+            {
+                if(fears.Contains(aFear.fearType))
+                {
+                    outOfZone = false;
+                    ChangeFear(aFear.fearApplied);
+                }
+            }
+            return true;
+        }
+        else { return false; }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.CompareTag("FearZone"))
+        {
+            withinFearZones.Add(collision.GetComponent<FearZone>());
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if(collision.CompareTag("FearZone"))
+        {
+            withinFearZones.Remove(collision.GetComponent<FearZone>());
+        }
+    }
+    #endregion
+
     /// <summary>
     /// Performs all operations related to fear decay.
     /// </summary>
     private void ApplyFearDecay()
     {
         //Moved code from FearFade to A function. Same effect, just prevents from having multiple coroutines running - Ben
-        if (outOfRange && currentFear > 0)
+        if (outOfRange && outOfZone && currentFear > 0)
         {
             if (safe == true)
             {
@@ -146,10 +208,20 @@ public class PlayerFearController : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Function to put all operations that need to be performed upon death.
+    /// Currently empty, change as needed
+    /// </summary>
+    private void TriggerDeath()
+    {
+
+    }
+
     private void FearTicker()
     {
         ApplyPassiveFear();
         ApplyFearDecay();
+        ApplyZoneFear();
     }
 
     //This event applies active fear (On Collision Fear)

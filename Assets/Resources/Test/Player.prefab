@@ -23,9 +23,11 @@ GameObject:
   - component: {fileID: 50859852658705908}
   - component: {fileID: 114495443886058440}
   - component: {fileID: 114604768576215224}
+  - component: {fileID: 114962938915135368}
+  - component: {fileID: 114087522974943790}
   m_Layer: 10
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -53,7 +55,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1532883761468236}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -22.1, y: -0.4, z: 0.3642578}
+  m_LocalPosition: {x: 9.48, y: 6.88, z: 0.3642578}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_Children:
   - {fileID: 4939784398955738}
@@ -108,6 +110,28 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0.5}
   m_Size: {x: 1, y: 1}
   m_Direction: 0
+--- !u!114 &114087522974943790
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1532883761468236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 822deda5c15224840ba1cf9a4d2b8715, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxFear: 100
+  currentFear: 0
+  fearRange: 10
+  fearTickTime: 0.5
+  normalFearFade: 1
+  safezoneFearFade: 15
+  fearDecayCooldown: 3
+  fears: 00000000
+  outOfRange: 0
+  safe: 0
+  fearCanDecay: 0
 --- !u!114 &114495443886058440
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -123,8 +147,8 @@ MonoBehaviour:
   height: 1
   crouchHeight: 0
   jumpDistance: 1
-  speed: 15
-  maxSpeed: 30
+  speed: 10
+  maxSpeed: 15
   maxReach: 1
   isGrounded: 0
   canGrab: 1
@@ -139,8 +163,22 @@ MonoBehaviour:
   jumpForce: 210
   grabbed: 0
   jumpped: 0
-  crouchSpeed: 0
+  crouchSpeed: 7
 --- !u!114 &114604768576215224
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1532883761468236}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8e5d99f06b820040a9dd0c7fa5f787c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 4861670924193674}
+  speed: 0
+  offset: {x: 0, y: 0, z: 0}
+--- !u!114 &114962938915135368
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -148,12 +186,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1532883761468236}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8e5d99f06b820040a9dd0c7fa5f787c, type: 3}
+  m_Script: {fileID: 11500000, guid: f9ae141b4a962514789fb87279e077ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
-  speed: 0
-  offset: {x: 0, y: 0, z: 0}
 --- !u!212 &212680948935643776
 SpriteRenderer:
   m_ObjectHideFlags: 1
