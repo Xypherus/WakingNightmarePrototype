@@ -10,6 +10,8 @@ TagManager:
   - FearObject
   - FearZone
   - Door
+  - Trap
+  - Switch
   layers:
   - Default
   - TransparentFX
