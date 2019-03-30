@@ -125,7 +125,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
             float speed = player.speed;
             if (player.sprinting) { speed = player.speed * 2; }
 
-            if (player.pathing) { player.Move(new Vector2 (player.GetWalkDirection(), 0f)); }
+            if (player.pathing) { player.Move(player.GetWalkVector()); }
             else { player.Move(new Vector2 (Input.GetAxis("Horizontal"), 0f)); }
 
             player.Decelerate();
@@ -209,7 +209,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
         public override void Subject()
         {
             if (player.fearController.currentFear >= player.fearController.maxFear) { Transition("Player Incappacitated"); }
-            else if (player.grabbed || !player.ladder) { Transition("Player Falling"); Debug.Log("tests: " + player.grabbed + " OR " + !player.ladder); }
+            else if (player.grabbed || !player.ladder) { Transition("Player Falling"); }
             else if (player.jumpped) { Transition("Player Jump From Grab"); }
         }
 
@@ -222,6 +222,10 @@ public class PlayerStateMachine : CharacterStateNetwork {
         {
             if (player.ladder)
             {
+                if (player.pathing) { player.Move(player.GetWalkVector()); }
+                else { player.Move(new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))); }
+
+                /*
                 player.ladder.MoveOnLadder(player, new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
 
                 if (player.ladder.ladderType == Ladder.LadderType.Side) {
@@ -229,12 +233,13 @@ public class PlayerStateMachine : CharacterStateNetwork {
                         player.ladder.GetComponent<Rigidbody2D>().AddForce(new Vector2(player.speed /4 * Input.GetAxis("Horizontal"), 0f));
                     }
                 }
+                */
             }
         }
 
         public override void OnStateExit()
         {
-            if (player.ladder) { player.DismountLadder(); }
+            if (player.ladder && !player.jumpped) { player.DismountLadder(); }
         }
     }
     public class PlayerOnLedge : PlayerCharacterState
@@ -265,7 +270,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void OnStateExit()
         {
-            if (player.ledge != null) { player.ReleaseLedge(); }
+            if (player.ledge != null && !player.jumpped) { player.ReleaseLedge(); }
         }
     }
     public class PlayerFalling : PlayerCharacterState

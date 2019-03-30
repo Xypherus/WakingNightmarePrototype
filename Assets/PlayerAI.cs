@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlayerAI : CharacterStateNetwork {
 
     public Transform target;
-    public Vector2 pingPosition;
+    public Vector2 pingPosition = Vector3.zero;
 
     NavmeshAgent2D agent;
     PlayerStateMachine player;
@@ -24,10 +24,17 @@ public class PlayerAI : CharacterStateNetwork {
 
         dead = new PlayerAIDead(target, agent, this, player);
         idle = new PlayerAIIdle(target, agent, this, player);
-        moveTo = new PlayerAIMoveTo(target, agent, this, player);
+        moveTo = new PlayerAIMoveTo(target, pingPosition, agent, this, player);
 
         CreateNetwork();
 	}
+
+    private void FixedUpdate() {
+
+        moveTo.target = target;
+        moveTo.pingPosition = pingPosition;
+        base.FixedUpdate();
+    }
 
     private void CreateNetwork() {
 
@@ -72,8 +79,11 @@ public class PlayerAI : CharacterStateNetwork {
         }
     }
     class PlayerAIMoveTo : PlayerAIState {
+        public Vector2 pingPosition;
 
-        public PlayerAIMoveTo(Transform target, NavmeshAgent2D agent, CharacterStateNetwork network, PlayerStateMachine player) : base("Player AI Move To", network, target, agent, player) { }
+        public PlayerAIMoveTo(Transform target, Vector2 pingPosition, NavmeshAgent2D agent, CharacterStateNetwork network, PlayerStateMachine player) : base("Player AI Move To", network, target, agent, player) {
+            this.pingPosition = pingPosition;
+        }
 
         public override void Subject()
         {
@@ -83,13 +93,21 @@ public class PlayerAI : CharacterStateNetwork {
 
         public override void FixedUpdate()
         {
-            if (target) {
-                if (Vector2.Distance(target.position, agent.transform.position) <= agent.stoppingDistance) { return; }
+            UnityEngine.Profiling.Profiler.BeginSample("Moving AI", agent);
+            if (Vector2.Distance(target.position, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
+            else if (Vector2.Distance(pingPosition, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
+            else { agent.isStopped = false; }
+
+            if (target && !agent.isStopped) {
                 //path to target.
-                agent.FindPathTo(target.position);
+                agent.FindPathTo(target.position, 100);
                 //get target node
                 NavmeshNode2D targetNode = agent.GetTargetNodeInPath();
 
+                Debug.DrawLine(agent.transform.position, targetNode.worldPosition);
+                Debug.Log("The ai's player state is " + player.activeState.name, agent);
+                Debug.Log(agent.GetWalkVector() + " is the walk vector", agent);
+                
                 //if agent.GetTargetNodeInPath is not a ground node or is connected to the previous node by a jump connection,
                 /*if ((targetNode.type == NavmeshNode2D.NodeType.Crawlable ||
                      targetNode.type == NavmeshNode2D.NodeType.Walkable) ||
@@ -102,34 +120,28 @@ public class PlayerAI : CharacterStateNetwork {
                     }
                 }*/
                 //else if agent.GetTargetNodeInPath is a ladder type node and not already on ladder,
-                if (targetNode.type == NavmeshNode2D.NodeType.Ladder && !player.onLadder)
+                if (targetNode.type == NavmeshNode2D.NodeType.Ladder && !player.player.ladder)
                 {
                     //grab the nearest ladder.
-                    agent.MountNearestLadder(agent.maxReach);
+                    player.player.grabbed = true;
                 }
                 //else if agent.GetTargetNodeInPath is not a ladder node and agent is already on ladder, 
-                else if (targetNode.type != NavmeshNode2D.NodeType.Ladder && player.onLadder)
+                else if (targetNode.type != NavmeshNode2D.NodeType.Ladder && player.player.ladder)
                 {
                     //jump off of ladder
-                    player.player.Jump(player.player.GetWalkDirection());
-                }
-                //else if agent.GetTargetNodeInPath is a ladder
-                else if (targetNode.type == NavmeshNode2D.NodeType.Ladder && player.onLadder)
-                {
-                    //move on ladder towards target node
-                    player.player.Move(agent.GetWalkVector());
+                    player.player.jumpped = true;
                 }
                 //else if agent.GetTargetNodeInPath is ledge, and not already on ledge,
-                else if (targetNode.type == NavmeshNode2D.NodeType.Ledge && !player.onLedge)
+                else if (targetNode.type == NavmeshNode2D.NodeType.Ledge && player.player.ledge == null)
                 {
                     //grab nearest ledge
-                    player.player.GrabLedge();
+                    player.player.grabbed = true;
                 }
                 //else if agent.GetTargetNodeInPath is not ledge and already on ledge,
-                else if (targetNode.type == NavmeshNode2D.NodeType.Ledge && player.onLedge)
+                else if (targetNode.type == NavmeshNode2D.NodeType.Ledge && player.player.ledge != null)
                 {
                     //jump off ledge
-                    player.player.Jump(player.player.GetWalkDirection());
+                    player.player.jumpped = true;
                 }
                 //else if agent.GetTargetNodeInPath is a ground node
                 else if (targetNode.type == NavmeshNode2D.NodeType.Walkable ||
@@ -145,10 +157,9 @@ public class PlayerAI : CharacterStateNetwork {
                         //untoggle crouch
                         player.player.isProne = false;
                     }
-                    //move in the direction of the target node
-                    player.player.Move(player.player.GetWalkVector());
                 }
             }
+            UnityEngine.Profiling.Profiler.EndSample();
         }
     }
     #endregion
@@ -156,7 +167,7 @@ public class PlayerAI : CharacterStateNetwork {
 }
 
 public class PlayerAIState : CharacterState {
-    protected Transform target;
+    public Transform target;
     protected NavmeshAgent2D agent;
     protected PlayerStateMachine player;
 

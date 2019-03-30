@@ -24,9 +24,6 @@ public class Ladder : MonoBehaviour {
     Vector2 lastPosition;
     Vector2 positionDelta;
 
-    [HideInInspector]
-    public float percent;
-
     private void Start()
     {
         collider = GetComponent<BoxCollider2D>();
@@ -72,11 +69,13 @@ public class Ladder : MonoBehaviour {
     }
 
     public void MoveOnLadder(NavmeshAgent2D actor, Vector2 movement) {
-        actor.transform.position = GetPositionOnLadder(actor.transform.position);
+        float percent = GetPercent(actor);
+        actor.transform.position = GetPositionOnLadder(actor.transform.position, percent);
         Vector3 previousPos = actor.transform.position;
 
         bool avoidCollCheck = false;
         if (CheckActorCollisions(actor) > 0) { avoidCollCheck = true; }
+
         if (ladderType == LadderType.Side)
         {
             previousPos = actor.transform.position;
@@ -110,7 +109,7 @@ public class Ladder : MonoBehaviour {
             }
 
 
-            actor.transform.position = GetPositionOnLadder(actor.transform.position);
+            actor.transform.position = GetPositionOnLadder(actor.transform.position, percent);
 
             if (!avoidCollCheck) { HandleActorCollisions(actor, previousPos); }
 
@@ -136,10 +135,10 @@ public class Ladder : MonoBehaviour {
         actor.canMove = false;
         if (ladderType == LadderType.Side)
         {
-            percent = Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
+            float percent = GetPercent(actor);
 
             actor.ladder = this;
-            actor.MoveTo(GetPositionOnLadder(actor.transform.position), () =>
+            actor.MoveTo(GetPositionOnLadder(actor.transform.position, percent), () =>
             {
                 actor.canMove = true;
                 actor.rigidbody.bodyType = RigidbodyType2D.Kinematic;
@@ -155,6 +154,10 @@ public class Ladder : MonoBehaviour {
         
     }
 
+    public float GetPercent(NavmeshAgent2D actor) {
+        return Vector2.Distance(bottom, actor.transform.position) / Vector2.Distance(bottom, top);
+    }
+
     void HandleActorCollisions(NavmeshAgent2D agent, Vector3 returnPosition) {
         if (CheckActorCollisions(agent) > 0) { agent.transform.position = returnPosition; }
     }
@@ -164,7 +167,7 @@ public class Ladder : MonoBehaviour {
         return contacts.Length;
     }
 
-    Vector2 GetPositionOnLadder(Vector2 actorPos) {
+    Vector2 GetPositionOnLadder(Vector2 actorPos, float percent) {
         if (ladderType == LadderType.Side)
         {
             Vector2 newPos = Vector2.Lerp(bottom, top, percent);

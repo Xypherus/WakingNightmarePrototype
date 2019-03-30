@@ -3356,10 +3356,16 @@ Prefab:
     - target: {fileID: 114495443886058440, guid: 23f972d680e86dd4da87e8a18548994e,
         type: 2}
       propertyPath: stoppingDistance
-      value: 0.5
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114495443886058440, guid: 23f972d680e86dd4da87e8a18548994e,
+        type: 2}
+      propertyPath: jumpDistance
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 114604768576215224, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
+    - {fileID: 114087522974943790, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
   m_SourcePrefab: {fileID: 100100000, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
   m_IsPrefabAsset: 0
 --- !u!1 &591224169 stripped
@@ -3391,22 +3397,15 @@ MonoBehaviour:
   normalFearFade: 1
   safezoneFearFade: 15
   fearDecayCooldown: 0
+  darknessFearChange: 1.5
   fears: 
   outOfRange: 0
+  outOfZone: 0
   safe: 0
   fearCanDecay: 0
---- !u!114 &591224172
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 591224169}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9ae141b4a962514789fb87279e077ee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 0}
+  appliedAreaFear: 0
+  currentFearModifier: 0
+  withinFearZones: []
 --- !u!114 &591224173
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3820,6 +3819,7 @@ Prefab:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 114604768576215224, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
+    - {fileID: 114087522974943790, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
   m_SourcePrefab: {fileID: 100100000, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
   m_IsPrefabAsset: 0
 --- !u!4 &756631423 stripped
@@ -5090,18 +5090,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   pingPosition: {x: 0, y: 0}
---- !u!114 &1051076579
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1051076576}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9ae141b4a962514789fb87279e077ee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 0}
 --- !u!114 &1051076581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5120,10 +5108,15 @@ MonoBehaviour:
   normalFearFade: 1
   safezoneFearFade: 15
   fearDecayCooldown: 0
+  darknessFearChange: 1.5
   fears: 
   outOfRange: 0
+  outOfZone: 0
   safe: 0
   fearCanDecay: 0
+  appliedAreaFear: 0
+  currentFearModifier: 0
+  withinFearZones: []
 --- !u!4 &1068072927 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4046284244731342, guid: 5999c160d521963439a09b9c7f9cdc02,

@@ -43,8 +43,7 @@ public class PlayerController : NavmeshAgent2D {
         //Call the Update function in the base NavmeshAgent2D
         base.Update();
 
-        if (Time.timeScale > 0) {
-            if (pathing) { return; }
+        if (Time.timeScale > 0 && !pathing) {
             //Test for grabbing ladders/ledges
             
             if (!stateMachine.rising && !stateMachine.onLadder && !stateMachine.onLedge && Input.GetAxisRaw("Vertical") != 0f)
@@ -55,6 +54,7 @@ public class PlayerController : NavmeshAgent2D {
             else { grabbed = false; }
 
             //Test for Jumping
+
             if (Input.GetButtonDown("Jump") && (isGrounded || stateMachine.onLadder || stateMachine.onLedge))
             {
                 jumpped = true;
@@ -62,7 +62,7 @@ public class PlayerController : NavmeshAgent2D {
             else { jumpped = false; }
         }
 
-        Debug.Log("The Active state is " + stateMachine.activeState.name, this);
+
     }
 
     // Update is called once per frame
@@ -70,6 +70,9 @@ public class PlayerController : NavmeshAgent2D {
     {
         base.FixedUpdate();
         ParseInput();
+
+        grabbed = false;
+        jumpped = false;
     }
 
     protected virtual void ParseInput() {
@@ -118,12 +121,12 @@ public class PlayerController : NavmeshAgent2D {
 
     public virtual void Move(Vector2 direction) {
         if (ladder) { ladder.MoveOnLadder(this, direction); }
-        else if (!stateMachine.incappacitated) { MoveHorizontal(direction); }
+        else if (!stateMachine.incappacitated) { MoveHorizontal(direction.x); }
     }
 
-    private void MoveHorizontal(Vector2 direction)
+    private void MoveHorizontal(float direction)
     {
-        Vector3 movement = direction;
+        Vector3 movement = Vector3.zero;
 
         if (!isGrounded)
         {
@@ -182,7 +185,8 @@ public class PlayerController : NavmeshAgent2D {
         if (isProne) { return; }
 
 
-        else if (ladder) {
+        if (ladder) {
+            Debug.Log("Ladder Jump!");
             DismountLadder();
             rigidbody.AddForce(new Vector2(jumpForce/2 * direction, jumpForce));
         }
