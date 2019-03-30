@@ -10,6 +10,7 @@ public class Door_Trap_Switch : MonoBehaviour{
 
     private void Start()
     {
+        trigger = GetComponentInParent<Triggerscript>();
         trap = gameObject.GetComponent<Rigidbody2D>();
         if(gameObject.GetComponent<Animator>() != null)
         {
@@ -20,7 +21,6 @@ public class Door_Trap_Switch : MonoBehaviour{
 
     private void Update()
     {
-
         if(trigger.triggered == true && gameObject.CompareTag("Door"))
         {
             open.SetBool("isopen", true);
@@ -28,7 +28,11 @@ public class Door_Trap_Switch : MonoBehaviour{
 
         if(trigger.triggered == true && gameObject.CompareTag("Trap"))
         {
-            trap.isKinematic = false;
+            if (trap != null)
+            {
+                Debug.Log("Trap has been triggered");
+                trap.isKinematic = false;
+            }
         }
 
         if (trigger.triggered == true && gameObject.CompareTag("Switch"))
