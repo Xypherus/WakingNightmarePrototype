@@ -87,11 +87,6 @@ public class PlayerFearController : MonoBehaviour {
     public bool fearCanDecay;
 
     /// <summary>
-    /// Total fear that will be applied via area fear per tick.
-    /// </summary>
-    public int appliedAreaFear;
-
-    /// <summary>
     /// Modifier which is applied to all fear changes. Used primarly for darkness. Visable for debug
     /// </summary>
     public float currentFearModifier;
@@ -169,21 +164,26 @@ public class PlayerFearController : MonoBehaviour {
     private bool ApplyZoneFear()
     {
         outOfZone = true;
-        currentFearModifier = 1.0f;
+        float newFearModifier = 1.0f;
+
         if(withinFearZones.Count != 0)
         {
             foreach(FearZone aFear in withinFearZones)
             {
-                if(fears.Contains(aFear.fearType) && aFear.fearApplied != 0)
+                if(fears.Contains(aFear.fearType) && aFear.fearModifier != 0)
                 {
                     outOfZone = false;
-                    ChangeFear(aFear.fearApplied);
+                    newFearModifier *= aFear.fearModifier;
                 }
-                if(aFear.fearType == FearTypes.Darkness) { currentFearModifier = darknessFearChange; }
             }
+            currentFearModifier = newFearModifier;
             return true;
         }
-        else { return false; }
+        else
+        {
+            currentFearModifier = newFearModifier;
+            return false;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -233,9 +233,9 @@ public class PlayerFearController : MonoBehaviour {
 
     private void FearTicker()
     {
+        ApplyZoneFear();
         ApplyPassiveFear();
         ApplyFearDecay();
-        ApplyZoneFear();
     }
 
     //This event applies active fear (On Collision Fear)

@@ -12,14 +12,9 @@ public class FearZone : MonoBehaviour {
     public FearTypes fearType;
 
     /// <summary>
-    /// The ammount of fear which this zone applies per feartick. Set to 0 if zone is darkness.
+    /// The ammount of fear which this zone applies per feartick. Set to one for no change. Do not set to zero.
     /// </summary>
-    [Tooltip("The ammount of fear which this zone applies per feartick. Set to 0 if zone is darkness.")]
-    public int fearApplied;
-
-    private void Start()
-    {
-        if(fearType == FearTypes.Darkness) { fearApplied = 0; }
-    }
+    [Tooltip("The ammount of fear which this zone applies per feartick. Set to one for no change. These stack multiplicitively")]
+    public float fearModifier;
 
 }
