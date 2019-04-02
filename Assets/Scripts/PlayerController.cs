@@ -16,14 +16,14 @@ public class PlayerController : NavmeshAgent2D {
     [Tooltip("The force used to propell the player upward. Higher values for objects with higher mass.")]
     public float jumpForce;
     #endregion
-
    
     public bool grabbed;
     public bool jumpped;
     public float crouchSpeed;
     //Added code for accessing fear system - 2019-02-26 <Ben Shackman>
     //Will be used later to alter movement speed
-    PlayerFearController fearController;
+    public PlayerFearController fearController;
+    public Animator animator;
     PlayerStateMachine stateMachine;
     
     protected override void Start()
@@ -37,12 +37,13 @@ public class PlayerController : NavmeshAgent2D {
         //Gets the fear controller - 2019-02-26 <Ben Shackman>
         fearController = gameObject.GetComponent<PlayerFearController>();
         stateMachine = GetComponent<PlayerStateMachine>();
+        animator = GetComponent<Animator>();
     }
     protected override void Update() {
         //Call the Update function in the base NavmeshAgent2D
         base.Update();
 
-        if (Time.timeScale > 0) {
+        if (Time.timeScale > 0 && !pathing) {
             //Test for grabbing ladders/ledges
             
             if (!stateMachine.rising && !stateMachine.onLadder && !stateMachine.onLedge && Input.GetAxisRaw("Vertical") != 0f)
@@ -53,6 +54,7 @@ public class PlayerController : NavmeshAgent2D {
             else { grabbed = false; }
 
             //Test for Jumping
+
             if (Input.GetButtonDown("Jump") && (isGrounded || stateMachine.onLadder || stateMachine.onLedge))
             {
                 jumpped = true;
@@ -60,7 +62,7 @@ public class PlayerController : NavmeshAgent2D {
             else { jumpped = false; }
         }
 
-        Debug.Log("The Active state is " + stateMachine.activeState.name);
+
     }
 
     // Update is called once per frame
@@ -68,9 +70,14 @@ public class PlayerController : NavmeshAgent2D {
     {
         base.FixedUpdate();
         ParseInput();
+
+        grabbed = false;
+        jumpped = false;
     }
 
     protected virtual void ParseInput() {
+
+        if (pathing) { return; }
 
         //Test For Crouching OR sprinting (can not be both)
         if (Input.GetAxisRaw("Prone") > 0 && ledge == null && !ladder)
@@ -112,34 +119,14 @@ public class PlayerController : NavmeshAgent2D {
         }
     }
 
-    protected virtual void Move() {
-        Crouch();
-
-        if (ladder) {
-            Vector3 movement = new Vector2(speed / 4, 0f);
-            float direction = Mathf.Clamp(Input.GetAxis("Horizontal") * accelMultiplier, -1f, 1f);
-
-            ladder.MoveOnLadder(GetComponent<NavmeshAgent2D>(), new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
-
-            if (Input.GetAxisRaw("Horizontal") != 0)
-            {
-                Debug.Log("Applying force to ladder");
-                Rigidbody2D ladderigidbodyody = ladder.GetComponent<Rigidbody2D>();
-                if (ladderigidbodyody)
-                {
-                    ladderigidbodyody.AddRelativeForce(direction * movement);
-                }
-            }
-        }
-
-        MoveHorizontal();
-        Decelerate();
+    public virtual void Move(Vector2 direction) {
+        if (ladder) { ladder.MoveOnLadder(this, direction); }
+        else if (!stateMachine.incappacitated) { MoveHorizontal(direction.x); }
     }
 
-    private void MoveHorizontal()
+    private void MoveHorizontal(float direction)
     {
         Vector3 movement = Vector3.zero;
-        float direction = Mathf.Clamp(Input.GetAxis("Horizontal") * accelMultiplier, -1f, 1f);
 
         if (!isGrounded)
         {
@@ -193,15 +180,19 @@ public class PlayerController : NavmeshAgent2D {
         }
     }
 
-    protected virtual void Jump() {
+    public virtual void Jump(float direction) {
+
         if (isProne) { return; }
-        else if (ladder) {
+
+
+        if (ladder) {
+            Debug.Log("Ladder Jump!");
             DismountLadder();
-            rigidbody.AddForce(new Vector2(jumpForce/2 * Input.GetAxisRaw("Horizontal"), jumpForce));
+            rigidbody.AddForce(new Vector2(jumpForce/2 * direction, jumpForce));
         }
         else if (ledge != null) {
             ReleaseLedge();
-            rigidbody.AddForce(new Vector2(jumpForce / 2 * Input.GetAxisRaw("Horizontal"), jumpForce / 2) * Mathf.Sqrt(2));
+            rigidbody.AddForce(new Vector2(jumpForce / 2 * direction, jumpForce / 2) * Mathf.Sqrt(2));
         }
         else if (isGrounded) {
             rigidbody.AddForce(new Vector2(0f, jumpForce));
@@ -225,8 +216,6 @@ public class PlayerController : NavmeshAgent2D {
             yield return new WaitForEndOfFrame();
         }
     }
-
-
 
     protected override void OnDrawGizmosSelected()
     {
