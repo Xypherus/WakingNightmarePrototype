@@ -13,6 +13,8 @@ public class NavmeshAgent2D : MonoBehaviour {
     public float speed;
     public float maxSpeed;
     public float maxReach;
+    public float stoppingDistance;
+    public float pathAccuracy = 0.2f;
     #endregion
 
     #region Movement Bools
@@ -20,6 +22,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     public bool canGrab = true;
     public bool isProne;
     public bool sprinting = false;
+    public bool isDead;
     #endregion
 
     public List<NavmeshNode2D> path = new List<NavmeshNode2D>();
@@ -36,6 +39,8 @@ public class NavmeshAgent2D : MonoBehaviour {
     protected bool wasCrouched = false;
     protected bool canWalkGrab = false;
     public bool canMove = true;
+
+    private float lastPath;
 
     #region Testing Variables
     protected Transform _sprite;
@@ -150,9 +155,7 @@ public class NavmeshAgent2D : MonoBehaviour {
 
     public void DismountLadder() {
         if (!ladder) { Debug.LogWarning("Could not dismount ladder because it does not exist."); return; }
-        if (ladder.CheckActorCollisions(this) > 0) { Debug.LogWarning("Could not dismount ladder because player is inside terrain!"); return; }
-
-        ladder.percent = 0;
+        if (ladder.CheckActorCollisions(this) > 0) { Debug.LogWarning("Could not dismount ladder because player is inside terrain!", this); return; }
 
         if (ladder.GetComponent<Rigidbody2D>()) {
             rigidbody.velocity = ladder.GetComponent<Rigidbody2D>().velocity;
@@ -214,6 +217,63 @@ public class NavmeshAgent2D : MonoBehaviour {
         }
     }
 
+    public virtual float GetWalkDirection() {
+        if (!pathing || path.Count == 0) { return 0; }
+        return GetWalkVector().x;
+    }
+
+    public virtual Vector2 GetWalkVector() {
+        if (!pathing || path.Count == 0) { return Vector2.zero; }
+
+        NavmeshNode2D targetNode = GetTargetNodeInPath();
+        Vector2 heading = targetNode.worldPosition - transform.position;
+        float distance = heading.magnitude;
+        Vector2 direction = heading / distance;
+        direction = new Vector2(Mathf.Clamp(Mathf.RoundToInt(direction.x), -1, 1), Mathf.Clamp(Mathf.RoundToInt(direction.y), -1, 1));
+
+        return direction;
+    }
+
+    public void FindPathTo(Vector3 position, int iterations) {
+        path = GetPath(transform.position, position, iterations);
+    }
+
+    public int PathIndexOf(NavmeshNode2D node) {
+        for (int i = 0; i < path.Count; i++) {
+            if (path[i]== node) { return i; }
+        }
+
+        return -1;
+    }
+
+    public virtual NavmeshNode2D GetTargetNodeInPath() {
+        NavmeshNode2D closestNode = GetClosestNodeInPath();
+        NavmeshNode2D targetNode = closestNode;
+        if (path.Count == 0 || closestNode == null) {
+            return null;
+        }
+
+        for (int i = path.IndexOf(closestNode); i < path.Count; i++) {
+            if (Vector2.Distance(path[i].worldPosition, transform.position) <= stoppingDistance) { targetNode = path[i]; }
+        }
+
+        return targetNode;
+    }
+
+    public virtual NavmeshNode2D GetClosestNodeInPath() {
+        if (path.Count == 0) { return null; }
+
+        NavmeshNode2D currentNode = area.NodeAtPoint(transform.position, this);
+        NavmeshNode2D nearest = path[0];
+        float nearestDistance = Vector2.Distance(nearest.worldPosition, transform.position);
+        foreach (NavmeshNode2D pnode in path) {
+            float distance = Vector2.Distance(pnode.worldPosition, transform.position);
+            if (distance < nearestDistance) { nearest = pnode; nearestDistance = distance; }
+        }
+
+        return nearest;
+    }
+
     protected virtual Transform GetGround() {
         if (!isGrounded) { return null; }
 
@@ -226,59 +286,146 @@ public class NavmeshAgent2D : MonoBehaviour {
         else { return null; }
     }
 
-    protected virtual List<NavmeshNode2D> GetPath(Vector2 start, Vector2 end) {
+    protected virtual List<NavmeshNode2D> GetPath(Vector2 start, Vector2 end, int maxIterations = 1000) {
+        if (!pathing || isStopped) { return path; }
+
+        if (Time.realtimeSinceStartup <= lastPath + pathAccuracy) { return path; }
+        else { Debug.Log("Updating AI", this); }
+
         List<NavmeshNode2D> closedList = new List<NavmeshNode2D>();
         List<NavmeshNode2D> openList = new List<NavmeshNode2D>();
         NavmeshNode2D startNode = area.NodeAtPoint(start, this);
         NavmeshNode2D endNode = area.NodeAtPoint(end, this);
-        NavmeshNode2D currentNode = startNode;
         
 
-        if (startNode.type == NavmeshNode2D.NodeType.None || startNode == null) { return closedList; }
+        if (!NodeIsTraversible(startNode)) {
+            startNode = FindTraversibleNeighbor(startNode);
 
-        closedList.Add(startNode);
-        TotalCost(startNode, startNode, endNode);
+            if (startNode == null) { lastPath = Time.realtimeSinceStartup; return path; }
+        }
+
+        openList.Add(startNode);
+        NavmeshNode2D currentNode = GetBestNode(openList);
+
+        int iterations = 0;
+
+        UnityEngine.Profiling.Profiler.BeginSample("Finding Path", this);
+        while (iterations < maxIterations) {
+            currentNode = GetBestNode(openList);
+            openList.Remove(currentNode);
+            closedList.Add(currentNode);
+
+            if (currentNode == endNode) { break; }
+
+            UnityEngine.Profiling.Profiler.BeginSample("viewing neighbors" + currentNode.connections.Count, this);
+            foreach (NavmeshNode2D.NavmeshNodeConnection2D connection in currentNode.connections) {
+
+                UnityEngine.Profiling.Profiler.BeginSample("traversibility", this);
+                if (!NodeIsTraversible(connection.b) || closedList.Contains(connection.b)) { UnityEngine.Profiling.Profiler.EndSample(); continue; }
+                UnityEngine.Profiling.Profiler.EndSample();
+
+                UnityEngine.Profiling.Profiler.BeginSample("Cost Calculation", this);
+                float newCostToNeighbor = currentNode.gcost + GCost(currentNode, connection.b);
+                if (newCostToNeighbor < connection.b.gcost || !openList.Contains(connection.b)) {
+                    TotalCost(connection, endNode);
+                    connection.b.parent = currentNode;
+
+                    if (!openList.Contains(connection.b)) { openList.Add(connection.b); }
+                }
+                UnityEngine.Profiling.Profiler.EndSample();
+            }
+            UnityEngine.Profiling.Profiler.EndSample();
+
+            iterations++;
+        }
+        UnityEngine.Profiling.Profiler.EndSample();
+
+        return RetracePath(startNode, currentNode);
+    }
+
+    private NavmeshNode2D FindTraversibleNeighbor(NavmeshNode2D node) {
+        if (NodeIsTraversible(node)) { return node; }
+
+        foreach (NavmeshNode2D.NavmeshNodeConnection2D connection in node.connections) {
+            if (NodeIsTraversible(connection.b)) { return connection.b; }
+        }
+
+        return null;
+    }
+
+    private List<NavmeshNode2D> RetracePath(NavmeshNode2D start, NavmeshNode2D end) {
+        List<NavmeshNode2D> path = new List<NavmeshNode2D>();
+        NavmeshNode2D currentNode = end;
 
         int count = 0;
-        while (currentNode != endNode && count < 1000) {
-            NavmeshNode2D best = currentNode.connections[0].b;
-            TotalCost(currentNode, best, endNode);
-            foreach (NavmeshNode2D.NavmeshNodeConnection2D connection in currentNode.connections) {
-                TotalCost(connection.a, connection.b, endNode);
-                if (connection.b.fcost <= best.fcost) {
-                    best = connection.b;
-                }
+        while (currentNode!= start|| count < 1000) {
+            if (currentNode.parent == null) {
+                break;
             }
-            closedList.Add(best);
-            currentNode = best;
+
+            path.Add(currentNode);
+            currentNode = currentNode.parent;
             count++;
         }
-        if (currentNode != endNode && jumpDistance > 0) {
-            //could do something here if path is not found
 
+        if (count >= 1000) { Debug.LogWarning("Limit Reached for path"); }
+
+        path.Reverse();
+        lastPath = Time.realtimeSinceStartup;
+        return path;
+    }
+
+    protected virtual bool NodeIsTraversible(NavmeshNode2D node) {
+        UnityEngine.Profiling.Profiler.BeginSample("Traversibility calculations", this);
+        if (node.type == NavmeshNode2D.NodeType.None || 
+            node.type == NavmeshNode2D.NodeType.Air)
+        { UnityEngine.Profiling.Profiler.EndSample(); return false; }
+        else { UnityEngine.Profiling.Profiler.EndSample(); return true; }
+    }
+
+    protected virtual NavmeshNode2D GetBestNeighbor(NavmeshNode2D node, NavmeshNode2D end) {
+        NavmeshNode2D best = node.connections[0].b;
+        foreach (NavmeshNode2D.NavmeshNodeConnection2D edge in node.connections) {
+            TotalCost(edge, end);
+            if (edge.b.fcost < best.fcost) { best = edge.b; }
         }
 
-        return closedList;
+        return best;
     }
 
-    protected virtual float TotalCost(NavmeshNode2D parent, NavmeshNode2D n, NavmeshNode2D end) {
-        n.fcost = Gcost(parent, n) + Heuristic(n, end);
-        return n.fcost;
+    protected virtual NavmeshNode2D GetBestNode(List<NavmeshNode2D> nodes) {
+        NavmeshNode2D best = nodes[0];
+
+        foreach (NavmeshNode2D node in nodes) {
+            if (node.fcost < best.fcost) { best = node; }
+        }
+
+        return best;
     }
 
+    protected virtual float GCost(NavmeshNode2D a, NavmeshNode2D b) {
+        float x = Mathf.Abs(b.gridPosition.x - a.gridPosition.x);
+        float y = Mathf.Abs(b.gridPosition.y - a.gridPosition.y);
+
+        if (y < x)
+        {
+            return 14 * y + (10 * (x - y));
+        }
+        else
+        { return 14 * x + (10 * (y - x)); }
+    }
+
+    protected virtual float TotalCost(NavmeshNode2D.NavmeshNodeConnection2D edge, NavmeshNode2D end)
+    {
+        edge.b.gcost = GCost(edge.a, edge.b) * (edge.b.GetWeight() + edge.a.GetWeight());
+        edge.b.hcost = GCost(edge.b, end);
+        edge.b.fcost = edge.b.gcost + edge.b.hcost;
+        return edge.b.fcost;
+    }
+
+    [System.Obsolete("Use 'GCost' instead")]
     protected virtual float Heuristic(NavmeshNode2D n, NavmeshNode2D end) {
         return Mathf.Abs(end.worldPosition.x - n.worldPosition.x) + Mathf.Abs(end.worldPosition.y - n.worldPosition.y);
-    }
-
-    protected virtual float Gcost(NavmeshNode2D parent, NavmeshNode2D n) {
-        if (n.type == NavmeshNode2D.NodeType.None) { n.gcost = Mathf.Infinity; }
-        else if (parent == n) { n.gcost = 0; }
-        else
-        {
-            n.gcost = parent.gcost + Vector2.Distance(parent.worldPosition, n.worldPosition);
-        }
-
-        return n.gcost;
     }
 
     protected virtual void Orient() {
@@ -347,9 +494,13 @@ public class NavmeshAgent2D : MonoBehaviour {
     protected virtual void OnDrawGizmosSelected() {
         if (!area) { area = FindObjectOfType<NavmeshArea2D>(); }
 
-        Gizmos.DrawCube(area.NodeAtPoint(transform.position, this).worldPosition, Vector3.one/4);
-        for (int i = 1; i < path.Count; i++) {
-            Debug.DrawLine(path[i-1].worldPosition, path[i].worldPosition, Color.green);
+        if (Application.isPlaying && path.Count >0)
+        {
+            Gizmos.DrawCube(area.NodeAtPoint(transform.position, this).worldPosition, Vector3.one / 4);
+            for (int i = 1; i < path.Count; i++)
+            {
+                Debug.DrawLine(path[i - 1].worldPosition, path[i].worldPosition, Color.green);
+            }
         }
 
         DrawGroundedBox();

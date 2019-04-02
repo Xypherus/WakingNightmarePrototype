@@ -27,6 +27,7 @@ public abstract class CharacterState {
     public abstract void FixedUpdate();
 
     public void AddTransition(CharacterState to, UnityEngine.Events.UnityAction callback = null) {
+        if (to == null) { Debug.LogError("Destination of transition can not be null. parent state: '" + name + "'"); return; }
         StateTransition transition = new StateTransition(this, to, callback);
         transitions.Add(transition);
     }
