@@ -229,6 +229,7 @@ public class NavmeshAgent2D : MonoBehaviour {
         Vector2 heading = targetNode.worldPosition - transform.position;
         float distance = heading.magnitude;
         Vector2 direction = heading / distance;
+
         direction = new Vector2(Mathf.Clamp(Mathf.RoundToInt(direction.x), -1, 1), Mathf.Clamp(Mathf.RoundToInt(direction.y), -1, 1));
 
         return direction;

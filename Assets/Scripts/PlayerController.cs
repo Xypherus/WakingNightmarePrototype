@@ -147,6 +147,9 @@ public class PlayerController : NavmeshAgent2D {
                 movement = new Vector3(speed, 0);
             }
         }
+        if (pathing) {
+            Debug.DrawRay(transform.position, direction * movement, Color.red);
+        }
 
         rigidbody.AddForce(direction * movement);
     }
@@ -200,7 +203,8 @@ public class PlayerController : NavmeshAgent2D {
     
     public virtual void Decelerate() {
         if (!isGrounded) { return; }
-        if (Input.GetAxisRaw("Horizontal") == 0) { StartCoroutine(Decelerator()); }
+        if (pathing && GetWalkDirection() == 0) { StartCoroutine(Decelerator()); }
+        else if (!pathing && Input.GetAxisRaw("Horizontal") == 0) { StartCoroutine(Decelerator()); }
         else { StopCoroutine(Decelerator()); }
     }
 

@@ -8,6 +8,7 @@ public class PlayerAI : CharacterStateNetwork {
     public Transform target;
     public Vector2 pingPosition = Vector3.zero;
     public string currentState;
+    public string aiState;
 
     NavmeshAgent2D agent;
     PlayerStateMachine player;
@@ -33,6 +34,7 @@ public class PlayerAI : CharacterStateNetwork {
     protected override void FixedUpdate() {
         target = PlayerSwapper.playerSwapper.currentPlayer.transform;
         currentState = player.activeState.name;
+        aiState = activeState.name;
 
         if (agent.pathing)
         {
@@ -110,7 +112,10 @@ public class PlayerAI : CharacterStateNetwork {
             UnityEngine.Profiling.Profiler.BeginSample("Moving AI", agent);
 
             if (target) {
-                RaycastHit2D targetGround = Physics2D.Raycast(target.transform.position, Vector2.down, 1000f, 1 << LayerMask.NameToLayer("Environment"));
+                LayerMask mask = new LayerMask();
+                mask |= (1 << LayerMask.NameToLayer("Environment"));
+                mask |= (1 << LayerMask.NameToLayer("Ladder"));
+                RaycastHit2D targetGround = Physics2D.Raycast(target.transform.position, Vector2.down, 1000f, mask);
 
                 //path to target.
                 agent.FindPathTo(targetGround.point, 100);
