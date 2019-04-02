@@ -19,13 +19,13 @@ public class CharacterStateNetwork : MonoBehaviour{
         activeState = network[0];
     }
 
-    public void Update()
+    protected virtual void Update()
     {
         activeState.Subject();
         activeState.Update();
     }
 
-    public void FixedUpdate()
+    protected virtual void FixedUpdate()
     {
         activeState.Subject();
         activeState.FixedUpdate();

@@ -29,11 +29,16 @@ public class PlayerAI : CharacterStateNetwork {
         CreateNetwork();
 	}
 
-    private void FixedUpdate() {
+    protected override void FixedUpdate() {
+        target = PlayerSwapper.playerSwapper.currentPlayer.transform;
 
-        moveTo.target = target;
-        moveTo.pingPosition = pingPosition;
-        base.FixedUpdate();
+        if (agent.pathing)
+        {
+            moveTo.target = target;
+            idle.target = target;
+            moveTo.pingPosition = pingPosition;
+            base.FixedUpdate();
+        }
     }
 
     private void CreateNetwork() {
@@ -123,7 +128,7 @@ public class PlayerAI : CharacterStateNetwork {
                     player.player.jumpped = true;
                 }
                 //else if agent.GetTargetNodeInPath is a ladder type node and not already on ladder,
-                if (targetNode.type == NavmeshNode2D.NodeType.Ladder && !player.player.ladder)
+                else if (targetNode.type == NavmeshNode2D.NodeType.Ladder && !player.player.ladder)
                 {
                     //grab the nearest ladder.
                     player.player.grabbed = true;

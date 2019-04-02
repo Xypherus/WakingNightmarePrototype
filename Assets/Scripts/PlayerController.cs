@@ -24,7 +24,7 @@ public class PlayerController : NavmeshAgent2D {
     //Will be used later to alter movement speed
     public PlayerFearController fearController;
     public Animator animator;
-    PlayerStateMachine stateMachine;
+    public PlayerStateMachine stateMachine;
     
     protected override void Start()
     {

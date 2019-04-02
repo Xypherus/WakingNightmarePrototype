@@ -29,6 +29,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
         rising = new PlayerRising(this, player);
         falling = new PlayerFalling(this, player);
 
+        incappacitated.AddTransition(walking);
+
         walking.AddTransition(incappacitated);
         walking.AddTransition(crawling);
         walking.AddTransition(falling);
@@ -96,12 +98,14 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void OnStateEnter()
         {
-            player.animator.SetBool("Dead", true);
+            player.isDead = true;
+            //player.animator.SetBool("Dead", true);
         }
 
         public override void OnStateExit()
         {
-            player.animator.SetBool("Dead", false);
+            player.isDead = false;
+            //player.animator.SetBool("Dead", false);
         }
     }
     public class PlayerWalking : PlayerCharacterState {
