@@ -43,7 +43,7 @@ public class PlayerFearController : MonoBehaviour {
     public int normalFearFade = 1;
 
     /// <summary>
-    /// The rate at which the players fear depletes normally
+    /// The rate at which the players fear depletes while in a safe zone
     /// </summary>
     [Tooltip("The value at which the player's fear depletes while in a safe zone")]
     public int safezoneFearFade = 15;
@@ -264,11 +264,6 @@ public class PlayerFearController : MonoBehaviour {
         }
 
         fearCanDecay = true;
-    }
-
-    public void FearUpdater()
-    {
-
     }
 
     // <summary>
