@@ -23,7 +23,7 @@ public class PlayerAI : CharacterStateNetwork {
         player = GetComponent<PlayerStateMachine>();
 
         dead = new PlayerAIDead(target, agent, this, player);
-        idle = new PlayerAIIdle(target, agent, this, player);
+        idle = new PlayerAIIdle(target, agent, pingPosition, this, player);
         moveTo = new PlayerAIMoveTo(target, pingPosition, agent, this, player);
 
         CreateNetwork();
@@ -65,12 +65,24 @@ public class PlayerAI : CharacterStateNetwork {
     }
     class PlayerAIIdle : PlayerAIState
     {
-        public PlayerAIIdle(Transform target, NavmeshAgent2D agent, CharacterStateNetwork network, PlayerStateMachine player) : base("Player AI Idle", network, target, agent, player) { }
+        public Vector2 pingPosition;
+
+        public PlayerAIIdle(Transform target, NavmeshAgent2D agent, Vector2 pingPosition, CharacterStateNetwork network, PlayerStateMachine player) : base("Player AI Idle", network, target, agent, player) {
+            this.pingPosition = pingPosition;
+        }
 
         public override void Subject()
         {
             if (agent.isDead) { Transition("Player AI Dead"); }
-            else if (agent.path != null) { Transition("Player AI Move To"); }
+            else if (!agent.isStopped) { Transition("Player AI Move To"); }
+        }
+
+        public override void Update()
+        {
+            if (Vector2.Distance(target.position, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
+            else if (Vector2.Distance(pingPosition, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
+            else if (agent.path.Count == 0) { agent.isStopped = true; }
+            else { agent.isStopped = false; }
         }
 
         public override void OnStateEnter()
@@ -88,19 +100,16 @@ public class PlayerAI : CharacterStateNetwork {
         public override void Subject()
         {
             if (agent.isDead) { Transition("Player AI Dead"); }
-            else if (agent.path == null) { Transition("Player AI Idle"); }
+            else if (agent.isStopped) { Transition("Player AI Idle"); }
         }
 
         public override void FixedUpdate()
         {
             UnityEngine.Profiling.Profiler.BeginSample("Moving AI", agent);
-            if (Vector2.Distance(target.position, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
-            else if (Vector2.Distance(pingPosition, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
-            else { agent.isStopped = false; }
 
-            if (target && !agent.isStopped) {
+            if (target) {
                 //path to target.
-                agent.FindPathTo(target.position, 100);
+                agent.FindPathTo(target.position, 1000);
                 //get target node
                 NavmeshNode2D targetNode = agent.GetTargetNodeInPath();
 
@@ -126,7 +135,7 @@ public class PlayerAI : CharacterStateNetwork {
                     player.player.grabbed = true;
                 }
                 //else if agent.GetTargetNodeInPath is not a ladder node and agent is already on ladder, 
-                else if (targetNode.type != NavmeshNode2D.NodeType.Ladder && player.player.ladder)
+                else if (targetNode.type != NavmeshNode2D.NodeType.Ladder && player.player.ladder && !(player.player.ladder.transform.position.y < agent.transform.position.y))
                 {
                     //jump off of ladder
                     player.player.jumpped = true;
@@ -159,7 +168,12 @@ public class PlayerAI : CharacterStateNetwork {
                     }
                 }
             }
+
             UnityEngine.Profiling.Profiler.EndSample();
+            if (Vector2.Distance(target.position, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
+            else if (Vector2.Distance(pingPosition, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
+            else if (agent.path.Count == 0) { agent.isStopped = true; }
+            else { agent.isStopped = false; }
         }
     }
     #endregion

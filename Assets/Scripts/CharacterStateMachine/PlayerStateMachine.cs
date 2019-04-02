@@ -117,8 +117,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
             else if (!player.isGrounded && player.rigidbody.velocity.y > 0) { Transition("Player Rising"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y < 0) { Transition("Player Falling"); }
             else if (player.isGrounded && player.isProne) { Transition("Player Crawling"); }
-            else if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
-            else if (player.grabbed && player.LedgeNearby()) { Transition("Player On Ledge"); }
+            else if (player.grabbed && player.LadderNearby() || player.ladder) { Transition("Player On Ladder"); }
+            else if (player.grabbed && player.LedgeNearby() || player.ledge != null) { Transition("Player On Ledge"); }
         }
 
         public override void FixedUpdate() {
@@ -144,8 +144,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
             else if (!player.isGrounded && player.rigidbody.velocity.y > 0) { Transition("Player Rising"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y < 0) { Transition("Player Falling"); }
             else if (player.isGrounded && !player.isProne) { Transition("Player Walking"); }
-            else if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
-            else if (player.grabbed && player.LedgeNearby()) { Transition("Player On Ledge"); }
+            else if (player.grabbed && player.LadderNearby() || player.ladder) { Transition("Player On Ladder"); }
+            else if (player.grabbed && player.LedgeNearby() || player.ledge != null) { Transition("Player On Ledge"); }
         }
 
         public override void OnStateEnter()
@@ -180,8 +180,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
             else if (player.isGrounded) { Transition("Player Walking"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y > 0 && elapsedTime >= maxTime) { Transition("Player Rising"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y < 0 && elapsedTime >= maxTime) { Transition("Player Falling"); }
-            else if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
-            else if (player.grabbed && player.LedgeNearby()) { Transition("Player On Ledge"); }
+            else if (player.grabbed && player.LadderNearby() || player.ladder) { Transition("Player On Ladder"); }
+            else if (player.grabbed && player.LedgeNearby() || player.ledge != null) { Transition("Player On Ledge"); }
         }
 
         public override void OnStateEnter()

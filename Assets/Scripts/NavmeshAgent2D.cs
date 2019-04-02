@@ -296,13 +296,6 @@ public class NavmeshAgent2D : MonoBehaviour {
         List<NavmeshNode2D> openList = new List<NavmeshNode2D>();
         NavmeshNode2D startNode = area.NodeAtPoint(start, this);
         NavmeshNode2D endNode = area.NodeAtPoint(end, this);
-        
-
-        if (!NodeIsTraversible(startNode)) {
-            startNode = FindTraversibleNeighbor(startNode);
-
-            if (startNode == null) { lastPath = Time.realtimeSinceStartup; return path; }
-        }
 
         openList.Add(startNode);
         NavmeshNode2D currentNode = GetBestNode(openList);
@@ -358,7 +351,7 @@ public class NavmeshAgent2D : MonoBehaviour {
         NavmeshNode2D currentNode = end;
 
         int count = 0;
-        while (currentNode!= start|| count < 1000) {
+        while (currentNode!= start && count < 1000) {
             if (currentNode.parent == null) {
                 break;
             }
@@ -377,6 +370,7 @@ public class NavmeshAgent2D : MonoBehaviour {
 
     protected virtual bool NodeIsTraversible(NavmeshNode2D node) {
         UnityEngine.Profiling.Profiler.BeginSample("Traversibility calculations", this);
+
         if (node.type == NavmeshNode2D.NodeType.None || 
             node.type == NavmeshNode2D.NodeType.Air)
         { UnityEngine.Profiling.Profiler.EndSample(); return false; }
