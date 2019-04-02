@@ -109,25 +109,19 @@ public class PlayerAI : CharacterStateNetwork {
 
             if (target) {
                 //path to target.
-                agent.FindPathTo(target.position, 1000);
+                agent.FindPathTo(target.position, 100);
                 //get target node
                 NavmeshNode2D targetNode = agent.GetTargetNodeInPath();
+                NavmeshNode2D currentNode = agent.area.NodeAtPoint(agent.transform.position, agent);
 
                 Debug.DrawLine(agent.transform.position, targetNode.worldPosition);
                 Debug.Log("The ai's player state is " + player.activeState.name, agent);
                 Debug.Log(agent.GetWalkVector() + " is the walk vector", agent);
-                
+
                 //if agent.GetTargetNodeInPath is not a ground node or is connected to the previous node by a jump connection,
-                /*if ((targetNode.type == NavmeshNode2D.NodeType.Crawlable ||
-                     targetNode.type == NavmeshNode2D.NodeType.Walkable) ||
-                     previousNode.GetConnection(targetNode).jump)
-                {
-                    //if agent is grounded, and the player is not crouching, jump
-                    if (agent.isGrounded && !agent.isProne)
-                    {
-                        player.player.jumpped = true;
-                    }
-                }*/
+                if (agent.NodeIsTraversible(currentNode) && !agent.ladder && agent.ledge == null && (targetNode.gridPosition.y > currentNode.gridPosition.y || Vector2.Distance(targetNode.worldPosition, agent.transform.position) > agent.jumpDistance)) {
+                    player.player.jumpped = true;
+                }
                 //else if agent.GetTargetNodeInPath is a ladder type node and not already on ladder,
                 if (targetNode.type == NavmeshNode2D.NodeType.Ladder && !player.player.ladder)
                 {
@@ -135,7 +129,7 @@ public class PlayerAI : CharacterStateNetwork {
                     player.player.grabbed = true;
                 }
                 //else if agent.GetTargetNodeInPath is not a ladder node and agent is already on ladder, 
-                else if (targetNode.type != NavmeshNode2D.NodeType.Ladder && player.player.ladder && !(player.player.ladder.transform.position.y < agent.transform.position.y))
+                else if (targetNode.type != NavmeshNode2D.NodeType.Ladder && player.player.ladder && Mathf.Abs(agent.transform.position.y - targetNode.worldPosition.y) < 1)
                 {
                     //jump off of ladder
                     player.player.jumpped = true;
@@ -147,8 +141,9 @@ public class PlayerAI : CharacterStateNetwork {
                     player.player.grabbed = true;
                 }
                 //else if agent.GetTargetNodeInPath is not ledge and already on ledge,
-                else if (targetNode.type == NavmeshNode2D.NodeType.Ledge && player.player.ledge != null)
+                else if (targetNode.type != NavmeshNode2D.NodeType.Ledge && player.player.ledge != null)
                 {
+                    Debug.Log("JUMP OFF THE LEDGE", agent);
                     //jump off ledge
                     player.player.jumpped = true;
                 }

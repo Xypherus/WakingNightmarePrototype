@@ -387,7 +387,7 @@ public class NavmeshNode2D
             case NodeType.Walkable:
                 return 1;
             case NodeType.Ladder:
-                return 1;
+                return 0;
             case NodeType.Ledge:
                 return 2;
             case NodeType.Air:
@@ -441,6 +441,7 @@ public class NavmeshNode2D
     {
         UnityEngine.Profiling.Profiler.BeginSample("Creating Connection");
 
+
         for(int i = 0; i < connections.Count; i++)
         {
             if (connections[i].b == destination) { UnityEngine.Profiling.Profiler.EndSample(); return; }
@@ -453,6 +454,11 @@ public class NavmeshNode2D
                 UnityEngine.Profiling.Profiler.EndSample();
                 return;
             }
+        }
+
+        if (Physics2D.Linecast(worldPosition, destination.worldPosition, 1 << LayerMask.NameToLayer("Environment"))) {
+            UnityEngine.Profiling.Profiler.EndSample();
+            return;
         }
                 
         NavmeshNodeConnection2D connection = new NavmeshNodeConnection2D(this, destination, jump);

@@ -263,7 +263,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void FixedUpdate()
         {
-            if (Input.GetAxis("Vertical") > 0) {
+            if (!player.pathing && Input.GetAxis("Vertical") > 0) {
                 player.ClimbLedge();
             }
         }

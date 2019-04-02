@@ -121,7 +121,7 @@ public class PlayerController : NavmeshAgent2D {
 
     public virtual void Move(Vector2 direction) {
         if (ladder) { ladder.MoveOnLadder(this, direction); }
-        else if (!stateMachine.incappacitated) { MoveHorizontal(direction.x); }
+        else if (!stateMachine.incappacitated && ledge == null) { MoveHorizontal(direction.x); }
     }
 
     private void MoveHorizontal(float direction)
