@@ -379,8 +379,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     public virtual bool NodeIsTraversible(NavmeshNode2D node) {
         UnityEngine.Profiling.Profiler.BeginSample("Traversibility calculations", this);
 
-        if (node.type == NavmeshNode2D.NodeType.None || 
-            node.type == NavmeshNode2D.NodeType.Air)
+        if (node.type == NavmeshNode2D.NodeType.None)
         { UnityEngine.Profiling.Profiler.EndSample(); return false; }
         else { UnityEngine.Profiling.Profiler.EndSample(); return true; }
     }

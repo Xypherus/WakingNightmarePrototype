@@ -7,6 +7,7 @@ public class PlayerAI : CharacterStateNetwork {
 
     public Transform target;
     public Vector2 pingPosition = Vector3.zero;
+    public string currentState;
 
     NavmeshAgent2D agent;
     PlayerStateMachine player;
@@ -31,6 +32,7 @@ public class PlayerAI : CharacterStateNetwork {
 
     protected override void FixedUpdate() {
         target = PlayerSwapper.playerSwapper.currentPlayer.transform;
+        currentState = player.activeState.name;
 
         if (agent.pathing)
         {
@@ -65,7 +67,7 @@ public class PlayerAI : CharacterStateNetwork {
 
         public override void OnStateEnter()
         {
-            Debug.Log("Player is dead");
+            Debug.Log("Player is dead", agent);
         }
     }
     class PlayerAIIdle : PlayerAIState
@@ -89,11 +91,6 @@ public class PlayerAI : CharacterStateNetwork {
             else if (agent.path.Count == 0) { agent.isStopped = true; }
             else { agent.isStopped = false; }
         }
-
-        public override void OnStateEnter()
-        {
-            Debug.Log("Player is now idling", agent.transform);
-        }
     }
     class PlayerAIMoveTo : PlayerAIState {
         public Vector2 pingPosition;
@@ -113,15 +110,15 @@ public class PlayerAI : CharacterStateNetwork {
             UnityEngine.Profiling.Profiler.BeginSample("Moving AI", agent);
 
             if (target) {
+                RaycastHit2D targetGround = Physics2D.Raycast(target.transform.position, Vector2.down, 1000f, 1 << LayerMask.NameToLayer("Environment"));
+
                 //path to target.
-                agent.FindPathTo(target.position, 100);
+                agent.FindPathTo(targetGround.point, 100);
                 //get target node
                 NavmeshNode2D targetNode = agent.GetTargetNodeInPath();
                 NavmeshNode2D currentNode = agent.area.NodeAtPoint(agent.transform.position, agent);
 
                 Debug.DrawLine(agent.transform.position, targetNode.worldPosition);
-                Debug.Log("The ai's player state is " + player.activeState.name, agent);
-                Debug.Log(agent.GetWalkVector() + " is the walk vector", agent);
 
                 //if agent.GetTargetNodeInPath is not a ground node or is connected to the previous node by a jump connection,
                 if (agent.NodeIsTraversible(currentNode) && !agent.ladder && agent.ledge == null && (targetNode.gridPosition.y > currentNode.gridPosition.y || Vector2.Distance(targetNode.worldPosition, agent.transform.position) > agent.jumpDistance)) {
@@ -148,7 +145,6 @@ public class PlayerAI : CharacterStateNetwork {
                 //else if agent.GetTargetNodeInPath is not ledge and already on ledge,
                 else if (targetNode.type != NavmeshNode2D.NodeType.Ledge && player.player.ledge != null)
                 {
-                    Debug.Log("JUMP OFF THE LEDGE", agent);
                     //jump off ledge
                     player.player.jumpped = true;
                 }
