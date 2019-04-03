@@ -48,4 +48,13 @@ public class SafeZoneScript : MonoBehaviour {
             playersInZone.Remove(collision.GetComponent<PlayerFearController>());
         }
     }
+
+    /// <summary>
+    /// Included if needed. Resets the safezone to be useable again
+    /// </summary>
+    public void ResetSafeZone()
+    {
+        playersInZone.Clear();
+        useable = true;
+    }
 }
