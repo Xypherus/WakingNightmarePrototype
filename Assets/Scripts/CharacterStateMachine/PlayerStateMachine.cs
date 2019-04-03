@@ -99,12 +99,14 @@ public class PlayerStateMachine : CharacterStateNetwork {
         public override void OnStateEnter()
         {
             player.isDead = true;
+            player.fearController.TriggerDeath();
             //player.animator.SetBool("Dead", true);
         }
 
         public override void OnStateExit()
         {
             player.isDead = false;
+            player.fearController.UntriggerDeath();
             //player.animator.SetBool("Dead", false);
         }
     }
