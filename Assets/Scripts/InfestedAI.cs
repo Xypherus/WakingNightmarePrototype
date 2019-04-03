@@ -15,8 +15,12 @@ public class InfestedAI : MonoBehaviour {
     public float distance;
 
     public Transform originPoint;
+    public Transform originPoint2;
+    public Transform jumpPoint;
     private Vector2 dir = new Vector2(-1, 0);
     public float range;
+
+    public bool flipped;
     // Use this for initialization
     void Start()
     {
@@ -45,6 +49,7 @@ public class InfestedAI : MonoBehaviour {
     void Patrol()
     {
         RaycastHit2D hit = Physics2D.Raycast(originPoint.position, dir, range);
+        RaycastHit2D hitFloor = Physics2D.Raycast(originPoint2.position, dir, range);
 
         if (hit == true)
         {
@@ -52,14 +57,35 @@ public class InfestedAI : MonoBehaviour {
             speed *= -1;
             dir *= -1;
         }
-        transform.Translate(Vector2.right * speed * Time.deltaTime);
+        if (!hitFloor)
+        {
+            Flip();
+            speed *= -1;
+            dir *= -1;
+        }
+        transform.Translate(Vector2.right * -speed * Time.deltaTime);
     }
     void Pursue()
     {
-        if (distanceToTarget < pursueRange)
+        RaycastHit2D hitJump = Physics2D.Raycast(jumpPoint.position, dir, range);
+        RaycastHit2D hitFloor = Physics2D.Raycast(originPoint2.position, dir, range);
+
+        if (hitJump == true)
         {
-            transform.position = Vector2.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
+            rb.AddForce(Vector2.up * 1000 * Time.deltaTime);
         }
+
+        if (target.position.x > transform.position.x && !flipped)
+        {
+            Flip();
+            speed *= -1;
+        }
+        else if (target.position.x < transform.position.x && flipped)
+        {
+            Flip();
+            speed *= -1;
+        }
+        transform.Translate(Vector2.right * -speed * Time.deltaTime);
     }
     
     void Bite()
@@ -75,5 +101,6 @@ public class InfestedAI : MonoBehaviour {
         Vector3 theScale = transform.localScale;
         theScale.x *= -1;
         transform.localScale = theScale;
+        flipped = !flipped;
     }
 }

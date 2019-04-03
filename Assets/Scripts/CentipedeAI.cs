@@ -18,21 +18,21 @@ public class CentipedeAI : MonoBehaviour
 
     Rigidbody2D rb;
     public float speed;
-    public Transform spawnTwo;
 
     public int Health = 1;
     public float distance;
 
     public Transform originPoint;
+    public Transform originPoint2;
+    public Transform jumpPoint;
     private Vector2 dir = new Vector2(-1, 0);
     public float range;
 
-    NavmeshAgent2D agent;
+    public bool flipped;
     // Use this for initialization
     void Start()
     {
-        agent = GetComponent<NavmeshAgent2D>();
-        target = GameObject.FindWithTag("Player").transform;
+        target = GameObject.Find("Thomas").transform;
         rb = GetComponent<Rigidbody2D>();
     }
 
@@ -58,6 +58,7 @@ public class CentipedeAI : MonoBehaviour
     void Patrol()
     {
         RaycastHit2D hit = Physics2D.Raycast(originPoint.position, dir, range);
+        RaycastHit2D hitFloor = Physics2D.Raycast(originPoint2.position, dir, range);
 
         if (hit == true)
         {
@@ -65,11 +66,35 @@ public class CentipedeAI : MonoBehaviour
             speed *= -1;
             dir *= -1;
         }
-        transform.Translate(Vector2.right * speed * Time.deltaTime);
+        if (!hitFloor)
+        {
+            Flip();
+            speed *= -1;
+            dir *= -1;
+        }
+        transform.Translate(Vector2.right * -speed * Time.deltaTime);
     }
     void Pursue()
     {
-        AIBS();
+        RaycastHit2D hitJump = Physics2D.Raycast(jumpPoint.position, dir, range);
+        RaycastHit2D hitFloor = Physics2D.Raycast(originPoint2.position, dir, range);
+
+        if (hitJump == true)
+        {
+            rb.AddForce(Vector2.up * 1000 * Time.deltaTime);
+        }
+
+        if (target.position.x > transform.position.x && !flipped)
+        {
+            Flip();
+            speed *= -1;
+        }
+        else if (target.position.x < transform.position.x &&  flipped)
+        {
+            Flip();
+            speed *= -1;
+        }
+        transform.Translate(Vector2.right * -speed * Time.deltaTime);
     }
     void Lunge()
     {
@@ -99,48 +124,7 @@ public class CentipedeAI : MonoBehaviour
         Vector3 theScale = transform.localScale;
         theScale.x *= -1;
         transform.localScale = theScale;
-    }
-    public Vector2 pingPosition;
-
-
-
-    void AIBS()
-    {
-
-        UnityEngine.Profiling.Profiler.BeginSample("Moving AI", agent);
-        if (Vector2.Distance(target.position, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
-        else if (Vector2.Distance(pingPosition, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
-        else { agent.isStopped = false; }
-
-        if (target && !agent.isStopped)
-        {
-            //path to target.
-            agent.FindPathTo(target.position, 100);
-            //get target node
-            NavmeshNode2D targetNode = agent.GetTargetNodeInPath();
-
-            Debug.DrawLine(agent.transform.position, targetNode.worldPosition);
-            
-            Debug.Log(agent.GetWalkVector() + " is the walk vector", agent);
-
-            if (targetNode.type == NavmeshNode2D.NodeType.Walkable ||
-                     targetNode.type == NavmeshNode2D.NodeType.Crawlable)
-            {
-                //if the target node is a crawl node
-                if (targetNode.type == NavmeshNode2D.NodeType.Crawlable)
-                {
-                    //toggle crouch
-                    target.player.isProne = true;
-                }
-                //else if the target node is a walk node
-                else if (targetNode.type == NavmeshNode2D.NodeType.Walkable)
-                {
-                    //untoggle crouch
-                    player.player.isProne = false;
-                }
-            }
-        }
-        UnityEngine.Profiling.Profiler.EndSample();
+        flipped = !flipped;
     }
 }
 
