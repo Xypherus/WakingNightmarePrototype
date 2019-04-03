@@ -123,7 +123,6 @@ public class PlayerAI : CharacterStateNetwork {
         public override void FixedUpdate()
         {
             UnityEngine.Profiling.Profiler.BeginSample("Moving AI", agent);
-            Debug.Log(Time.time - timeSinceGrab);
 
             if (target) {
                 LayerMask mask = new LayerMask();
