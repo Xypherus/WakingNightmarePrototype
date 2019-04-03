@@ -283,6 +283,18 @@ public class PlayerFearController : MonoBehaviour {
         fearCanDecay = true;
     }
 
+    //Leaving this in a region as it may be unneeded. Code for handeling of one time use safezones, which is, I believe how they are intended to work - Ben
+    #region Safe Zone Handler
+    /// <summary>
+    /// Applies safe zone. Public as it is called from the safezone script as needed.
+    /// </summary>
+    public void ApplySafeZone()
+    {
+        ChangeFear(-currentFear, false);
+    }
+
+    #endregion
+
     // <summary>
     // Sets the safe zone variable to true if the player is in a safezone
     // <summary>
