@@ -3458,11 +3458,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4861670924193674, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
       propertyPath: m_LocalScale.x
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4861670924193674, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
       propertyPath: m_LocalScale.y
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4861670924193674, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
       propertyPath: m_LocalScale.z
@@ -3524,6 +3524,7 @@ MonoBehaviour:
   normalFearFade: 1
   safezoneFearFade: 15
   fearDecayCooldown: 0
+  trapdamage: 40
   darknessFearChange: 1.5
   fears: 
   outOfRange: 0
@@ -5206,6 +5207,7 @@ MonoBehaviour:
   normalFearFade: 1
   safezoneFearFade: 15
   fearDecayCooldown: 0
+  trapdamage: 40
   darknessFearChange: 1.5
   fears: 
   outOfRange: 0
@@ -7724,7 +7726,7 @@ Transform:
   m_GameObject: {fileID: 1051076576}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -5.56, y: -2.58, z: 0.3642578}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 235137066}
   m_Father: {fileID: 0}
