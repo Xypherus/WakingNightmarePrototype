@@ -2931,6 +2931,11 @@ Prefab:
       propertyPath: fears.Array.size
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 114806525951683588, guid: 23f972d680e86dd4da87e8a18548994e,
+        type: 2}
+      propertyPath: fears.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4861670924193674, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
       propertyPath: m_LocalPosition.x
       value: 9.48
@@ -2966,6 +2971,16 @@ Prefab:
     - target: {fileID: 114087522974943790, guid: 23f972d680e86dd4da87e8a18548994e,
         type: 2}
       propertyPath: fears.Array.data[1]
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114806525951683588, guid: 23f972d680e86dd4da87e8a18548994e,
+        type: 2}
+      propertyPath: fearRange
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114806525951683588, guid: 23f972d680e86dd4da87e8a18548994e,
+        type: 2}
+      propertyPath: fearDecayCooldown
       value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -5522,7 +5537,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fearDealt: 10
-  fearDistance: 0
+  fearDistance: 10
   fearDOT: 5
   agroDistance: 0
   trackDistance: 0

@@ -107,11 +107,13 @@ public class PlayerFearController : MonoBehaviour {
     /// <summary>
     /// Changes the character's fear. Please use this function in liu of directly changing fear, as this includes several checks.
     /// </summary>
-    /// <param name="fearChange">The ammount of fear to change, Positive adds fear, negitive removes it</param>
-    private void ChangeFear(int fearChange)
+    /// <param name="fearChange">How much to change the fear Modifiers are applied on top of this value</param>
+    /// <param name="killable">True of this fear is able to kill the player, False otherwise</param>
+    private void ChangeFear(int fearChange, bool killable)
     {
         int newFear = currentFear + (int)(fearChange * currentFearModifier);
-        currentFear = Mathf.Clamp(newFear, 0, maxFear);
+        if(killable) { currentFear = Mathf.Clamp(newFear, 0, maxFear); }
+        else { currentFear = Mathf.Clamp(newFear, 0, maxFear - 1); }
 
         if(currentFear == maxFear)
         {
@@ -148,7 +150,7 @@ public class PlayerFearController : MonoBehaviour {
                     float fearMod = Mathf.Clamp((fearRange - distance) / fearRange, 0f, .9f) + .1f;
                     //Debug.Log("FearMod = " + fearMod);
 
-                    ChangeFear((int)(enemyClass.fearDOT * fearMod));
+                    ChangeFear((int)(enemyClass.fearDOT * fearMod), false);
                 }
             }
             return true;
@@ -213,11 +215,11 @@ public class PlayerFearController : MonoBehaviour {
         {
             if (safe == true)
             {
-                ChangeFear(-safezoneFearFade);
+                ChangeFear(-safezoneFearFade, false);
             }
             else if(fearCanDecay)
             {
-                ChangeFear(-normalFearFade);
+                ChangeFear(-normalFearFade, false);
             }
         }
     }
@@ -243,7 +245,7 @@ public class PlayerFearController : MonoBehaviour {
     {
         if(collision.gameObject.layer == LayerMask.NameToLayer("Enemy"))
         {
-            ChangeFear(collision.gameObject.GetComponent<EnemyClass>().fearDealt);
+            ChangeFear(collision.gameObject.GetComponent<EnemyClass>().fearDealt, true);
 
             //Handles the cooldown
             fearCooldownTime = fearDecayCooldown;
