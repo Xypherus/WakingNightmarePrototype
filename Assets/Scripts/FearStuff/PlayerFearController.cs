@@ -55,6 +55,12 @@ public class PlayerFearController : MonoBehaviour {
     public float fearDecayCooldown = 0;
 
     /// <summary>
+    /// Sets the amount of damage a trap does when it hits a player
+    /// </summary>
+    [Tooltip("Sets the amount of damage a trap does when it hits a player")]
+    public int trapdamage = 40;
+
+    /// <summary>
     /// The fear modifier applied by darkness. Set to 1.0f for no modifier.
     /// </summary>
     [Tooltip("The fear modifier applied by darkness. Set to 1.0f for no modifier.")]
@@ -194,6 +200,10 @@ public class PlayerFearController : MonoBehaviour {
         {
             withinFearZones.Add(collision.GetComponent<FearZone>());
         }
+        if(collision.CompareTag("Trap"))
+        {
+            ChangeFear(trapdamage, true);  
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -201,6 +211,11 @@ public class PlayerFearController : MonoBehaviour {
         if(collision.CompareTag("FearZone"))
         {
             withinFearZones.Remove(collision.GetComponent<FearZone>());
+        }
+
+        if (collision.gameObject.CompareTag("SafeZone"))
+        {
+            collision.gameObject.SetActive(false);
         }
     }
     #endregion
@@ -278,5 +293,6 @@ public class PlayerFearController : MonoBehaviour {
             safe = true;
         }
     }
+    
 
 }
