@@ -152,21 +152,11 @@ public class PlayerStateMachine : CharacterStateNetwork {
             else if (player.grabbed && player.LedgeNearby() || player.ledge != null) { Transition("Player On Ledge"); }
         }
 
-        public override void OnStateEnter()
-        {
-            player.SetSize(new Vector2(player.width, player.crouchHeight));
-        }
-
         public override void FixedUpdate()
         {
             player.rigidbody.AddForce(new Vector2(Mathf.Clamp(Input.GetAxis("Horizontal") * player.accelMultiplier, -1, 1) * player.crouchSpeed, 0f));
 
             player.Decelerate();
-        }
-
-        public override void OnStateExit()
-        {
-            player.SetSize(new Vector2(player.width, player.height));
         }
     }
     public class PlayerJumping : PlayerCharacterState

@@ -21,10 +21,11 @@ GameObject:
   - component: {fileID: 4861670924193674}
   - component: {fileID: 70666627772198322}
   - component: {fileID: 50859852658705908}
+  - component: {fileID: 95619715754135950}
   - component: {fileID: 114495443886058440}
-  - component: {fileID: 114604768576215224}
   - component: {fileID: 114962938915135368}
-  - component: {fileID: 114087522974943790}
+  - component: {fileID: 114950874033186772}
+  - component: {fileID: 114806525951683588}
   m_Layer: 10
   m_Name: Player
   m_TagString: Player
@@ -55,8 +56,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1532883761468236}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.48, y: 6.88, z: 0.3642578}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalPosition: {x: -5.56, y: -2.58, z: 0.3642578}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4939784398955738}
   m_Father: {fileID: 0}
@@ -110,28 +111,24 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0.5}
   m_Size: {x: 1, y: 1}
   m_Direction: 0
---- !u!114 &114087522974943790
-MonoBehaviour:
+--- !u!95 &95619715754135950
+Animator:
+  serializedVersion: 3
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1532883761468236}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 822deda5c15224840ba1cf9a4d2b8715, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxFear: 100
-  currentFear: 0
-  fearRange: 10
-  fearTickTime: 0.5
-  normalFearFade: 1
-  safezoneFearFade: 15
-  fearDecayCooldown: 3
-  fears: 00000000
-  outOfRange: 0
-  safe: 0
-  fearCanDecay: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 11a6234ffd4894c4bab16b5cecd6e32b, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &114495443886058440
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -150,34 +147,68 @@ MonoBehaviour:
   speed: 10
   maxSpeed: 15
   maxReach: 1
+  stoppingDistance: 0
+  pathAccuracy: 0.2
   isGrounded: 0
   canGrab: 1
   isProne: 0
   sprinting: 0
+  isDead: 0
   rigidbody: {fileID: 0}
   ladder: {fileID: 0}
+  animator: {fileID: 0}
   isStopped: 0
   pathing: 0
+  area: {fileID: 0}
   canMove: 1
   accelMultiplier: 10
   jumpForce: 210
   grabbed: 0
   jumpped: 0
   crouchSpeed: 7
---- !u!114 &114604768576215224
+  fearController: {fileID: 0}
+  stateMachine: {fileID: 0}
+--- !u!114 &114806525951683588
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1532883761468236}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8e5d99f06b820040a9dd0c7fa5f787c, type: 3}
+  m_Script: {fileID: 11500000, guid: 822deda5c15224840ba1cf9a4d2b8715, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 4861670924193674}
-  speed: 0
-  offset: {x: 0, y: 0, z: 0}
+  maxFear: 100
+  currentFear: 0
+  fearRange: 0
+  fearTickTime: 0.5
+  normalFearFade: 1
+  safezoneFearFade: 15
+  fearDecayCooldown: 0
+  darknessFearChange: 1.5
+  fears: 
+  outOfRange: 0
+  outOfZone: 0
+  safe: 0
+  fearCanDecay: 0
+  currentFearModifier: 0
+  withinFearZones: []
+--- !u!114 &114950874033186772
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1532883761468236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb9c8979c45041944825491eebc2b843, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  pingPosition: {x: 0, y: 0}
+  currentState: 
+  aiState: 
 --- !u!114 &114962938915135368
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -225,9 +256,9 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 21300000, guid: 79c4f1a324d15de4aafaff6b5ff56dda, type: 3}
-  m_Color: {r: 1, g: 0.6654622, b: 0.504717, a: 1}
-  m_FlipX: 0
+  m_Sprite: {fileID: 21300000, guid: 4857760de850d9c42945a4108d0e8643, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 0.16, y: 0.16}

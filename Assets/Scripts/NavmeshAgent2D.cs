@@ -29,6 +29,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     new public Rigidbody2D rigidbody;
     public Ladder ladder;
     public NavmeshNode2D ledge;
+    public Animator animator;
 
     public bool isStopped;
     public bool pathing;
@@ -52,7 +53,6 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     protected virtual void FixedUpdate() {
-        _sprite.localScale = capsuleCollider.size;
 
         Orient();
         GroundCheck();
@@ -63,19 +63,11 @@ public class NavmeshAgent2D : MonoBehaviour {
         area = FindObjectOfType<NavmeshArea2D>();
         path = new List<NavmeshNode2D>();
         capsuleCollider = GetComponent<CapsuleCollider2D>();
+        animator = GetComponent<Animator>();
         crouchHeight = height / 2;
-        SetSize(new Vector2(width, height));
 
         _sprite = transform.Find("Sprite");
         _initSpriteHeight = _sprite.localScale.y;
-    }
-
-    public void SetSize(Vector2 newSize) {
-        if (newSize.y < newSize.x) { capsuleCollider.direction = CapsuleDirection2D.Horizontal; }
-        else { capsuleCollider.direction = CapsuleDirection2D.Vertical; }
-
-        capsuleCollider.size = newSize;
-        capsuleCollider.offset = new Vector2(0f, capsuleCollider.size.y / 2);
     }
 
     public void MoveTo(Vector2 position, UnityEngine.Events.UnityAction callback) {
@@ -205,16 +197,6 @@ public class NavmeshAgent2D : MonoBehaviour {
         Ladder newLadder = GetNearestLadder(radius);
 
         if (newLadder) { newLadder.MountLadder(this); }
-    }
-
-    protected virtual void Crouch() {
-        if (isProne)
-        {
-            SetSize(new Vector2(width, height / 2));
-        }
-        else {
-            SetSize(new Vector2(width, height));
-        }
     }
 
     public virtual float GetWalkDirection() {
@@ -488,10 +470,6 @@ public class NavmeshAgent2D : MonoBehaviour {
 
     private void OnDrawGizmos() {
         if (!capsuleCollider) { capsuleCollider = GetComponent<CapsuleCollider2D>(); }
-        if (!Application.isPlaying)
-        {
-            SetSize(new Vector2(width, height));
-        }
     }
 
     protected virtual void OnDrawGizmosSelected() {

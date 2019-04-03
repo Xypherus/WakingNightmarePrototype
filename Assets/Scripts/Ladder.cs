@@ -86,6 +86,7 @@ public class Ladder : MonoBehaviour {
             percent += (actor.speed / 4 / height) * Time.deltaTime * direction;
 
             if (percent <= 0 ) {
+                actor.animator.SetFloat("climbDirection", -1);
                 if (previous)
                 {
                     actor.transform.position = previous.top;
@@ -97,6 +98,7 @@ public class Ladder : MonoBehaviour {
                 }
             }
             else if (percent >= 1) {
+                actor.animator.SetFloat("climbDirection", 1);
                 if (next)
                 {
                     actor.transform.position = next.bottom;
