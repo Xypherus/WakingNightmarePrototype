@@ -49,8 +49,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
         jumping.AddTransition(incappacitated);
         jumping.AddTransition(rising);
         jumping.AddTransition(falling);
-        jumping.AddTransition(onLadder);
-        jumping.AddTransition(onLedge);
+        //jumping.AddTransition(onLadder);
+        //jumping.AddTransition(onLedge);
         jumping.AddTransition(walking);
 
         jumpFromGrab.AddTransition(incappacitated);
@@ -285,6 +285,11 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void FixedUpdate()
         {
+            if (player.rigidbody.bodyType == RigidbodyType2D.Kinematic) {
+                player.DismountLadder();
+                player.rigidbody.bodyType = RigidbodyType2D.Dynamic;
+            }
+
             player.rigidbody.AddForce(new Vector2((player.speed / 1.5f) * Input.GetAxis("Horizontal"), 0f));
         }
     }
@@ -306,6 +311,12 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void FixedUpdate()
         {
+            if (player.rigidbody.bodyType == RigidbodyType2D.Kinematic)
+            {
+                player.DismountLadder();
+                player.rigidbody.bodyType = RigidbodyType2D.Dynamic;
+            }
+
             player.rigidbody.AddForce(new Vector2((player.speed / 1.5f) * Input.GetAxis("Horizontal"), 0f));
         }
     }
