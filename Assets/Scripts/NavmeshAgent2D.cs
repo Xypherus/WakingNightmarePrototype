@@ -30,6 +30,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     public Ladder ladder;
     public NavmeshNode2D ledge;
     public Animator animator;
+    public NavmeshNode2D currentNode;
 
     public bool isStopped;
     public bool pathing;
@@ -56,6 +57,7 @@ public class NavmeshAgent2D : MonoBehaviour {
 
         Orient();
         GroundCheck();
+        currentNode = area.NodeAtPoint(transform.position, this);
     }
 
     protected virtual void Start() {
@@ -76,7 +78,7 @@ public class NavmeshAgent2D : MonoBehaviour {
 
     public NavmeshNode2D GetClosestLedge() {
         if (area == null) { return null; }
-        List<NavmeshNode2D> ledges = area.NodesOfTypeInRange(this, transform.position, new List<NavmeshNode2D.NodeType> { NavmeshNode2D.NodeType.Ledge }, maxReach * transform.localScale.x);
+        List<NavmeshNode2D> ledges = area.NodesOfTypeInRange(this, transform.position, new List<NavmeshNode2D.NodeType> { NavmeshNode2D.NodeType.Ledge }, maxReach);
         if (ledges == null) { return null; }
         isProne = false;
 
@@ -239,8 +241,8 @@ public class NavmeshAgent2D : MonoBehaviour {
         for (int i = path.IndexOf(closestNode); i < path.Count; i++) {
             NavmeshNode2D node = path[i];
 
-            if (Vector2.Distance(node.worldPosition, transform.position) <= stoppingDistance) {
-                if (!Physics2D.Linecast(transform.position, node.worldPosition, 1 << LayerMask.NameToLayer("Environment")))
+            if (Vector2.Distance(node.worldPosition, currentNode.worldPosition) <= stoppingDistance) {
+                if (!Physics2D.Linecast(currentNode.worldPosition, node.worldPosition, 1 << LayerMask.NameToLayer("Environment")))
                 {
                     targetNode = path[i];
                 }

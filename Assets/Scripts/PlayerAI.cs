@@ -6,9 +6,11 @@ using UnityEngine;
 public class PlayerAI : CharacterStateNetwork {
 
     public Transform target;
-    public Vector2 pingPosition = Vector3.zero;
+    public Ping ping;
     public string currentState;
     public string aiState;
+
+    
 
     NavmeshAgent2D agent;
     PlayerStateMachine player;
@@ -23,10 +25,11 @@ public class PlayerAI : CharacterStateNetwork {
     void Start () {
         agent = GetComponent<NavmeshAgent2D>();
         player = GetComponent<PlayerStateMachine>();
+        ping = null;
 
         dead = new PlayerAIDead(target, agent, this, player);
-        idle = new PlayerAIIdle(target, agent, pingPosition, this, player);
-        moveTo = new PlayerAIMoveTo(target, pingPosition, agent, this, player);
+        idle = new PlayerAIIdle(target, agent, ping, this, player);
+        moveTo = new PlayerAIMoveTo(target, ping, agent, this, player);
 
         CreateNetwork();
 	}
@@ -40,7 +43,7 @@ public class PlayerAI : CharacterStateNetwork {
         {
             moveTo.target = target;
             idle.target = target;
-            moveTo.pingPosition = pingPosition;
+            moveTo.ping = ping;
             base.FixedUpdate();
         }
     }
@@ -74,10 +77,10 @@ public class PlayerAI : CharacterStateNetwork {
     }
     class PlayerAIIdle : PlayerAIState
     {
-        public Vector2 pingPosition;
+        public Ping ping;
 
-        public PlayerAIIdle(Transform target, NavmeshAgent2D agent, Vector2 pingPosition, CharacterStateNetwork network, PlayerStateMachine player) : base("Player AI Idle", network, target, agent, player) {
-            this.pingPosition = pingPosition;
+        public PlayerAIIdle(Transform target, NavmeshAgent2D agent, Ping ping, CharacterStateNetwork network, PlayerStateMachine player) : base("Player AI Idle", network, target, agent, player) {
+            this.ping = ping;
         }
 
         public override void Subject()
@@ -89,16 +92,21 @@ public class PlayerAI : CharacterStateNetwork {
         public override void Update()
         {
             if (Vector2.Distance(target.position, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
-            else if (Vector2.Distance(pingPosition, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
+            else if (ping != null)
+            {
+                if (Vector2.Distance(ping.pingPosition, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
+            }
             else if (agent.path.Count == 0) { agent.isStopped = true; }
             else { agent.isStopped = false; }
         }
     }
     class PlayerAIMoveTo : PlayerAIState {
-        public Vector2 pingPosition;
+        public Ping ping;
 
-        public PlayerAIMoveTo(Transform target, Vector2 pingPosition, NavmeshAgent2D agent, CharacterStateNetwork network, PlayerStateMachine player) : base("Player AI Move To", network, target, agent, player) {
-            this.pingPosition = pingPosition;
+        float timeSinceGrab;
+
+        public PlayerAIMoveTo(Transform target, Ping ping, NavmeshAgent2D agent, CharacterStateNetwork network, PlayerStateMachine player) : base("Player AI Move To", network, target, agent, player) {
+            this.ping = ping;
         }
 
         public override void Subject()
@@ -107,9 +115,15 @@ public class PlayerAI : CharacterStateNetwork {
             else if (agent.isStopped) { Transition("Player AI Idle"); }
         }
 
+        public override void OnStateEnter()
+        {
+            timeSinceGrab = Time.time;
+        }
+
         public override void FixedUpdate()
         {
             UnityEngine.Profiling.Profiler.BeginSample("Moving AI", agent);
+            Debug.Log(Time.time - timeSinceGrab);
 
             if (target) {
                 LayerMask mask = new LayerMask();
@@ -126,32 +140,38 @@ public class PlayerAI : CharacterStateNetwork {
                 Debug.DrawLine(agent.transform.position, targetNode.worldPosition);
 
                 //if agent.GetTargetNodeInPath is not a ground node or is connected to the previous node by a jump connection,
-                if (agent.NodeIsTraversible(currentNode) && !agent.ladder && agent.ledge == null && (targetNode.gridPosition.y > currentNode.gridPosition.y || Vector2.Distance(targetNode.worldPosition, agent.transform.position) > agent.jumpDistance)) {
+                /*
+                if (agent.NodeIsTraversible(currentNode) && agent.isGrounded && !agent.ladder && agent.ledge == null && (targetNode.gridPosition.y > currentNode.gridPosition.y || Vector2.Distance(targetNode.worldPosition, agent.transform.position) > agent.jumpDistance)) {
                     player.player.jumpped = true;
                 }
+                */
                 //else if agent.GetTargetNodeInPath is a ladder type node and not already on ladder,
-                else if (targetNode.type == NavmeshNode2D.NodeType.Ladder && !player.player.ladder)
+                if ((Time.time - timeSinceGrab) > 2f && targetNode.type == NavmeshNode2D.NodeType.Ladder && !player.player.ladder)
                 {
                     //grab the nearest ladder.
                     player.player.grabbed = true;
+                    timeSinceGrab = Time.time;
                 }
                 //else if agent.GetTargetNodeInPath is not a ladder node and agent is already on ladder, 
-                else if (targetNode.type != NavmeshNode2D.NodeType.Ladder && player.player.ladder && Mathf.Abs(agent.transform.position.y - targetNode.worldPosition.y) < 1)
+                else if ((Time.time - timeSinceGrab) > 2f && targetNode.type != NavmeshNode2D.NodeType.Ladder && player.player.ladder && (Mathf.Abs(agent.transform.position.y - targetNode.worldPosition.y) < 0.5 || agent.transform.position.y > targetNode.worldPosition.y))
                 {
                     //jump off of ladder
                     player.player.jumpped = true;
+                    timeSinceGrab = Time.time;
                 }
                 //else if agent.GetTargetNodeInPath is ledge, and not already on ledge,
-                else if (targetNode.type == NavmeshNode2D.NodeType.Ledge && player.player.ledge == null)
+                else if ((Time.time - timeSinceGrab) > 2f && targetNode.type == NavmeshNode2D.NodeType.Ledge && player.player.ledge == null)
                 {
                     //grab nearest ledge
                     player.player.grabbed = true;
+                    timeSinceGrab = Time.time;
                 }
                 //else if agent.GetTargetNodeInPath is not ledge and already on ledge,
-                else if (targetNode.type != NavmeshNode2D.NodeType.Ledge && player.player.ledge != null)
+                else if ((Time.time - timeSinceGrab) > 2f && targetNode.type != NavmeshNode2D.NodeType.Ledge && player.player.ledge != null)
                 {
                     //jump off ledge
                     player.player.jumpped = true;
+                    timeSinceGrab = Time.time;
                 }
                 //else if agent.GetTargetNodeInPath is a ground node
                 else if (targetNode.type == NavmeshNode2D.NodeType.Walkable ||
@@ -172,7 +192,10 @@ public class PlayerAI : CharacterStateNetwork {
 
             UnityEngine.Profiling.Profiler.EndSample();
             if (Vector2.Distance(target.position, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
-            else if (Vector2.Distance(pingPosition, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
+            else if (ping != null)
+            {
+                if (Vector2.Distance(ping.pingPosition, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
+            }
             else if (agent.path.Count == 0) { agent.isStopped = true; }
             else { agent.isStopped = false; }
         }
@@ -197,4 +220,12 @@ public class PlayerAIState : CharacterState {
     public override void FixedUpdate() { }
     public override void Subject() { }
     public override void Update() { }
+}
+
+public class Ping {
+    public Vector2 pingPosition;
+
+    public Ping(Vector2 pingPosition) {
+        this.pingPosition = pingPosition;
+    }
 }

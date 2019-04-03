@@ -402,7 +402,7 @@ public class NavmeshNode2D
             case NodeType.Ledge:
                 return 2;
             case NodeType.Air:
-                return 100;
+                return 5;
             case NodeType.None:
                 return Mathf.Infinity;
             default:
