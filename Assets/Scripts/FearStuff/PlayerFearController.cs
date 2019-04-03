@@ -55,6 +55,12 @@ public class PlayerFearController : MonoBehaviour {
     public float fearDecayCooldown = 0;
 
     /// <summary>
+    /// Sets the amount of damage a trap does when it hits a player
+    /// </summary>
+    [Tooltip("Sets the amount of damage a trap does when it hits a player")]
+    public int trapdamage = 40;
+
+    /// <summary>
     /// The fear modifier applied by darkness. Set to 1.0f for no modifier.
     /// </summary>
     [Tooltip("The fear modifier applied by darkness. Set to 1.0f for no modifier.")]
@@ -107,11 +113,13 @@ public class PlayerFearController : MonoBehaviour {
     /// <summary>
     /// Changes the character's fear. Please use this function in liu of directly changing fear, as this includes several checks.
     /// </summary>
-    /// <param name="fearChange">The ammount of fear to change, Positive adds fear, negitive removes it</param>
-    private void ChangeFear(int fearChange)
+    /// <param name="fearChange">How much to change the fear Modifiers are applied on top of this value</param>
+    /// <param name="killable">True of this fear is able to kill the player, False otherwise</param>
+    private void ChangeFear(int fearChange, bool killable)
     {
         int newFear = currentFear + (int)(fearChange * currentFearModifier);
-        currentFear = Mathf.Clamp(newFear, 0, maxFear);
+        if(killable) { currentFear = Mathf.Clamp(newFear, 0, maxFear); }
+        else { currentFear = Mathf.Clamp(newFear, 0, maxFear - 1); }
 
         if(currentFear == maxFear)
         {
@@ -148,7 +156,7 @@ public class PlayerFearController : MonoBehaviour {
                     float fearMod = Mathf.Clamp((fearRange - distance) / fearRange, 0f, .9f) + .1f;
                     //Debug.Log("FearMod = " + fearMod);
 
-                    ChangeFear((int)(enemyClass.fearDOT * fearMod));
+                    ChangeFear((int)(enemyClass.fearDOT * fearMod), false);
                 }
             }
             return true;
@@ -192,6 +200,10 @@ public class PlayerFearController : MonoBehaviour {
         {
             withinFearZones.Add(collision.GetComponent<FearZone>());
         }
+        if(collision.CompareTag("Trap"))
+        {
+            ChangeFear(trapdamage, true);  
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -199,6 +211,11 @@ public class PlayerFearController : MonoBehaviour {
         if(collision.CompareTag("FearZone"))
         {
             withinFearZones.Remove(collision.GetComponent<FearZone>());
+        }
+
+        if (collision.gameObject.CompareTag("SafeZone"))
+        {
+            collision.gameObject.SetActive(false);
         }
     }
     #endregion
@@ -213,11 +230,11 @@ public class PlayerFearController : MonoBehaviour {
         {
             if (safe == true)
             {
-                ChangeFear(-safezoneFearFade);
+                ChangeFear(-safezoneFearFade, false);
             }
             else if(fearCanDecay)
             {
-                ChangeFear(-normalFearFade);
+                ChangeFear(-normalFearFade, false);
             }
         }
     }
@@ -243,7 +260,7 @@ public class PlayerFearController : MonoBehaviour {
     {
         if(collision.gameObject.layer == LayerMask.NameToLayer("Enemy"))
         {
-            ChangeFear(collision.gameObject.GetComponent<EnemyClass>().fearDealt);
+            ChangeFear(collision.gameObject.GetComponent<EnemyClass>().fearDealt, true);
 
             //Handles the cooldown
             fearCooldownTime = fearDecayCooldown;
@@ -276,5 +293,6 @@ public class PlayerFearController : MonoBehaviour {
             safe = true;
         }
     }
+    
 
 }
