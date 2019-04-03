@@ -43,7 +43,7 @@ public class PlayerFearController : MonoBehaviour {
     public int normalFearFade = 1;
 
     /// <summary>
-    /// The rate at which the players fear depletes normally
+    /// The rate at which the players fear depletes while in a safe zone
     /// </summary>
     [Tooltip("The value at which the player's fear depletes while in a safe zone")]
     public int safezoneFearFade = 15;
@@ -85,11 +85,6 @@ public class PlayerFearController : MonoBehaviour {
     /// Serves to allow for fear decay to go on cooldown. Should not be change manualy. See fearDecayCooldown variable to change functionality.
     /// </summary>
     public bool fearCanDecay;
-
-    /// <summary>
-    /// Total fear that will be applied via area fear per tick.
-    /// </summary>
-    public int appliedAreaFear;
 
     /// <summary>
     /// Modifier which is applied to all fear changes. Used primarly for darkness. Visable for debug
@@ -169,21 +164,26 @@ public class PlayerFearController : MonoBehaviour {
     private bool ApplyZoneFear()
     {
         outOfZone = true;
-        currentFearModifier = 1.0f;
+        float newFearModifier = 1.0f;
+
         if(withinFearZones.Count != 0)
         {
             foreach(FearZone aFear in withinFearZones)
             {
-                if(fears.Contains(aFear.fearType) && aFear.fearApplied != 0)
+                if(fears.Contains(aFear.fearType) && aFear.fearModifier != 0)
                 {
                     outOfZone = false;
-                    ChangeFear(aFear.fearApplied);
+                    newFearModifier *= aFear.fearModifier;
                 }
-                if(aFear.fearType == FearTypes.Darkness) { currentFearModifier = darknessFearChange; }
             }
+            currentFearModifier = newFearModifier;
             return true;
         }
-        else { return false; }
+        else
+        {
+            currentFearModifier = newFearModifier;
+            return false;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -233,9 +233,9 @@ public class PlayerFearController : MonoBehaviour {
 
     private void FearTicker()
     {
+        ApplyZoneFear();
         ApplyPassiveFear();
         ApplyFearDecay();
-        ApplyZoneFear();
     }
 
     //This event applies active fear (On Collision Fear)
@@ -264,11 +264,6 @@ public class PlayerFearController : MonoBehaviour {
         }
 
         fearCanDecay = true;
-    }
-
-    public void FearUpdater()
-    {
-
     }
 
     // <summary>

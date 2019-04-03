@@ -29,12 +29,13 @@ public class NavmeshAgent2D : MonoBehaviour {
     new public Rigidbody2D rigidbody;
     public Ladder ladder;
     public NavmeshNode2D ledge;
+    public Animator animator;
 
     public bool isStopped;
     public bool pathing;
 
     protected CapsuleCollider2D capsuleCollider;
-    protected NavmeshArea2D area;
+    public NavmeshArea2D area;
 
     protected bool wasCrouched = false;
     protected bool canWalkGrab = false;
@@ -52,7 +53,6 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     protected virtual void FixedUpdate() {
-        _sprite.localScale = capsuleCollider.size;
 
         Orient();
         GroundCheck();
@@ -63,19 +63,11 @@ public class NavmeshAgent2D : MonoBehaviour {
         area = FindObjectOfType<NavmeshArea2D>();
         path = new List<NavmeshNode2D>();
         capsuleCollider = GetComponent<CapsuleCollider2D>();
+        animator = GetComponent<Animator>();
         crouchHeight = height / 2;
-        SetSize(new Vector2(width, height));
 
         _sprite = transform.Find("Sprite");
         _initSpriteHeight = _sprite.localScale.y;
-    }
-
-    public void SetSize(Vector2 newSize) {
-        if (newSize.y < newSize.x) { capsuleCollider.direction = CapsuleDirection2D.Horizontal; }
-        else { capsuleCollider.direction = CapsuleDirection2D.Vertical; }
-
-        capsuleCollider.size = newSize;
-        capsuleCollider.offset = new Vector2(0f, capsuleCollider.size.y / 2);
     }
 
     public void MoveTo(Vector2 position, UnityEngine.Events.UnityAction callback) {
@@ -113,10 +105,10 @@ public class NavmeshAgent2D : MonoBehaviour {
         canGrab = false;
         ledge = closest;
         //Todo: change to hanging animation
+        rigidbody.bodyType = RigidbodyType2D.Kinematic;
         MoveTo(closest.worldPosition, () =>
         {
             canMove = true;
-            rigidbody.bodyType = RigidbodyType2D.Kinematic;
             canGrab = true;
         });
     }
@@ -131,7 +123,7 @@ public class NavmeshAgent2D : MonoBehaviour {
 
         if (surface)
         {
-            Debug.Log("Climbing Ledge...");
+            Debug.Log("Climbing Ledge...", this);
             
             MoveTo(new Vector2(surface.point.x, surface.point.y + (height/2)), () => {
                 ledge = null;
@@ -142,7 +134,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     public virtual void ReleaseLedge() {
-        Debug.Log("Releasing ledge");
+        Debug.Log("Releasing ledge", this);
         if (ledge == null) { return; }
 
         ledge = null;
@@ -207,16 +199,6 @@ public class NavmeshAgent2D : MonoBehaviour {
         if (newLadder) { newLadder.MountLadder(this); }
     }
 
-    protected virtual void Crouch() {
-        if (isProne)
-        {
-            SetSize(new Vector2(width, height / 2));
-        }
-        else {
-            SetSize(new Vector2(width, height));
-        }
-    }
-
     public virtual float GetWalkDirection() {
         if (!pathing || path.Count == 0) { return 0; }
         return GetWalkVector().x;
@@ -229,6 +211,7 @@ public class NavmeshAgent2D : MonoBehaviour {
         Vector2 heading = targetNode.worldPosition - transform.position;
         float distance = heading.magnitude;
         Vector2 direction = heading / distance;
+
         direction = new Vector2(Mathf.Clamp(Mathf.RoundToInt(direction.x), -1, 1), Mathf.Clamp(Mathf.RoundToInt(direction.y), -1, 1));
 
         return direction;
@@ -254,7 +237,14 @@ public class NavmeshAgent2D : MonoBehaviour {
         }
 
         for (int i = path.IndexOf(closestNode); i < path.Count; i++) {
-            if (Vector2.Distance(path[i].worldPosition, transform.position) <= stoppingDistance) { targetNode = path[i]; }
+            NavmeshNode2D node = path[i];
+
+            if (Vector2.Distance(node.worldPosition, transform.position) <= stoppingDistance) {
+                if (!Physics2D.Linecast(transform.position, node.worldPosition, 1 << LayerMask.NameToLayer("Environment")))
+                {
+                    targetNode = path[i];
+                }
+            }
         }
 
         return targetNode;
@@ -296,16 +286,10 @@ public class NavmeshAgent2D : MonoBehaviour {
         List<NavmeshNode2D> openList = new List<NavmeshNode2D>();
         NavmeshNode2D startNode = area.NodeAtPoint(start, this);
         NavmeshNode2D endNode = area.NodeAtPoint(end, this);
-        
-
-        if (!NodeIsTraversible(startNode)) {
-            startNode = FindTraversibleNeighbor(startNode);
-
-            if (startNode == null) { lastPath = Time.realtimeSinceStartup; return path; }
-        }
 
         openList.Add(startNode);
         NavmeshNode2D currentNode = GetBestNode(openList);
+        if (currentNode == null) { return path; }
 
         int iterations = 0;
 
@@ -315,7 +299,7 @@ public class NavmeshAgent2D : MonoBehaviour {
             openList.Remove(currentNode);
             closedList.Add(currentNode);
 
-            if (currentNode == endNode) { break; }
+            if (currentNode == endNode || currentNode.connections.Count == 0) { break; }
 
             UnityEngine.Profiling.Profiler.BeginSample("viewing neighbors" + currentNode.connections.Count, this);
             foreach (NavmeshNode2D.NavmeshNodeConnection2D connection in currentNode.connections) {
@@ -358,7 +342,7 @@ public class NavmeshAgent2D : MonoBehaviour {
         NavmeshNode2D currentNode = end;
 
         int count = 0;
-        while (currentNode!= start|| count < 1000) {
+        while (currentNode!= start && count < 1000) {
             if (currentNode.parent == null) {
                 break;
             }
@@ -375,10 +359,10 @@ public class NavmeshAgent2D : MonoBehaviour {
         return path;
     }
 
-    protected virtual bool NodeIsTraversible(NavmeshNode2D node) {
+    public virtual bool NodeIsTraversible(NavmeshNode2D node) {
         UnityEngine.Profiling.Profiler.BeginSample("Traversibility calculations", this);
-        if (node.type == NavmeshNode2D.NodeType.None || 
-            node.type == NavmeshNode2D.NodeType.Air)
+
+        if (node.type == NavmeshNode2D.NodeType.None)
         { UnityEngine.Profiling.Profiler.EndSample(); return false; }
         else { UnityEngine.Profiling.Profiler.EndSample(); return true; }
     }
@@ -394,6 +378,7 @@ public class NavmeshAgent2D : MonoBehaviour {
     }
 
     protected virtual NavmeshNode2D GetBestNode(List<NavmeshNode2D> nodes) {
+        if (nodes.Count == 0) { return null; }
         NavmeshNode2D best = nodes[0];
 
         foreach (NavmeshNode2D node in nodes) {
@@ -485,10 +470,6 @@ public class NavmeshAgent2D : MonoBehaviour {
 
     private void OnDrawGizmos() {
         if (!capsuleCollider) { capsuleCollider = GetComponent<CapsuleCollider2D>(); }
-        if (!Application.isPlaying)
-        {
-            SetSize(new Vector2(width, height));
-        }
     }
 
     protected virtual void OnDrawGizmosSelected() {

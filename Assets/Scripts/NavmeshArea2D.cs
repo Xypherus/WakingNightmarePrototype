@@ -286,13 +286,24 @@ public class NavmeshArea2D : MonoBehaviour {
     public NavmeshNode2D NodeAtPoint(Vector2 position, NavmeshAgent2D agent) {
         if (meshes == null) { return null; }
         else if (meshes[agent] == null) { return null; }
+        NavmeshNode2D node = null;
 
         Vector2 gridPos = new Vector2(Mathf.RoundToInt((position.x - bounds.min.x)/resolution), Mathf.RoundToInt((position.y -bounds.min.y) / resolution));
         if (gridPos.x < 0) { gridPos.x = 0; }
         else if (gridPos.x >= xcount) { gridPos.x = xcount-1; }
         if (gridPos.y < 0) { gridPos.y = 0; }
         else if (gridPos.y >= ycount) { gridPos.y = ycount-1; }
-        return meshes[agent][(int) gridPos.x,(int) gridPos.y];
+
+        node = meshes[agent][(int) gridPos.x,(int) gridPos.y];
+
+        if (agent.NodeIsTraversible(node)) { return node; }
+        else {
+            NavmeshNode2D upone = meshes[agent][(int)gridPos.x, (int)gridPos.y + 1];
+            NavmeshNode2D downone = meshes[agent][(int)gridPos.x, (int)gridPos.y - 1];
+            if (agent.NodeIsTraversible(upone)) { return upone; }
+            else if (agent.NodeIsTraversible(downone)) { return downone; }
+            else { return null; }
+        }
     }
 
     public void OnDrawGizmosSelected() {
@@ -387,11 +398,11 @@ public class NavmeshNode2D
             case NodeType.Walkable:
                 return 1;
             case NodeType.Ladder:
-                return 1;
+                return 0;
             case NodeType.Ledge:
                 return 2;
             case NodeType.Air:
-                return 10;
+                return 100;
             case NodeType.None:
                 return Mathf.Infinity;
             default:
@@ -441,6 +452,7 @@ public class NavmeshNode2D
     {
         UnityEngine.Profiling.Profiler.BeginSample("Creating Connection");
 
+
         for(int i = 0; i < connections.Count; i++)
         {
             if (connections[i].b == destination) { UnityEngine.Profiling.Profiler.EndSample(); return; }
@@ -453,6 +465,11 @@ public class NavmeshNode2D
                 UnityEngine.Profiling.Profiler.EndSample();
                 return;
             }
+        }
+
+        if (Physics2D.Linecast(worldPosition, destination.worldPosition, 1 << LayerMask.NameToLayer("Environment"))) {
+            UnityEngine.Profiling.Profiler.EndSample();
+            return;
         }
                 
         NavmeshNodeConnection2D connection = new NavmeshNodeConnection2D(this, destination, jump);

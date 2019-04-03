@@ -29,6 +29,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
         rising = new PlayerRising(this, player);
         falling = new PlayerFalling(this, player);
 
+        incappacitated.AddTransition(walking);
+
         walking.AddTransition(incappacitated);
         walking.AddTransition(crawling);
         walking.AddTransition(falling);
@@ -96,12 +98,14 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void OnStateEnter()
         {
-            player.animator.SetBool("Dead", true);
+            player.isDead = true;
+            //player.animator.SetBool("Dead", true);
         }
 
         public override void OnStateExit()
         {
-            player.animator.SetBool("Dead", false);
+            player.isDead = false;
+            //player.animator.SetBool("Dead", false);
         }
     }
     public class PlayerWalking : PlayerCharacterState {
@@ -117,8 +121,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
             else if (!player.isGrounded && player.rigidbody.velocity.y > 0) { Transition("Player Rising"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y < 0) { Transition("Player Falling"); }
             else if (player.isGrounded && player.isProne) { Transition("Player Crawling"); }
-            else if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
-            else if (player.grabbed && player.LedgeNearby()) { Transition("Player On Ledge"); }
+            else if (player.grabbed && player.LadderNearby() || player.ladder) { Transition("Player On Ladder"); }
+            else if (player.grabbed && player.LedgeNearby() || player.ledge != null) { Transition("Player On Ledge"); }
         }
 
         public override void FixedUpdate() {
@@ -144,13 +148,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
             else if (!player.isGrounded && player.rigidbody.velocity.y > 0) { Transition("Player Rising"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y < 0) { Transition("Player Falling"); }
             else if (player.isGrounded && !player.isProne) { Transition("Player Walking"); }
-            else if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
-            else if (player.grabbed && player.LedgeNearby()) { Transition("Player On Ledge"); }
-        }
-
-        public override void OnStateEnter()
-        {
-            player.SetSize(new Vector2(player.width, player.crouchHeight));
+            else if (player.grabbed && player.LadderNearby() || player.ladder) { Transition("Player On Ladder"); }
+            else if (player.grabbed && player.LedgeNearby() || player.ledge != null) { Transition("Player On Ledge"); }
         }
 
         public override void FixedUpdate()
@@ -158,11 +157,6 @@ public class PlayerStateMachine : CharacterStateNetwork {
             player.rigidbody.AddForce(new Vector2(Mathf.Clamp(Input.GetAxis("Horizontal") * player.accelMultiplier, -1, 1) * player.crouchSpeed, 0f));
 
             player.Decelerate();
-        }
-
-        public override void OnStateExit()
-        {
-            player.SetSize(new Vector2(player.width, player.height));
         }
     }
     public class PlayerJumping : PlayerCharacterState
@@ -180,8 +174,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
             else if (player.isGrounded) { Transition("Player Walking"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y > 0 && elapsedTime >= maxTime) { Transition("Player Rising"); }
             else if (!player.isGrounded && player.rigidbody.velocity.y < 0 && elapsedTime >= maxTime) { Transition("Player Falling"); }
-            else if (player.grabbed && player.LadderNearby()) { Transition("Player On Ladder"); }
-            else if (player.grabbed && player.LedgeNearby()) { Transition("Player On Ledge"); }
+            else if (player.grabbed && player.LadderNearby() || player.ladder) { Transition("Player On Ladder"); }
+            else if (player.grabbed && player.LedgeNearby() || player.ledge != null) { Transition("Player On Ledge"); }
         }
 
         public override void OnStateEnter()
@@ -263,7 +257,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void FixedUpdate()
         {
-            if (Input.GetAxis("Vertical") > 0) {
+            if (!player.pathing && Input.GetAxis("Vertical") > 0) {
                 player.ClimbLedge();
             }
         }

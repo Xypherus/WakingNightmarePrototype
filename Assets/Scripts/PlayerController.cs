@@ -23,8 +23,7 @@ public class PlayerController : NavmeshAgent2D {
     //Added code for accessing fear system - 2019-02-26 <Ben Shackman>
     //Will be used later to alter movement speed
     public PlayerFearController fearController;
-    public Animator animator;
-    PlayerStateMachine stateMachine;
+    public PlayerStateMachine stateMachine;
     
     protected override void Start()
     {
@@ -37,11 +36,12 @@ public class PlayerController : NavmeshAgent2D {
         //Gets the fear controller - 2019-02-26 <Ben Shackman>
         fearController = gameObject.GetComponent<PlayerFearController>();
         stateMachine = GetComponent<PlayerStateMachine>();
-        animator = GetComponent<Animator>();
     }
+
     protected override void Update() {
         //Call the Update function in the base NavmeshAgent2D
         base.Update();
+        Animate();
 
         if (Time.timeScale > 0 && !pathing) {
             //Test for grabbing ladders/ledges
@@ -73,6 +73,19 @@ public class PlayerController : NavmeshAgent2D {
 
         grabbed = false;
         jumpped = false;
+    }
+
+    private void Animate() {
+        animator.SetFloat("fear", fearController.currentFear);
+        if (ledge != null && grabbed) {
+            animator.SetTrigger("grab");
+        }
+        if (jumpped) { animator.SetTrigger("jump"); }
+        animator.SetBool("sprinting", sprinting);
+        animator.SetBool("grounded", isGrounded);
+        animator.SetBool("prone", isProne);
+        if (rigidbody.velocity.y < 0) { animator.SetBool("falling", true); }
+        else { animator.SetBool("falling", false); }
     }
 
     protected virtual void ParseInput() {
@@ -121,7 +134,7 @@ public class PlayerController : NavmeshAgent2D {
 
     public virtual void Move(Vector2 direction) {
         if (ladder) { ladder.MoveOnLadder(this, direction); }
-        else if (!stateMachine.incappacitated) { MoveHorizontal(direction.x); }
+        else if (!stateMachine.incappacitated && ledge == null) { MoveHorizontal(direction.x); }
     }
 
     private void MoveHorizontal(float direction)
@@ -147,6 +160,18 @@ public class PlayerController : NavmeshAgent2D {
                 movement = new Vector3(speed, 0);
             }
         }
+
+        if (pathing) {
+            Debug.DrawRay(transform.position, direction * movement, Color.red);
+        }
+
+        if (direction > 0) { transform.localScale = new Vector3(1, 1, 1); }
+        else if (direction < 0) { transform.localScale = new Vector3(-1, 1, 1); }
+
+        if (isGrounded && stateMachine.walking && direction == 0) { animator.SetBool("walking", false); }
+        else if (isGrounded && stateMachine.crawling && direction == 0) { animator.SetBool("crawling", false); }
+        else if (isGrounded && stateMachine.crawling && direction != 0) { animator.SetBool("crawling", true); }
+        else if (isGrounded && stateMachine.walking && direction != 0) { animator.SetBool("walking", true); }
 
         rigidbody.AddForce(direction * movement);
     }
@@ -186,7 +211,6 @@ public class PlayerController : NavmeshAgent2D {
 
 
         if (ladder) {
-            Debug.Log("Ladder Jump!");
             DismountLadder();
             rigidbody.AddForce(new Vector2(jumpForce/2 * direction, jumpForce));
         }
@@ -201,7 +225,8 @@ public class PlayerController : NavmeshAgent2D {
     
     public virtual void Decelerate() {
         if (!isGrounded) { return; }
-        if (Input.GetAxisRaw("Horizontal") == 0) { StartCoroutine(Decelerator()); }
+        if (pathing && GetWalkDirection() == 0) { StartCoroutine(Decelerator()); }
+        else if (!pathing && Input.GetAxisRaw("Horizontal") == 0) { StartCoroutine(Decelerator()); }
         else { StopCoroutine(Decelerator()); }
     }
 
