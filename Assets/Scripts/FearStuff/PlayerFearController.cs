@@ -103,6 +103,11 @@ public class PlayerFearController : MonoBehaviour {
     private float fearCooldownTime;
 
     /// <summary>
+    /// Halts fear operations if true;
+    /// </summary>
+    private bool playerIsDead;
+
+    /// <summary>
     /// Fear zones that the player is in. Only visable for debug, should not be manualy changed.
     /// </summary>
     public List<FearZone> withinFearZones;
@@ -123,7 +128,7 @@ public class PlayerFearController : MonoBehaviour {
 
         if(currentFear == maxFear)
         {
-            TriggerDeath();
+            //TriggerDeath();
         }
     }
 
@@ -134,6 +139,7 @@ public class PlayerFearController : MonoBehaviour {
         enemyMask = 1 << LayerMask.NameToLayer("Enemy");
         InvokeRepeating("FearTicker", 1, fearTickTime);
         fearCanDecay = true;
+        playerIsDead = false;
     }
     /// <summary>
     /// Performs all operations related to passive fear gain.
@@ -243,16 +249,24 @@ public class PlayerFearController : MonoBehaviour {
     /// Function to put all operations that need to be performed upon death.
     /// Currently empty, change as needed
     /// </summary>
-    private void TriggerDeath()
+    public void TriggerDeath()
     {
+        playerIsDead = true;
+    }
 
+    public void UntriggerDeath()
+    {
+        playerIsDead = false;
     }
 
     private void FearTicker()
     {
-        ApplyZoneFear();
-        ApplyPassiveFear();
-        ApplyFearDecay();
+        if(!playerIsDead)
+        {
+            ApplyZoneFear();
+            ApplyPassiveFear();
+            ApplyFearDecay();
+        }
     }
 
     //This event applies active fear (On Collision Fear)
