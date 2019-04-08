@@ -92,6 +92,11 @@ public class PlayerController : NavmeshAgent2D {
 
         if (pathing) { return; }
 
+        //Test for ping
+        if (Input.GetButtonDown("Ping")) {
+            GetComponent<PlayerAI>().ping = new Ping(transform.position);
+        }
+
         //Test For Crouching OR sprinting (can not be both)
         if (Input.GetAxisRaw("Prone") > 0 && ledge == null && !ladder)
         {
