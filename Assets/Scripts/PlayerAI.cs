@@ -123,78 +123,82 @@ public class PlayerAI : CharacterStateNetwork {
         public override void FixedUpdate()
         {
             UnityEngine.Profiling.Profiler.BeginSample("Moving AI", agent);
+            Vector2 targetLocation = Vector2.zero;
 
-            if (target) {
-                LayerMask mask = new LayerMask();
-                mask |= (1 << LayerMask.NameToLayer("Environment"));
-                mask |= (1 << LayerMask.NameToLayer("Ladder"));
-                RaycastHit2D targetGround = Physics2D.Raycast(target.transform.position, Vector2.down, 1000f, mask);
+            if (ping != null) {
+                targetLocation = ping.pingPosition;
+            }
+            else if (target) {
+                targetLocation = target.position;
+            }
 
-                //path to target.
-                agent.FindPathTo(targetGround.point, 100);
-                //get target node
-                NavmeshNode2D targetNode = agent.GetTargetNodeInPath();
-                NavmeshNode2D currentNode = agent.area.NodeAtPoint(agent.transform.position, agent);
+            LayerMask mask = new LayerMask();
+            mask |= (1 << LayerMask.NameToLayer("Environment"));
+            mask |= (1 << LayerMask.NameToLayer("Ladder"));
+            RaycastHit2D targetGround = Physics2D.Raycast(targetLocation, Vector2.down, 1000f, mask);
 
-                Debug.DrawLine(agent.transform.position, targetNode.worldPosition);
+            //path to target.
+            agent.FindPathTo(targetGround.point, 100);
+            //get target node
+            NavmeshNode2D targetNode = agent.GetTargetNodeInPath();
+            NavmeshNode2D currentNode = agent.area.NodeAtPoint(agent.transform.position, agent);
 
-                //if agent.GetTargetNodeInPath is not a ground node or is connected to the previous node by a jump connection,
-                /*
-                if (agent.NodeIsTraversible(currentNode) && agent.isGrounded && !agent.ladder && agent.ledge == null && (targetNode.gridPosition.y > currentNode.gridPosition.y || Vector2.Distance(targetNode.worldPosition, agent.transform.position) > agent.jumpDistance)) {
-                    player.player.jumpped = true;
-                }
-                */
-                //else if agent.GetTargetNodeInPath is a ladder type node and not already on ladder,
-                if ((Time.time - timeSinceGrab) > 2f && targetNode.type == NavmeshNode2D.NodeType.Ladder && !player.player.ladder)
+            if (targetNode == null) { return; }
+
+            Debug.DrawLine(agent.transform.position, targetNode.worldPosition);
+
+            //if agent.GetTargetNodeInPath is not a ground node or is connected to the previous node by a jump connection,
+            /*
+            if (agent.NodeIsTraversible(currentNode) && agent.isGrounded && !agent.ladder && agent.ledge == null && (targetNode.gridPosition.y > currentNode.gridPosition.y || Vector2.Distance(targetNode.worldPosition, agent.transform.position) > agent.jumpDistance)) {
+                player.player.jumpped = true;
+            }
+            */
+            //else if agent.GetTargetNodeInPath is a ladder type node and not already on ladder,
+            if ((Time.time - timeSinceGrab) > 2f && targetNode.type == NavmeshNode2D.NodeType.Ladder && !player.player.ladder)
+            {
+                //grab the nearest ladder.
+                player.player.grabbed = true;
+                timeSinceGrab = Time.time;
+            }
+            //else if agent.GetTargetNodeInPath is not a ladder node and agent is already on ladder, 
+            else if ((Time.time - timeSinceGrab) > 2f && targetNode.type != NavmeshNode2D.NodeType.Ladder && player.player.ladder && (Mathf.Abs(agent.transform.position.y - targetNode.worldPosition.y) < 0.5 || agent.transform.position.y > targetNode.worldPosition.y))
+            {
+                //jump off of ladder
+                player.player.jumpped = true;
+                timeSinceGrab = Time.time;
+            }
+            //else if agent.GetTargetNodeInPath is ledge, and not already on ledge,
+            else if ((Time.time - timeSinceGrab) > 2f && targetNode.type == NavmeshNode2D.NodeType.Ledge && player.player.ledge == null)
+            {
+                //grab nearest ledge
+                player.player.grabbed = true;
+                timeSinceGrab = Time.time;
+            }
+            //else if agent.GetTargetNodeInPath is not ledge and already on ledge,
+            else if ((Time.time - timeSinceGrab) > 2f && targetNode.type != NavmeshNode2D.NodeType.Ledge && player.player.ledge != null)
+            {
+                //jump off ledge
+                player.player.jumpped = true;
+                timeSinceGrab = Time.time;
+            }
+            //else if agent.GetTargetNodeInPath is a ground node
+            else if (targetNode.type == NavmeshNode2D.NodeType.Walkable ||
+                        targetNode.type == NavmeshNode2D.NodeType.Crawlable) {
+                //if the target node is a crawl node
+                if (targetNode.type == NavmeshNode2D.NodeType.Crawlable)
                 {
-                    //grab the nearest ladder.
-                    player.player.grabbed = true;
-                    timeSinceGrab = Time.time;
+                    //toggle crouch
+                    player.player.isProne = true;
                 }
-                //else if agent.GetTargetNodeInPath is not a ladder node and agent is already on ladder, 
-                else if ((Time.time - timeSinceGrab) > 2f && targetNode.type != NavmeshNode2D.NodeType.Ladder && player.player.ladder && (Mathf.Abs(agent.transform.position.y - targetNode.worldPosition.y) < 0.5 || agent.transform.position.y > targetNode.worldPosition.y))
-                {
-                    //jump off of ladder
-                    player.player.jumpped = true;
-                    timeSinceGrab = Time.time;
-                }
-                //else if agent.GetTargetNodeInPath is ledge, and not already on ledge,
-                else if ((Time.time - timeSinceGrab) > 2f && targetNode.type == NavmeshNode2D.NodeType.Ledge && player.player.ledge == null)
-                {
-                    //grab nearest ledge
-                    player.player.grabbed = true;
-                    timeSinceGrab = Time.time;
-                }
-                //else if agent.GetTargetNodeInPath is not ledge and already on ledge,
-                else if ((Time.time - timeSinceGrab) > 2f && targetNode.type != NavmeshNode2D.NodeType.Ledge && player.player.ledge != null)
-                {
-                    //jump off ledge
-                    player.player.jumpped = true;
-                    timeSinceGrab = Time.time;
-                }
-                //else if agent.GetTargetNodeInPath is a ground node
-                else if (targetNode.type == NavmeshNode2D.NodeType.Walkable ||
-                         targetNode.type == NavmeshNode2D.NodeType.Crawlable) {
-                    //if the target node is a crawl node
-                    if (targetNode.type == NavmeshNode2D.NodeType.Crawlable)
-                    {
-                        //toggle crouch
-                        player.player.isProne = true;
-                    }
-                    //else if the target node is a walk node
-                    else if (targetNode.type == NavmeshNode2D.NodeType.Walkable) {
-                        //untoggle crouch
-                        player.player.isProne = false;
-                    }
+                //else if the target node is a walk node
+                else if (targetNode.type == NavmeshNode2D.NodeType.Walkable) {
+                    //untoggle crouch
+                    player.player.isProne = false;
                 }
             }
 
             UnityEngine.Profiling.Profiler.EndSample();
-            if (Vector2.Distance(target.position, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
-            else if (ping != null)
-            {
-                if (Vector2.Distance(ping.pingPosition, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
-            }
+            if (Vector2.Distance(targetLocation, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
             else if (agent.path.Count == 0) { agent.isStopped = true; }
             else { agent.isStopped = false; }
         }
