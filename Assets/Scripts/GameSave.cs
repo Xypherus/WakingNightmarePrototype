@@ -36,7 +36,7 @@ public class GameSave : MonoBehaviour{
         }
 
         SaveData data = new SaveData(playerposition, SceneManager.GetActiveScene().buildIndex, usableSafeZones);
-        FileStream file = new FileStream(Application.persistentDataPath + "//saves//" + DateTime.Now, FileMode.OpenOrCreate);
+        FileStream file = new FileStream(Application.persistentDataPath + "//saves//" + DateTime.Now.ToString("yy-MM-dd"), FileMode.Create);
 
         formatter.Serialize(file, data);
         file.Close();

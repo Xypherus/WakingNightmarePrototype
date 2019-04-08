@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4603406050550820}
   - component: {fileID: 61765919439686868}
+  - component: {fileID: 114618428396944314}
   m_Layer: 0
   m_Name: SafeZone
   m_TagString: SafeZone
@@ -65,3 +66,17 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 6.354838, y: 8.15858}
   m_EdgeRadius: 0
+--- !u!114 &114618428396944314
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1430081166461302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b96fbe14d8e05744c9bd81e1aa971b3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useable: 0
+  playerCountToActivate: 2
+  playersInZone: []
