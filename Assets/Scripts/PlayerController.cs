@@ -15,6 +15,7 @@ public class PlayerController : NavmeshAgent2D {
     public float accelMultiplier;
     [Tooltip("The force used to propell the player upward. Higher values for objects with higher mass.")]
     public float jumpForce;
+    public Sprite vingette;
     #endregion
    
     public bool grabbed;
