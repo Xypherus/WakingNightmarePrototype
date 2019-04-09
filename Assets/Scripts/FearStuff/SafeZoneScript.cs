@@ -38,6 +38,8 @@ public class SafeZoneScript : MonoBehaviour {
                 }
                 useable = false;
             }
+
+            GameSave.gameSaver.SaveGame(transform.position);
         }
     }
 
