@@ -41,7 +41,6 @@ public class PlayerController : NavmeshAgent2D {
     protected override void Update() {
         //Call the Update function in the base NavmeshAgent2D
         base.Update();
-        Animate();
 
         if (Time.timeScale > 0 && !pathing) {
             //Test for grabbing ladders/ledges
@@ -62,6 +61,7 @@ public class PlayerController : NavmeshAgent2D {
             else { jumpped = false; }
         }
 
+        Animate();
 
     }
 
@@ -77,9 +77,15 @@ public class PlayerController : NavmeshAgent2D {
 
     private void Animate() {
         animator.SetFloat("fear", fearController.currentFear);
-        if (ledge != null && grabbed) {
-            animator.SetTrigger("grab");
+        if (ledge != null)
+        {
+            animator.SetBool("ledge", true);
         }
+        else { animator.SetBool("ledge", false); }
+
+        if (ladder) { animator.SetBool("climbing", true); }
+        else { animator.SetBool("climbing", false); }
+
         if (jumpped) { animator.SetTrigger("jump"); }
         animator.SetBool("sprinting", sprinting);
         animator.SetBool("grounded", isGrounded);
