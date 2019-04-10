@@ -54,8 +54,8 @@ public class InfestedAI : MonoBehaviour {
     }
     void Patrol()
     {
-        RaycastHit2D hit = Physics2D.Raycast(originPoint.position, dir, range);
-        RaycastHit2D hitFloor = Physics2D.Raycast(originPoint2.position, dir, range);
+        RaycastHit2D hit = Physics2D.Raycast(originPoint.position, dir, range, 1 << LayerMask.NameToLayer("Environment"));
+        RaycastHit2D hitFloor = Physics2D.Raycast(originPoint2.position, dir, range, 1 << LayerMask.NameToLayer("Environment"));
 
         if (hit == true)
         {
@@ -75,12 +75,12 @@ public class InfestedAI : MonoBehaviour {
     }
     void Pursue()
     {
-        RaycastHit2D hitJump = Physics2D.Raycast(jumpPoint.position, dir, range);
-        RaycastHit2D hitFloor = Physics2D.Raycast(originPoint2.position, dir, range);
+        RaycastHit2D hitJump = Physics2D.Raycast(jumpPoint.position, dir, range, 1 << LayerMask.NameToLayer("Environment"));
+        RaycastHit2D hitFloor = Physics2D.Raycast(originPoint2.position, dir, range, 1 << LayerMask.NameToLayer("Environment"));
 
-        if (hitJump == true)
+        if (hitJump == true && !gameObject.CompareTag("Player"))
         {
-            rb.AddForce(Vector2.up * 1000 * Time.deltaTime);
+            rb.AddForce(Vector2.up * 10000 * Time.deltaTime);
         }
 
         if (target.position.x > transform.position.x && !flipped)
