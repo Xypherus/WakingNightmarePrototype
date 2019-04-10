@@ -33,10 +33,10 @@ public class GameManager : MonoBehaviour {
 
     /// <summary>
     /// Loads specified level.
-    /// When called without any paramaters, automaticly loads next level
+    /// When called without any paramaters, automaticly Reloads current level
     /// </summary>
     public void LoadLevel()
     {
-        LoadLevel(SceneManager.GetActiveScene().buildIndex + 1);
+        LoadLevel(SceneManager.GetActiveScene().buildIndex);
     }
 }
