@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class FearVignette : MonoBehaviour {
 
-    new Image image;
+    Image image;
 
     private void Start()
     {
