@@ -1,8 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using soundTool.soundManager;
 
 public class Door_Trap_Switch : MonoBehaviour{
+    //Definition of Audio Sources used
+    public AudioClip Door;
+    public AudioClip Switch;
+    public AudioClip Trap;
+
+
     Triggerscript trigger;
     private Animator open;
     private Rigidbody2D trap;
@@ -18,12 +25,16 @@ public class Door_Trap_Switch : MonoBehaviour{
             open = gameObject.GetComponent<Animator>();
         }
     }
-
+    IEnumerator Delay()
+    {
+        yield return new WaitForSeconds(1.5f);
+    }
     private void Update()
     {
         if(trigger.triggered == true && gameObject.CompareTag("Door"))
         {
             open.SetBool("isopen", true);
+            SoundManager.PlaySound(Door, 1f);
         }
 
         if(trigger.triggered == true && gameObject.CompareTag("Trap"))
@@ -31,6 +42,7 @@ public class Door_Trap_Switch : MonoBehaviour{
             if (trap != null)
             {
                 Debug.Log("Trap has been triggered");
+                SoundManager.PlaySound(Trap);
                 trap.isKinematic = false;
             }
         }
@@ -40,6 +52,11 @@ public class Door_Trap_Switch : MonoBehaviour{
             if (Input.GetKeyDown(switch_key))
             {
                 open.SetBool("isopen", true);
+                SoundManager.PlaySound(Switch);
+
+                //Delays door sound to be one second after switch sound
+                StartCoroutine("Delay");
+                SoundManager.PlaySound(Door);
             }
         }
         if (trigger.triggered == false)
