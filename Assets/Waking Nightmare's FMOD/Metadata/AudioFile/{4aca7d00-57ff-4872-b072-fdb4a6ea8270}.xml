@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="AudioFile" id="{4aca7d00-57ff-4872-b072-fdb4a6ea8270}">
+        <property name="assetPath">
+            <value>Inst 5-cm-cm.wav</value>
+        </property>
+        <property name="isStreaming">
+            <value>true</value>
+        </property>
+        <property name="frequencyInKHz">
+            <value>44.0999985</value>
+        </property>
+        <property name="channelCount">
+            <value>2</value>
+        </property>
+        <property name="length">
+            <value>225.17176870748298</value>
+        </property>
+        <relationship name="masterAssetFolder">
+            <destination>{d84a1e3d-29d8-4447-963f-7c4e55f2f20d}</destination>
+        </relationship>
+    </object>
+</objects>
