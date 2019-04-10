@@ -3502,6 +3502,7 @@ MonoBehaviour:
   normalFearFade: 1
   safezoneFearFade: 15
   fearDecayCooldown: 0
+  trapdamage: 40
   darknessFearChange: 1.5
   fears: 
   outOfRange: 0
@@ -3522,7 +3523,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1780775492}
-  pingPosition: {x: 0, y: 0}
   currentState: 
   aiState: 
 --- !u!4 &603355552 stripped
@@ -3530,6 +3530,34 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4046284244731342, guid: 5999c160d521963439a09b9c7f9cdc02,
     type: 2}
   m_PrefabInternal: {fileID: 239933486}
+--- !u!1 &625194566
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 625194567}
+  m_Layer: 0
+  m_Name: jumpPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &625194567
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 625194566}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.23, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1241542415}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &626276860 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4046284244731342, guid: 5999c160d521963439a09b9c7f9cdc02,
@@ -3996,7 +4024,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 791009698}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.879, y: 0, z: 0}
+  m_LocalPosition: {x: -0.59, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1241542415}
@@ -5088,7 +5116,7 @@ Prefab:
     - target: {fileID: 114703357456668706, guid: 593c903d1d01dc24b813d6ec6de56b7b,
         type: 2}
       propertyPath: showDebug
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114703357456668706, guid: 593c903d1d01dc24b813d6ec6de56b7b,
         type: 2}
@@ -5110,6 +5138,11 @@ Prefab:
       propertyPath: agents.Array.data[2]
       value: 
       objectReference: {fileID: 591224170}
+    - target: {fileID: 114703357456668706, guid: 593c903d1d01dc24b813d6ec6de56b7b,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 593c903d1d01dc24b813d6ec6de56b7b, type: 2}
   m_IsPrefabAsset: 0
@@ -5148,7 +5181,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  pingPosition: {x: 0, y: 0}
   currentState: 
   aiState: 
 --- !u!114 &1051076578
@@ -5219,6 +5251,7 @@ MonoBehaviour:
   normalFearFade: 1
   safezoneFearFade: 15
   fearDecayCooldown: 0
+  trapdamage: 40
   darknessFearChange: 1.5
   fears: 
   outOfRange: 0
@@ -5969,17 +6002,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  pursueRange: 0
+  pursueRange: 8
   distanceToTarget: 0
-  lungeRange: 0
+  lungeRange: 3
   lungeDelay: 0
   speed: 1
   Health: 1
   distance: 0
   originPoint: {fileID: 791009699}
   originPoint2: {fileID: 2105303492}
+  jumpPoint: {fileID: 625194567}
   range: 0
-  pingPosition: {x: 0, y: 0}
+  flipped: 0
 --- !u!212 &1241542414
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -6033,11 +6067,12 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1241542412}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 25.89, y: -3.187, z: 0}
+  m_LocalPosition: {x: 33.18, y: -4.34, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 791009699}
   - {fileID: 2105303492}
+  - {fileID: 625194567}
   m_Father: {fileID: 0}
   m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -7884,7 +7919,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1051076576}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.56, y: -2.58, z: 0.3642578}
+  m_LocalPosition: {x: 23.66, y: -2.58, z: 0.3642578}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 235137066}
