@@ -21,11 +21,13 @@ GameObject:
   - component: {fileID: 4861670924193674}
   - component: {fileID: 70666627772198322}
   - component: {fileID: 50859852658705908}
-  - component: {fileID: 95619715754135950}
+  - component: {fileID: 95754633688445256}
   - component: {fileID: 114495443886058440}
   - component: {fileID: 114962938915135368}
-  - component: {fileID: 114950874033186772}
-  - component: {fileID: 114806525951683588}
+  - component: {fileID: 114144310688773994}
+  - component: {fileID: 114305720856192880}
+  - component: {fileID: 114891367300160924}
+  - component: {fileID: 114310661275611792}
   m_Layer: 10
   m_Name: Player
   m_TagString: Player
@@ -56,7 +58,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1532883761468236}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.56, y: -2.58, z: 0.3642578}
+  m_LocalPosition: {x: -11, y: -2.65, z: 0.3642578}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4939784398955738}
@@ -111,7 +113,7 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0.5}
   m_Size: {x: 1, y: 1}
   m_Direction: 0
---- !u!95 &95619715754135950
+--- !u!95 &95754633688445256
 Animator:
   serializedVersion: 3
   m_ObjectHideFlags: 1
@@ -129,7 +131,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &114495443886058440
+--- !u!114 &114144310688773994
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -137,38 +139,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1532883761468236}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0343b6cc38ef2744b3d5d2018b4877f, type: 3}
+  m_Script: {fileID: 11500000, guid: eb9c8979c45041944825491eebc2b843, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 1
-  height: 1
-  crouchHeight: 0
-  jumpDistance: 1
-  speed: 10
-  maxSpeed: 15
-  maxReach: 1
-  stoppingDistance: 0
-  pathAccuracy: 0.2
-  isGrounded: 0
-  canGrab: 1
-  isProne: 0
-  sprinting: 0
-  isDead: 0
-  rigidbody: {fileID: 0}
-  ladder: {fileID: 0}
-  animator: {fileID: 0}
-  isStopped: 0
-  pathing: 0
-  area: {fileID: 0}
-  canMove: 1
-  accelMultiplier: 10
-  jumpForce: 210
-  grabbed: 0
-  jumpped: 0
-  crouchSpeed: 7
-  fearController: {fileID: 0}
-  stateMachine: {fileID: 0}
---- !u!114 &114806525951683588
+  target: {fileID: 0}
+  currentState: 
+  aiState: 
+--- !u!114 &114305720856192880
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -186,6 +163,7 @@ MonoBehaviour:
   normalFearFade: 1
   safezoneFearFade: 15
   fearDecayCooldown: 0
+  trapdamage: 40
   darknessFearChange: 1.5
   fears: 
   outOfRange: 0
@@ -194,7 +172,7 @@ MonoBehaviour:
   fearCanDecay: 0
   currentFearModifier: 0
   withinFearZones: []
---- !u!114 &114950874033186772
+--- !u!114 &114310661275611792
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -206,9 +184,75 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  pingPosition: {x: 0, y: 0}
   currentState: 
   aiState: 
+--- !u!114 &114495443886058440
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1532883761468236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0343b6cc38ef2744b3d5d2018b4877f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  width: 1
+  height: 1
+  crouchHeight: 0
+  jumpDistance: 2
+  speed: 10
+  maxSpeed: 15
+  maxReach: 2
+  stoppingDistance: 2
+  pathAccuracy: 0.2
+  isGrounded: 0
+  canGrab: 1
+  isProne: 0
+  sprinting: 0
+  isDead: 0
+  rigidbody: {fileID: 0}
+  ladder: {fileID: 0}
+  animator: {fileID: 0}
+  isStopped: 0
+  pathing: 1
+  area: {fileID: 0}
+  canMove: 1
+  accelMultiplier: 10
+  jumpForce: 210
+  vingette: {fileID: 21300000, guid: da2f5145e4912cb4b9f94a953de683a0, type: 3}
+  grabbed: 0
+  jumpped: 0
+  crouchSpeed: 7
+  fearController: {fileID: 0}
+  stateMachine: {fileID: 0}
+--- !u!114 &114891367300160924
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1532883761468236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 822deda5c15224840ba1cf9a4d2b8715, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxFear: 100
+  currentFear: 0
+  fearRange: 0
+  fearTickTime: 0.5
+  normalFearFade: 1
+  safezoneFearFade: 15
+  fearDecayCooldown: 0
+  trapdamage: 40
+  darknessFearChange: 1.5
+  fears: 
+  outOfRange: 0
+  outOfZone: 0
+  safe: 0
+  fearCanDecay: 0
+  currentFearModifier: 0
+  withinFearZones: []
 --- !u!114 &114962938915135368
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -256,7 +300,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 21300000, guid: 4857760de850d9c42945a4108d0e8643, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c778b28f508bd56468a8aeecf1886bbd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 1
   m_FlipY: 0

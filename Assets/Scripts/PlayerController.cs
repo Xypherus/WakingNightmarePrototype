@@ -15,6 +15,7 @@ public class PlayerController : NavmeshAgent2D {
     public float accelMultiplier;
     [Tooltip("The force used to propell the player upward. Higher values for objects with higher mass.")]
     public float jumpForce;
+    public Sprite vingette;
     #endregion
    
     public bool grabbed;
@@ -41,7 +42,6 @@ public class PlayerController : NavmeshAgent2D {
     protected override void Update() {
         //Call the Update function in the base NavmeshAgent2D
         base.Update();
-        Animate();
 
         if (Time.timeScale > 0 && !pathing) {
             //Test for grabbing ladders/ledges
@@ -62,6 +62,7 @@ public class PlayerController : NavmeshAgent2D {
             else { jumpped = false; }
         }
 
+        Animate();
 
     }
 
@@ -77,9 +78,15 @@ public class PlayerController : NavmeshAgent2D {
 
     private void Animate() {
         animator.SetFloat("fear", fearController.currentFear);
-        if (ledge != null && grabbed) {
-            animator.SetTrigger("grab");
+        if (ledge != null)
+        {
+            animator.SetBool("ledge", true);
         }
+        else { animator.SetBool("ledge", false); }
+
+        if (ladder) { animator.SetBool("climbing", true); }
+        else { animator.SetBool("climbing", false); }
+
         if (jumpped) { animator.SetTrigger("jump"); }
         animator.SetBool("sprinting", sprinting);
         animator.SetBool("grounded", isGrounded);
@@ -91,6 +98,11 @@ public class PlayerController : NavmeshAgent2D {
     protected virtual void ParseInput() {
 
         if (pathing) { return; }
+
+        //Test for ping
+        if (Input.GetButtonDown("Ping")) {
+            GetComponent<PlayerAI>().ping = new Ping(transform.position);
+        }
 
         //Test For Crouching OR sprinting (can not be both)
         if (Input.GetAxisRaw("Prone") > 0 && ledge == null && !ladder)

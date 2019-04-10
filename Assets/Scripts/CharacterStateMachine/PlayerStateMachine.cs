@@ -81,6 +81,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
         falling.AddTransition(walking);
 
         activeState = falling;
+
     }
 
     #region Player States
@@ -99,12 +100,14 @@ public class PlayerStateMachine : CharacterStateNetwork {
         public override void OnStateEnter()
         {
             player.isDead = true;
+            player.fearController.TriggerDeath();
             //player.animator.SetBool("Dead", true);
         }
 
         public override void OnStateExit()
         {
             player.isDead = false;
+            player.fearController.UntriggerDeath();
             //player.animator.SetBool("Dead", false);
         }
     }
@@ -126,6 +129,8 @@ public class PlayerStateMachine : CharacterStateNetwork {
         }
 
         public override void FixedUpdate() {
+            if (player.rigidbody.bodyType == RigidbodyType2D.Kinematic) { player.rigidbody.bodyType = RigidbodyType2D.Dynamic; }
+
             float speed = player.speed;
             if (player.sprinting) { speed = player.speed * 2; }
 
@@ -154,7 +159,10 @@ public class PlayerStateMachine : CharacterStateNetwork {
 
         public override void FixedUpdate()
         {
-            player.rigidbody.AddForce(new Vector2(Mathf.Clamp(Input.GetAxis("Horizontal") * player.accelMultiplier, -1, 1) * player.crouchSpeed, 0f));
+            if (player.rigidbody.bodyType == RigidbodyType2D.Kinematic) { player.rigidbody.bodyType = RigidbodyType2D.Dynamic; }
+
+            if (player.pathing) { player.Move(player.GetWalkVector()); }
+            else { player.Move(new Vector2(Input.GetAxis("Horizontal"), 0f)); }
 
             player.Decelerate();
         }

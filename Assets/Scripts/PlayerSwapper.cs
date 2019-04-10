@@ -58,6 +58,7 @@ public class PlayerSwapper : MonoBehaviour {
         }
 
         currentPlayer.pathing = false;
+        currentPlayer.GetComponent<PlayerAI>().ping = null;
         camera.player = currentPlayer.transform;
     }
 
