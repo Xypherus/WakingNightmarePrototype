@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using soundTool.soundManager;
 
 public class InfestedAI : MonoBehaviour {
     public Transform target;
@@ -14,6 +15,8 @@ public class InfestedAI : MonoBehaviour {
     public float speed;
     public float distance;
 
+    private Animator infAnim;
+
     public Transform originPoint;
     public Transform originPoint2;
     public Transform jumpPoint;
@@ -21,9 +24,12 @@ public class InfestedAI : MonoBehaviour {
     public float range;
 
     public bool flipped;
+    public AudioClip Melee;
+    public AudioClip Wander;
     // Use this for initialization
     void Start()
     {
+        infAnim = GetComponent<Animator>();
         target = GameObject.FindWithTag("Player").transform;
         rb = GetComponent<Rigidbody2D>();
     }
@@ -63,6 +69,8 @@ public class InfestedAI : MonoBehaviour {
             speed *= -1;
             dir *= -1;
         }
+        infAnim.ResetTrigger("IsHitting");
+        infAnim.SetTrigger("IsWalking");
         transform.Translate(Vector2.right * -speed * Time.deltaTime);
     }
     void Pursue()
@@ -85,6 +93,9 @@ public class InfestedAI : MonoBehaviour {
             Flip();
             speed *= -1;
         }
+        infAnim.ResetTrigger("IsHitting");
+        infAnim.SetTrigger("IsWalking");
+        SoundManager.PlaySound(Wander, 1f);
         transform.Translate(Vector2.right * -speed * Time.deltaTime);
     }
     
@@ -92,8 +103,12 @@ public class InfestedAI : MonoBehaviour {
     {
         if (Time.time > lastBiteTime + biteDelay)
         {
+            SoundManager.PlaySound(Melee, 1f);
             Debug.Log("Hit");
             lastBiteTime = Time.time;
+            infAnim.ResetTrigger("IsWalking");
+            infAnim.SetTrigger("IsHitting");
+            
         }
     }
     void Flip()
