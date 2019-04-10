@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="AudioFile" id="{a9bab69d-5238-474e-9ec3-050b18d7ab9d}">
+        <property name="assetPath">
+            <value>Underground 5.wav</value>
+        </property>
+        <property name="isStreaming">
+            <value>true</value>
+        </property>
+        <property name="frequencyInKHz">
+            <value>44.0999985</value>
+        </property>
+        <property name="channelCount">
+            <value>2</value>
+        </property>
+        <property name="length">
+            <value>209.23496598639457</value>
+        </property>
+        <relationship name="masterAssetFolder">
+            <destination>{d84a1e3d-29d8-4447-963f-7c4e55f2f20d}</destination>
+        </relationship>
+    </object>
+</objects>
