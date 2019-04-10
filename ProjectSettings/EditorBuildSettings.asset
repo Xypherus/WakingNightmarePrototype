@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/General Test Level.unity
     guid: fcdb1a8a2f8d4514ca7954bba5004cc9
   - enabled: 1
-    path: Assets/Scenes/Showcase scene.unity
+    path: Assets/Scenes/Movement Showcase scene.unity
     guid: 2572fd69ca9b43a488146ec9d5fc42dc
+  - enabled: 1
+    path: Assets/Scenes/AItestLevel.unity
+    guid: c6b4a3b34ab20b346a6c10054a424c2b
   m_configObjects: {}
