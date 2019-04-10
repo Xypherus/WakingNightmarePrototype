@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using soundTool.soundManager;
 
 public class CentipedeAI : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class CentipedeAI : MonoBehaviour
 
     public float lungeDelay;
 
+    private Animator centAnim;
 
     Rigidbody2D rb;
     public float speed;
@@ -28,10 +30,14 @@ public class CentipedeAI : MonoBehaviour
     private Vector2 dir = new Vector2(-1, 0);
     public float range;
 
+    public AudioClip LungeS;
+    public AudioClip Wander;
+    public AudioClip Aggro;
     public bool flipped;
     // Use this for initialization
     void Start()
     {
+        centAnim = GetComponent<Animator>();
         target = GameObject.Find("Thomas").transform;
         rb = GetComponent<Rigidbody2D>();
     }
@@ -72,7 +78,10 @@ public class CentipedeAI : MonoBehaviour
             speed *= -1;
             dir *= -1;
         }
+        centAnim.ResetTrigger("IsLunge");
+        centAnim.SetTrigger("IsWalking");
         transform.Translate(Vector2.right * -speed * Time.deltaTime);
+        SoundManager.PlaySound(Wander, 1f);
     }
     void Pursue()
     {
@@ -94,12 +103,20 @@ public class CentipedeAI : MonoBehaviour
             Flip();
             speed *= -1;
         }
+        centAnim.ResetTrigger("IsLunge");
+        centAnim.SetTrigger("IsWalking");
+        SoundManager.PlaySound(Wander, 1f);
+        SoundManager.PlaySound(Aggro, 1f);
         transform.Translate(Vector2.right * -speed * Time.deltaTime);
     }
     void Lunge()
     {
+
+        centAnim.ResetTrigger("IsWalking");
+        centAnim.SetTrigger("IsLunge");
         if (Time.time > lastLungeTime + lungeDelay)
         {
+            SoundManager.PlaySound(LungeS, 1f);
             float xdistance;
             xdistance = target.position.x - transform.position.x;
             float ydistance;
