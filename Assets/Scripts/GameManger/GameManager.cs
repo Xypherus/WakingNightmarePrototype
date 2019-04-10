@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour {
 
     public static GameManager GM;
+    public GameObject PauseUI;
 
     private void Awake()
     {
@@ -13,6 +14,11 @@ public class GameManager : MonoBehaviour {
         else { GM = this; }
 
         DontDestroyOnLoad(GM);
+    }
+
+    private void Start()
+    {
+        LoadLevel();
     }
 
     delegate void OnLevelLoaded();
@@ -28,6 +34,7 @@ public class GameManager : MonoBehaviour {
     public void LoadLevel(int toLoad)
     {
         SceneManager.LoadScene(toLoad);
+        //if(toLoad != 0) { BuildPauseUI(); }
         if(levelLoaded != null) { levelLoaded(); }
     }
 
@@ -38,5 +45,11 @@ public class GameManager : MonoBehaviour {
     public void LoadLevel()
     {
         LoadLevel(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void BuildPauseUI()
+    {
+        Debug.Log("Building UI");
+        Instantiate(PauseUI);
     }
 }

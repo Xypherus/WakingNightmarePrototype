@@ -51,3 +51,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69628e72178bfc945add141008d6373b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PauseUI: {fileID: 1963604477676144, guid: df93f627d1c00344c93087580fece57a, type: 2}
