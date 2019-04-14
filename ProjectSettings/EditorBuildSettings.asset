@@ -8,7 +8,7 @@ EditorBuildSettings:
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/General Test Level.unity
     guid: fcdb1a8a2f8d4514ca7954bba5004cc9
   - enabled: 1
@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/AItestLevel.unity
     guid: c6b4a3b34ab20b346a6c10054a424c2b
+  - enabled: 1
+    path: Assets/Scenes/Level Selections Combined/Section 1 and Transistion Final.unity
+    guid: cd10e04fdf83b884ea3d26592ffd4a87
   m_configObjects: {}
