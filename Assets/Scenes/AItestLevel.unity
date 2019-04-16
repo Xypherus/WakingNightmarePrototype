@@ -3853,33 +3853,6 @@ MonoBehaviour:
   crouchSpeed: 0
   fearController: {fileID: 0}
   stateMachine: {fileID: 0}
---- !u!114 &591224171
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 591224169}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 822deda5c15224840ba1cf9a4d2b8715, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxFear: 100
-  currentFear: 0
-  fearRange: 0
-  fearTickTime: 0.5
-  normalFearFade: 1
-  safezoneFearFade: 15
-  fearDecayCooldown: 0
-  trapdamage: 40
-  darknessFearChange: 1.5
-  fears: 
-  outOfRange: 0
-  outOfZone: 0
-  safe: 0
-  fearCanDecay: 0
-  currentFearModifier: 0
-  withinFearZones: []
 --- !u!4 &591224172
 Transform:
   m_ObjectHideFlags: 0
@@ -6440,12 +6413,52 @@ MonoBehaviour:
   distance: 0
   originPoint: {fileID: 791009699}
   originPoint2: {fileID: 2105303492}
-  jumpPoint: {fileID: 625194567}
+  jumpPoint: {fileID: 0}
   range: 0
   LungeS: {fileID: 0}
   Wander: {fileID: 0}
   Aggro: {fileID: 0}
   flipped: 0
+  target: {fileID: 0}
+  pursueRange: 8
+  distanceToTarget: 0
+  lungeRange: 3
+  lungeDelay: 0
+  speed: 1
+  Health: 1
+  distance: 0
+  originPoint: {fileID: 791009699}
+  originPoint2: {fileID: 2105303492}
+  jumpPoint: {fileID: 0}
+  jumpPoint: {fileID: ''}
+  jumpPoint: {fileID: 625194567}
+  range: 0
+  flipped: 0
+  m_Script: {fileID: 11500000, guid: d8439ab1b16278e4d8f73531ea51f2ed, type: 3}
+  m_PrefabInternal: {fileID: 0}
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 1241542412}
+  target: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_Name: 
+  m_EditorHideFlags: 0
+  m_Enabled: 1
+  jumpPoint: {fileID: 625194567}
+  m_EditorClassIdentifier: 
+  distance: 0
+  Wander: {fileID: 0}
+  speed: 1
+  originPoint2: {fileID: 2105303492}
+  distanceToTarget: 0
+  originPoint: {fileID: 791009699}
+  pursueRange: 8
+  range: 0
+  flipped: 0
+  LungeS: {fileID: 0}
+  Health: 1
+  lungeDelay: 0
+  lungeRange: 3
+  Aggro: {fileID: 0}
 --- !u!212 &1241542414
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -9199,6 +9212,67 @@ Prefab:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e8f25a27e26204372b9f8956b84f71bf, type: 2}
+  m_IsPrefabAsset: 0
+--- !u!1001 &1992825175
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4155679507088626, guid: 7e83a31aff7cd8a4e8bb21a29dddd407, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: -5.56
+      objectReference: {fileID: 0}
+    - target: {fileID: 4155679507088626, guid: 7e83a31aff7cd8a4e8bb21a29dddd407, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 2.83
+      objectReference: {fileID: 0}
+    - target: {fileID: 4155679507088626, guid: 7e83a31aff7cd8a4e8bb21a29dddd407, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: -9.635742
+      objectReference: {fileID: 0}
+    - target: {fileID: 4155679507088626, guid: 7e83a31aff7cd8a4e8bb21a29dddd407, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4155679507088626, guid: 7e83a31aff7cd8a4e8bb21a29dddd407, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4155679507088626, guid: 7e83a31aff7cd8a4e8bb21a29dddd407, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4155679507088626, guid: 7e83a31aff7cd8a4e8bb21a29dddd407, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4155679507088626, guid: 7e83a31aff7cd8a4e8bb21a29dddd407, type: 2}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1929700489804194, guid: 7e83a31aff7cd8a4e8bb21a29dddd407, type: 2}
+      propertyPath: m_Name
+      value: Main Camera (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 20376292309731196, guid: 7e83a31aff7cd8a4e8bb21a29dddd407,
+        type: 2}
+      propertyPath: orthographic size
+      value: 8.957179
+      objectReference: {fileID: 0}
+    - target: {fileID: 114839473018125342, guid: 7e83a31aff7cd8a4e8bb21a29dddd407,
+        type: 2}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 1780775492}
+    - target: {fileID: 224159877169988034, guid: 7e83a31aff7cd8a4e8bb21a29dddd407,
+        type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7e83a31aff7cd8a4e8bb21a29dddd407, type: 2}
   m_IsPrefabAsset: 0
 --- !u!1001 &2000093515
 Prefab:

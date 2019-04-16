@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [LOG] System::create                           : Header version = 1.10.08. Current version = 1.10.08.
 [LOG] Manager::init                            : maxchannels = 256 studioflags = 00000006 flags 00000000 extradriverdata 0000000000000000.
 [LOG] SystemI::init                            : Initialize version=11008 (96768), maxchannels=256, flags=0x00020000
@@ -22,3 +23,5 @@
 [LOG] Manager::readBank                        : fileversion = 100, compatVersion = 99 (oldest = 44, newest = 100)
 [LOG] Manager::readBank                        : fileversion = 100, compatVersion = 99 (oldest = 44, newest = 100)
 [LOG] PlaybackSystem::acquireMasterBus         : Setting master channel group format to 6
+=======
+>>>>>>> fc8e15734f8263ee3d0b9bf12ee49be1b3ecea6d

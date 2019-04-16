@@ -105,7 +105,8 @@ public class PlayerFearController : MonoBehaviour {
     /// <summary>
     /// Halts fear operations if true;
     /// </summary>
-    private bool playerIsDead;
+    [Tooltip("Halts fear operations if true. Do not change manualy from inspector unless for debuging")]
+    public bool playerIsDead;
 
     /// <summary>
     /// Fear zones that the player is in. Only visable for debug, should not be manualy changed.
@@ -141,6 +142,13 @@ public class PlayerFearController : MonoBehaviour {
         fearCanDecay = true;
         playerIsDead = false;
     }
+
+    private void Awake()
+    {
+        Debug.Log("Adding player to list");
+        GameManager.GM.PlayerCharacters.Add(this);
+    }
+
     /// <summary>
     /// Performs all operations related to passive fear gain.
     /// </summary>

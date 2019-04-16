@@ -3300,6 +3300,15 @@ Prefab:
       propertyPath: area
       value: 
       objectReference: {fileID: 900336919}
+    - target: {fileID: 114435181150873594, guid: e37323c24635e5e45bb0fa6c20e2eaa6,
+        type: 2}
+      propertyPath: currentFear
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1912512868331186, guid: e37323c24635e5e45bb0fa6c20e2eaa6, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e37323c24635e5e45bb0fa6c20e2eaa6, type: 2}
   m_IsPrefabAsset: 0
@@ -5896,8 +5905,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 638c1ad55fa520a40896185401f97d2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  players: []
-  currentPlayer: {fileID: 0}
+  maxPlayerDistance: 20
+  players:
+  - {fileID: 1499886308}
+  - {fileID: 591224170}
+  currentPlayer: {fileID: 1499886308}
   camera: {fileID: 0}
 --- !u!1 &1343230220
 GameObject:
@@ -8494,11 +8506,11 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4779235331448974, guid: e6def6bca324dab48942e2f521c0a54c, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -5.56
+      value: -8.39
       objectReference: {fileID: 0}
     - target: {fileID: 4779235331448974, guid: e6def6bca324dab48942e2f521c0a54c, type: 2}
       propertyPath: m_LocalPosition.y
-      value: -2.58
+      value: -2.61
       objectReference: {fileID: 0}
     - target: {fileID: 4779235331448974, guid: e6def6bca324dab48942e2f521c0a54c, type: 2}
       propertyPath: m_LocalPosition.z
