@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using soundTool.soundManager;
+
 /// <summary>
 /// PlayerController contains implemented methods of NavmeshAgent and responds to Key input accordingly.
 /// </summary>
@@ -74,6 +76,14 @@ public class PlayerController : NavmeshAgent2D {
 
         grabbed = false;
         jumpped = false;
+    }
+
+    public void PlayFootstep() {
+        //initialize a string with the path to a random footstep sound found in "../StreamingAssets/Audio/footstep x"
+        string audioPath = Application.dataPath + "/StreamingAssets/Audio/";
+        string clipName = "footstep " + Random.Range(1, 4) + ".wav";
+
+        SoundManager.GetClipFromPath(audioPath + clipName, SoundManager.PlaySoundVoid);
     }
 
     private void Animate() {

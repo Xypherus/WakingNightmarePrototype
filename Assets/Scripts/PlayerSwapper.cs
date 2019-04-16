@@ -56,7 +56,10 @@ public class PlayerSwapper : MonoBehaviour {
             if (Vector2.Distance(player.transform.position, currentPlayer.transform.position) >= maxPlayerDistance)
             {
                 Debug.DrawLine(player.transform.position, currentPlayer.transform.position, Color.red);
-                player.GetComponent<PlayerFearController>().currentFear = 100;
+                if (Application.isPlaying)
+                {
+                    player.GetComponent<PlayerFearController>().currentFear = 100;
+                }
             }
             else {
                 Debug.DrawLine(player.transform.position, currentPlayer.transform.position, Color.blue);
