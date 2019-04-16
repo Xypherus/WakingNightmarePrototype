@@ -92,7 +92,7 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 1
   m_Material: {fileID: 6200000, guid: 9d3273ffa4da6fc44a8ed22c5e6975d4, type: 2}
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
@@ -216,7 +216,7 @@ MonoBehaviour:
   canMove: 1
   accelMultiplier: 10
   jumpForce: 210
-  vingette: {fileID: 21300000, guid: b518721ef40edf148b1e3caa8cbecdb2, type: 3}
+  vingette: {fileID: 21300000, guid: da2f5145e4912cb4b9f94a953de683a0, type: 3}
   grabbed: 0
   jumpped: 0
   crouchSpeed: 7

@@ -6,6 +6,7 @@ public class PlayerSwapper : MonoBehaviour {
 
     public static PlayerSwapper playerSwapper;
 
+    public float maxPlayerDistance;
     public List<PlayerController> players;
     public PlayerController currentPlayer;
     new public FollowCamera camera;
@@ -32,8 +33,14 @@ public class PlayerSwapper : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         if (Time.timeScale > 0) {
+            CheckPlayerDistances();
+
             if (Input.GetButtonDown("Swap")) {
                 ChangeToNextPlayer();
+            }
+
+            if (Input.GetButtonDown("Call")) {
+                CallOtherPlayers();
             }
 
             if (currentPlayer.stateMachine.incappacitated) {
@@ -41,6 +48,31 @@ public class PlayerSwapper : MonoBehaviour {
             }
         }
 	}
+
+    void CheckPlayerDistances() {
+        foreach (PlayerController player in players) {
+            if (player == currentPlayer) { continue; }
+
+            if (Vector2.Distance(player.transform.position, currentPlayer.transform.position) >= maxPlayerDistance)
+            {
+                Debug.DrawLine(player.transform.position, currentPlayer.transform.position, Color.red);
+                player.GetComponent<PlayerFearController>().currentFear = 100;
+            }
+            else {
+                Debug.DrawLine(player.transform.position, currentPlayer.transform.position, Color.blue);
+            }
+        }
+    }
+
+    void CallOtherPlayers() {
+        foreach (PlayerController player in players) {
+            if (player == currentPlayer) { continue; }
+
+            PlayerAI ai = player.GetComponent<PlayerAI>();
+            ai.ping = null;
+            ai.target = currentPlayer.transform;
+        }
+    }
 
     public void FindPlayers() {
         foreach (GameObject playerObj in GameObject.FindGameObjectsWithTag("Player")) {
@@ -79,5 +111,19 @@ public class PlayerSwapper : MonoBehaviour {
         int nextPlayerIndex = (int) Mathf.Repeat(currentPlayerIndex+1, players.Count);
 
         ChangePlayer(nextPlayerIndex);
+    }
+
+    public void OnDrawGizmos()
+    {
+        FindPlayers();
+        if (players.Count > 0)
+        {
+            if (!currentPlayer)
+            {
+                currentPlayer = players[0];
+            }
+
+            CheckPlayerDistances();
+        }
     }
 }
