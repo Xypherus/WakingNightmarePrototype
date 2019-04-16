@@ -36,11 +36,25 @@ public class PlayerSwapper : MonoBehaviour {
                 ChangeToNextPlayer();
             }
 
+            if (Input.GetButtonDown("Call")) {
+                CallOtherPlayers();
+            }
+
             if (currentPlayer.stateMachine.incappacitated) {
                 ChangeToNextPlayer();
             }
         }
 	}
+
+    void CallOtherPlayers() {
+        foreach (PlayerController player in players) {
+            if (player == currentPlayer) { continue; }
+
+            PlayerAI ai = player.GetComponent<PlayerAI>();
+            ai.ping = null;
+            ai.target = currentPlayer.transform;
+        }
+    }
 
     public void FindPlayers() {
         foreach (GameObject playerObj in GameObject.FindGameObjectsWithTag("Player")) {
