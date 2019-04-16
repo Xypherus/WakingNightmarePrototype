@@ -3562,33 +3562,6 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 591224168}
   m_Script: {fileID: 11500000, guid: f0343b6cc38ef2744b3d5d2018b4877f, type: 3}
---- !u!114 &591224171
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 591224169}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 822deda5c15224840ba1cf9a4d2b8715, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxFear: 100
-  currentFear: 0
-  fearRange: 0
-  fearTickTime: 0.5
-  normalFearFade: 1
-  safezoneFearFade: 15
-  fearDecayCooldown: 0
-  trapdamage: 40
-  darknessFearChange: 1.5
-  fears: 
-  outOfRange: 0
-  outOfZone: 0
-  safe: 0
-  fearCanDecay: 0
-  currentFearModifier: 0
-  withinFearZones: []
 --- !u!114 &591224173
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6090,9 +6063,10 @@ MonoBehaviour:
   originPoint: {fileID: 791009699}
   originPoint2: {fileID: 2105303492}
   jumpPoint: {fileID: 0}
-  jumpPoint: {fileID: ''}
-  jumpPoint: {fileID: 625194567}
   range: 0
+  LungeS: {fileID: 0}
+  Wander: {fileID: 0}
+  Aggro: {fileID: 0}
   flipped: 0
 --- !u!212 &1241542414
 SpriteRenderer:
@@ -7165,6 +7139,7 @@ MonoBehaviour:
   canMove: 1
   accelMultiplier: 10
   jumpForce: 210
+  vingette: {fileID: 0}
   grabbed: 0
   jumpped: 0
   crouchSpeed: 7
@@ -8814,6 +8789,11 @@ Prefab:
       propertyPath: player
       value: 
       objectReference: {fileID: 1780775492}
+    - target: {fileID: 224159877169988034, guid: 7e83a31aff7cd8a4e8bb21a29dddd407,
+        type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7e83a31aff7cd8a4e8bb21a29dddd407, type: 2}
   m_IsPrefabAsset: 0

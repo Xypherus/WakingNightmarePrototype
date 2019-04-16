@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour {
     public static GameManager GM;
     public GameObject PauseUI;
 
+    public List<PlayerFearController> PlayerCharacters;
+
     private void Awake()
     {
         if (GM != null) { Destroy(gameObject); }
@@ -33,6 +35,8 @@ public class GameManager : MonoBehaviour {
     /// <param name="toLoad">The level ID that is to be loaded</param>
     public void LoadLevel(int toLoad)
     {
+        Debug.Log("Level Loaded");
+        PlayerCharacters.Clear();
         SceneManager.LoadScene(toLoad);
         //if(toLoad != 0) { BuildPauseUI(); }
         if(levelLoaded != null) { levelLoaded(); }
@@ -51,5 +55,22 @@ public class GameManager : MonoBehaviour {
     {
         Debug.Log("Building UI");
         Instantiate(PauseUI);
+    }
+
+    private void Update()
+    {
+        if(PlayerCharacters.Count != 0)
+        {
+            int deadPlayers = 0;
+            foreach(PlayerFearController player in PlayerCharacters)
+            {
+                if (player.playerIsDead) { deadPlayers++; }
+            }
+            if (deadPlayers >= PlayerCharacters.Count)
+            {
+                //DO DEATH THINGS
+                Debug.Log("U R DED");
+            }
+        }
     }
 }
