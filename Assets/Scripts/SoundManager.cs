@@ -189,6 +189,34 @@ namespace soundTool.soundManager
             }
         }
 
+        /// <summary>
+        /// Gets the AudioClip from a sound file given at a certain path.
+        /// </summary>
+        /// <param name="filepath">The path on the hard disk of the file.</param>
+        /// <returns>A unity AudioClip object.</returns>
+        public static void GetClipFromPath(string filepath, UnityEngine.Events.UnityAction<AudioClip> callback) {
+            instance.StartCoroutine(GetFile(filepath, (AudioClip clip) => {
+                if (callback != null) {
+                    callback(clip);
+                }
+            }));
+        }
+
+        static IEnumerator GetFile(string filepath, UnityEngine.Events.UnityAction<AudioClip> callback = null)
+        {
+            WWW data = new WWW(filepath);
+            yield return data;
+
+            if (callback != null && data != null)
+            {
+                callback(data.GetAudioClip());
+            }
+        }
+
+        public static void PlaySoundVoid(AudioClip clip) {
+            PlaySound(clip);
+        }
+
         /// Returns the Audio that has as its id the audioID if one is found, returns null if no such Audio is found
 
         /// <param name="audioID">The id of the Audio to be retrieved</param>

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using soundTool.soundManager;
+
 /// <summary>
 /// PlayerController contains implemented methods of NavmeshAgent and responds to Key input accordingly.
 /// </summary>
@@ -66,6 +68,7 @@ public class PlayerController : NavmeshAgent2D {
 
     }
 
+    bool _wasGrounded = false;
     // Update is called once per frame
     protected override void FixedUpdate()
     {
@@ -74,6 +77,27 @@ public class PlayerController : NavmeshAgent2D {
 
         grabbed = false;
         jumpped = false;
+
+        if (!_wasGrounded && isGrounded) {
+            PlaySound("landing");
+        }
+
+        _wasGrounded = isGrounded;
+    }
+
+    public void PlaySound(string soundname) {
+        string audioPath = Application.dataPath + "/StreamingAssets/Audio/";
+        string clipName = soundname + ".wav";
+
+        SoundManager.GetClipFromPath(audioPath + clipName, SoundManager.PlaySoundVoid);
+    }
+
+    public void PlayFootstep() {
+        //initialize a string with the path to a random footstep sound found in "../StreamingAssets/Audio/footstep x"
+        string audioPath = Application.dataPath + "/StreamingAssets/Audio/";
+        string clipName = "footstep " + Random.Range(1, 4) + ".wav";
+
+        SoundManager.GetClipFromPath(audioPath + clipName, SoundManager.PlaySoundVoid);
     }
 
     private void Animate() {
