@@ -101,6 +101,7 @@ public class PlayerStateMachine : CharacterStateNetwork {
         {
             player.isDead = true;
             player.fearController.TriggerDeath();
+            player.animator.SetTrigger("die");
             //player.animator.SetBool("Dead", true);
         }
 
