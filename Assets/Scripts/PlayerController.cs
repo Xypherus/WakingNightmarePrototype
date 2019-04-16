@@ -68,6 +68,7 @@ public class PlayerController : NavmeshAgent2D {
 
     }
 
+    bool _wasGrounded = false;
     // Update is called once per frame
     protected override void FixedUpdate()
     {
@@ -76,6 +77,12 @@ public class PlayerController : NavmeshAgent2D {
 
         grabbed = false;
         jumpped = false;
+
+        if (!_wasGrounded && isGrounded) {
+            PlaySound("landing");
+        }
+
+        _wasGrounded = isGrounded;
     }
 
     public void PlaySound(string soundname) {
