@@ -69,6 +69,7 @@ public class GameManager : MonoBehaviour {
             if (deadPlayers >= PlayerCharacters.Count)
             {
                 //DO DEATH THINGS
+                Time.timeScale = 0;
                 Debug.Log("U R DED");
             }
         }
