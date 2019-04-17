@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour {
     {
         Debug.Log("Level Loaded");
         PlayerCharacters.Clear();
+        Time.timeScale = 1.0f;
         SceneManager.LoadScene(toLoad);
         //if(toLoad != 0) { BuildPauseUI(); }
         if(levelLoaded != null) { levelLoaded(); }
@@ -69,7 +70,8 @@ public class GameManager : MonoBehaviour {
             if (deadPlayers >= PlayerCharacters.Count)
             {
                 //DO DEATH THINGS
-                Time.timeScale = 0;
+                GameObject.Find("Pause Menu Parent").GetComponent<PauseMenu>().OpenDeathMenu();
+                Time.timeScale = 0.0f;
                 Debug.Log("U R DED");
             }
         }
