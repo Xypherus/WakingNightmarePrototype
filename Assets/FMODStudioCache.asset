@@ -13,14 +13,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EditorBanks:
   - {fileID: 114110004254592310}
-  - {fileID: 114020874362338606}
+  - {fileID: 114597805840395694}
   EditorEvents:
   - {fileID: 114068170918481728}
-  MasterBankRef: {fileID: 114020874362338606}
+  MasterBankRef: {fileID: 114597805840395694}
   StringsBankRef: {fileID: 114110004254592310}
-  stringsBankWriteTime: 636910486640000000
+  stringsBankWriteTime: 636904986377994351
   cacheVersion: 2
---- !u!114 &114020874362338606
+--- !u!114 &114046213500668226
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -28,19 +28,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Path: /Users/pmusco17/Documents/Payton College Works/Semester 2 Sophmore/Game Studio/Waking
-    nightmares/WakingNightmarePrototype/Assets/Waking Nightmare's FMOD/Build/Desktop/Master
-    Bank.bank
-  lastModified: 636910486630000000
-  LoadResult: 0
-  FileSizes:
-  - Name: 
-    Value: 22858464
-  Exists: 1
---- !u!114 &114046213500668226
+  Name: Fear
+  Min: 0
+  Max: 15
+  Default: 0
+--- !u!114 &114060081309609756
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -69,16 +64,31 @@ MonoBehaviour:
   Path: event:/Music
   guid: d72b987f7744774493a8e8ef7fef8579
   Banks:
-  - {fileID: 114020874362338606}
+  - {fileID: 114597805840395694}
   IsStream: 1
   Is3D: 0
   IsOneShot: 0
   Parameters:
-  - {fileID: 114237839277787380}
-  - {fileID: 114631318620616106}
+  - {fileID: 114768385560587308}
+  - {fileID: 114377254375366938}
   MinDistance: 0
   MaxDistance: 0
   Length: 233000
+--- !u!114 &114089375831357534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Region
+  Min: 0
+  Max: 10
+  Default: 0
 --- !u!114 &114110004254592310
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -90,8 +100,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Path: Assets/Waking Nightmare's FMOD/Build/Desktop/Master Bank.strings.bank
-  lastModified: 636910486640000000
+  Path: Assets\Waking Nightmare's FMOD\Build\Desktop\Master Bank.strings.bank
+  lastModified: 636904986377994351
   LoadResult: 0
   FileSizes:
   - Name: 
@@ -130,7 +140,7 @@ MonoBehaviour:
   Min: 0
   Max: 10
   Default: 0
---- !u!114 &114237839277787380
+--- !u!114 &114184363256215754
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -138,13 +148,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Name: Fear
-  Min: 0
-  Max: 15
-  Default: 0
+  Path: D:\WakingNightmare\WakingNightmarePrototype\Assets\Waking Nightmare's FMOD\Build\Desktop\Master
+    Bank.bank
+  lastModified: 636905780142840989
+  LoadResult: 0
+  FileSizes:
+  - Name: 
+    Value: 22858464
+  Exists: 1
 --- !u!114 &114238113417783086
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -165,6 +179,40 @@ MonoBehaviour:
     Value: 22858464
   Exists: 1
 --- !u!114 &114315778973650934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Region
+  Min: 0
+  Max: 10
+  Default: 0
+--- !u!114 &114345653390269564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: D:\WakingMightmareGame\WakingNightmarePrototype\Assets\Waking Nightmare's
+    FMOD\Build\Desktop\Master Bank.bank
+  lastModified: 636905773825233473
+  LoadResult: 0
+  FileSizes:
+  - Name: 
+    Value: 22858464
+  Exists: 0
+--- !u!114 &114377254375366938
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -232,7 +280,7 @@ MonoBehaviour:
   - Name: 
     Value: 22858464
   Exists: 0
---- !u!114 &114631318620616106
+--- !u!114 &114597805840395694
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -240,13 +288,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Name: Region
-  Min: 0
-  Max: 10
-  Default: 0
+  Path: C:\Users\brand\OneDrive\Waking Nightmares\WakingNightmarePrototype\Assets\Waking
+    Nightmare's FMOD\Build\Desktop\Master Bank.bank
+  lastModified: 636911024334322602
+  LoadResult: 0
+  FileSizes:
+  - Name: 
+    Value: 22858464
+  Exists: 1
 --- !u!114 &114642173712310230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -286,6 +338,21 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 233000
+--- !u!114 &114768385560587308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Fear
+  Min: 0
+  Max: 15
+  Default: 0
 --- !u!114 &114855903289979910
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -300,4 +367,34 @@ MonoBehaviour:
   Name: Region
   Min: 0
   Max: 10
+  Default: 0
+--- !u!114 &114865641419308090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Region
+  Min: 0
+  Max: 10
+  Default: 0
+--- !u!114 &114960395273135674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Fear
+  Min: 0
+  Max: 15
   Default: 0
