@@ -155,6 +155,7 @@ MonoBehaviour:
   safe: 0
   fearCanDecay: 0
   currentFearModifier: 0
+  playerIsDead: 0
   withinFearZones: []
 --- !u!114 &114495443886058440
 MonoBehaviour:

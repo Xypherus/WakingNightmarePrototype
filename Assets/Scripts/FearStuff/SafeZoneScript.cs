@@ -10,6 +10,12 @@ public class SafeZoneScript : MonoBehaviour {
     public bool useable;
 
     /// <summary>
+    /// Whether or not this safezone is the end of a level
+    /// </summary>
+    [Tooltip("Whether or not this safezone is the end of a level")]
+    public bool isWinZone;
+
+    /// <summary>
     /// How many characters must be inside this zone for it to activate. Should be two under normal conditions.
     /// </summary>
     public int playerCountToActivate = 2;
@@ -35,6 +41,7 @@ public class SafeZoneScript : MonoBehaviour {
                 foreach(PlayerFearController player in playersInZone)
                 {
                     player.ApplySafeZone();
+                    if(isWinZone) { GameManager.GM.DoLevelEnd(); }
                 }
                 useable = false;
             }
