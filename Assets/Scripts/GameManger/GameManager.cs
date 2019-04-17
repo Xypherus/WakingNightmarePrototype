@@ -58,6 +58,14 @@ public class GameManager : MonoBehaviour {
         Instantiate(PauseUI);
     }
 
+    /// <summary>
+    /// Contains all functions required to end the level
+    /// </summary>
+    public void DoLevelEnd()
+    {
+        GameObject.Find("Pause Menu Parent").GetComponent<PauseMenu>().OpenWinMenu();
+    }
+
     private void Update()
     {
         if(PlayerCharacters.Count != 0)
