@@ -12,6 +12,7 @@ TagManager:
   - Door
   - Trap
   - Switch
+  - Snare
   layers:
   - Default
   - TransparentFX
