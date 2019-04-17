@@ -13,14 +13,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EditorBanks:
   - {fileID: 114110004254592310}
-  - {fileID: 114184363256215754}
+  - {fileID: 114020874362338606}
   EditorEvents:
   - {fileID: 114068170918481728}
-  MasterBankRef: {fileID: 114184363256215754}
+  MasterBankRef: {fileID: 114020874362338606}
   StringsBankRef: {fileID: 114110004254592310}
-  stringsBankWriteTime: 636905780142900528
+  stringsBankWriteTime: 636910486640000000
   cacheVersion: 2
---- !u!114 &114046213500668226
+--- !u!114 &114020874362338606
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -28,14 +28,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Name: Fear
-  Min: 0
-  Max: 15
-  Default: 0
---- !u!114 &114060081309609756
+  Path: /Users/pmusco17/Documents/Payton College Works/Semester 2 Sophmore/Game Studio/Waking
+    nightmares/WakingNightmarePrototype/Assets/Waking Nightmare's FMOD/Build/Desktop/Master
+    Bank.bank
+  lastModified: 636910486630000000
+  LoadResult: 0
+  FileSizes:
+  - Name: 
+    Value: 22858464
+  Exists: 1
+--- !u!114 &114046213500668226
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -64,13 +69,13 @@ MonoBehaviour:
   Path: event:/Music
   guid: d72b987f7744774493a8e8ef7fef8579
   Banks:
-  - {fileID: 114184363256215754}
+  - {fileID: 114020874362338606}
   IsStream: 1
   Is3D: 0
   IsOneShot: 0
   Parameters:
-  - {fileID: 114060081309609756}
-  - {fileID: 114865641419308090}
+  - {fileID: 114237839277787380}
+  - {fileID: 114631318620616106}
   MinDistance: 0
   MaxDistance: 0
   Length: 233000
@@ -85,8 +90,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Path: Assets\Waking Nightmare's FMOD\Build\Desktop\Master Bank.strings.bank
-  lastModified: 636905780142900528
+  Path: Assets/Waking Nightmare's FMOD/Build/Desktop/Master Bank.strings.bank
+  lastModified: 636910486640000000
   LoadResult: 0
   FileSizes:
   - Name: 
@@ -125,7 +130,7 @@ MonoBehaviour:
   Min: 0
   Max: 10
   Default: 0
---- !u!114 &114184363256215754
+--- !u!114 &114237839277787380
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -133,17 +138,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Path: D:\WakingNightmare\WakingNightmarePrototype\Assets\Waking Nightmare's FMOD\Build\Desktop\Master
-    Bank.bank
-  lastModified: 636905780142840989
-  LoadResult: 0
-  FileSizes:
-  - Name: 
-    Value: 22858464
-  Exists: 1
+  Name: Fear
+  Min: 0
+  Max: 15
+  Default: 0
 --- !u!114 &114238113417783086
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -231,6 +232,21 @@ MonoBehaviour:
   - Name: 
     Value: 22858464
   Exists: 0
+--- !u!114 &114631318620616106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Region
+  Min: 0
+  Max: 10
+  Default: 0
 --- !u!114 &114642173712310230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -271,21 +287,6 @@ MonoBehaviour:
   MaxDistance: 0
   Length: 233000
 --- !u!114 &114855903289979910
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: Region
-  Min: 0
-  Max: 10
-  Default: 0
---- !u!114 &114865641419308090
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

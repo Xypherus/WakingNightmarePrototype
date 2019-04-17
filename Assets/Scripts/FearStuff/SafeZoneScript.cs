@@ -38,15 +38,15 @@ public class SafeZoneScript : MonoBehaviour {
 
             if(playersInZone.Count >= playerCountToActivate)
             {
-                foreach(PlayerFearController player in playersInZone)
+                GameSave.gameSaver.SaveGame(transform.position);
+
+                foreach (PlayerFearController player in playersInZone)
                 {
                     player.ApplySafeZone();
                     if(isWinZone) { GameManager.GM.DoLevelEnd(); }
                 }
                 useable = false;
             }
-
-            GameSave.gameSaver.SaveGame(transform.position);
         }
     }
 
