@@ -74,12 +74,17 @@ public class PlayerFearController : MonoBehaviour {
     public FearTypes[] fears;
 
     #endregion
+<<<<<<< HEAD
     //FMOD initialization and variable setup - Jake
     [FMODUnity.EventRef]
     public string PlayerStateEvent;
     FMOD.Studio.EventInstance playerState;
     float Fearpar = 0.0f;
 
+=======
+    private Door_Trap_Switch trapswitch;
+    
+>>>>>>> d85afa3d2b1e5c0eb7f9dbd9b47ffe98311c1b26
     //This is just a place holder, I need to figure out how to find wether or not the player is in fear range first
     //I've set this variable up. It's true when out of fear range, false when in - Ben
     public bool outOfRange;
@@ -245,6 +250,7 @@ public class PlayerFearController : MonoBehaviour {
         if(collision.CompareTag("Snare"))
         {
             ChangeFear(trapdamage, true);
+            trapswitch.captured = true;
         }
     }
 
