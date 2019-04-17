@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     public void DoLevelEnd()
     {
-
+        GameObject.Find("Pause Menu Parent").GetComponent<PauseMenu>().OpenWinMenu();
     }
 
     private void Update()
