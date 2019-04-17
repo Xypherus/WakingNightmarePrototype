@@ -37,6 +37,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4802051801006580}
   - component: {fileID: 114085842846636772}
+  - component: {fileID: 114169610311370876}
   m_Layer: 0
   m_Name: Standard Rope
   m_TagString: Snare
@@ -51,7 +52,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1246757491430570}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.7, y: 0.21, z: 0.02734375}
+  m_LocalPosition: {x: 1.43, y: 0.15, z: 0.02734375}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4802051801006580}
@@ -123,3 +124,19 @@ MonoBehaviour:
   segmentCount: 8
   ropeSegment: {fileID: 1744389014700046, guid: cd7a190f275f74a19bd3c3a327e7c9a8,
     type: 2}
+--- !u!114 &114169610311370876
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1880403412624156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 193dd3a45b9664059ba90c6664729c2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Door: {fileID: 0}
+  Switch: {fileID: 0}
+  Trap: {fileID: 0}
+  DoorDelay: 1.5
+  switch_key: v

@@ -74,6 +74,7 @@ public class PlayerFearController : MonoBehaviour {
     public FearTypes[] fears;
 
     #endregion
+    private Door_Trap_Switch trapswitch;
     
     //This is just a place holder, I need to figure out how to find wether or not the player is in fear range first
     //I've set this variable up. It's true when out of fear range, false when in - Ben
@@ -221,6 +222,7 @@ public class PlayerFearController : MonoBehaviour {
         if(collision.CompareTag("Snare"))
         {
             ChangeFear(trapdamage, true);
+            trapswitch.captured = true;
         }
     }
 

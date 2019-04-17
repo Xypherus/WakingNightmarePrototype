@@ -10,26 +10,37 @@ public class Door_Trap_Switch : MonoBehaviour{
     public AudioClip Trap;
     public float DoorDelay = 1.5f;
 
+    public int playerTrapCount = 2;
+    public List<PlayerController> playersInTrigger;
 
     Triggerscript trigger;
-    private bool captured;
+    public bool captured;
     private Animator open;
     private Rigidbody2D trap;
-    private Component[] snare;
+    public Rigidbody2D[] snare;
     public string switch_key = "v";
 
     private void Start()
     {
         trigger = GetComponentInParent<Triggerscript>();
         trap = gameObject.GetComponent<Rigidbody2D>();
-        snare = gameObject.GetComponentsInChildren(typeof(Rigidbody2D));
-
+         
         if (gameObject.GetComponent<Animator>() != null)
         {
             Debug.Log("Door animation found.");
             open = gameObject.GetComponent<Animator>();
         }
     }
+
+    private void InitSnare() { 
+        snare = gameObject.GetComponentsInChildren<Rigidbody2D>();
+        
+        Debug.LogWarning(snare.Length - 1 + " is the length of the snare", this);
+        HingeJoint2D hinge = snare[snare.Length - 1].GetComponent<HingeJoint2D>();
+
+        hinge.enabled = false;
+    }
+
     IEnumerator Delay()
     {
         yield return new WaitForSeconds(DoorDelay);
@@ -48,19 +59,25 @@ public class Door_Trap_Switch : MonoBehaviour{
             {
                 Debug.Log("Trap has been triggered");
                 SoundManager.PlaySound(Trap);
-                trap.isKinematic = false;
+                trap.bodyType = RigidbodyType2D.Dynamic;
             }
         }
         if(trigger.triggered == true && gameObject.CompareTag("Snare"))
-        { 
+        {
+            InitSnare();
             if(snare != null)
             {
                 Debug.Log("Trap has been triggered");
                 SoundManager.PlaySound(Trap);
                 foreach (Rigidbody2D body in snare)
                 {
-                    body.isKinematic = false;
+                    body.bodyType = RigidbodyType2D.Dynamic;
                 }
+                if(captured = true && Input.GetButtonDown("Action") && playersInTrigger.Count >= playerTrapCount)
+                {
+                    gameObject.SetActive(false);
+                    captured = false;
+               }
             }
         }
         if (trigger.triggered == true && gameObject.CompareTag("Switch"))
