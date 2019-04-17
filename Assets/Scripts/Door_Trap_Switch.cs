@@ -8,18 +8,23 @@ public class Door_Trap_Switch : MonoBehaviour{
     public AudioClip Door;
     public AudioClip Switch;
     public AudioClip Trap;
+    public float DoorDelay = 1.5f;
 
 
     Triggerscript trigger;
+    private bool captured;
     private Animator open;
     private Rigidbody2D trap;
+    private Component[] snare;
     public string switch_key = "v";
 
     private void Start()
     {
         trigger = GetComponentInParent<Triggerscript>();
         trap = gameObject.GetComponent<Rigidbody2D>();
-        if(gameObject.GetComponent<Animator>() != null)
+        snare = gameObject.GetComponentsInChildren(typeof(Rigidbody2D));
+
+        if (gameObject.GetComponent<Animator>() != null)
         {
             Debug.Log("Door animation found.");
             open = gameObject.GetComponent<Animator>();
@@ -27,7 +32,7 @@ public class Door_Trap_Switch : MonoBehaviour{
     }
     IEnumerator Delay()
     {
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(DoorDelay);
     }
     private void Update()
     {
@@ -46,7 +51,18 @@ public class Door_Trap_Switch : MonoBehaviour{
                 trap.isKinematic = false;
             }
         }
-
+        if(trigger.triggered == true && gameObject.CompareTag("Snare"))
+        { 
+            if(snare != null)
+            {
+                Debug.Log("Trap has been triggered");
+                SoundManager.PlaySound(Trap);
+                foreach (Rigidbody2D body in snare)
+                {
+                    body.isKinematic = false;
+                }
+            }
+        }
         if (trigger.triggered == true && gameObject.CompareTag("Switch"))
         {
             if (Input.GetKeyDown(switch_key))
