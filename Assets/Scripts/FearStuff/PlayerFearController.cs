@@ -218,6 +218,10 @@ public class PlayerFearController : MonoBehaviour {
         {
             ChangeFear(trapdamage, true);  
         }
+        if(collision.CompareTag("Snare"))
+        {
+            ChangeFear(trapdamage, true);
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)

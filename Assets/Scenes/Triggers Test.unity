@@ -113,6 +113,48 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1001 &105817241
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4348626571371742, guid: 630a9e3a187f84348bd2659e2a644aa3, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 1.43
+      objectReference: {fileID: 0}
+    - target: {fileID: 4348626571371742, guid: 630a9e3a187f84348bd2659e2a644aa3, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4348626571371742, guid: 630a9e3a187f84348bd2659e2a644aa3, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0.02734375
+      objectReference: {fileID: 0}
+    - target: {fileID: 4348626571371742, guid: 630a9e3a187f84348bd2659e2a644aa3, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4348626571371742, guid: 630a9e3a187f84348bd2659e2a644aa3, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4348626571371742, guid: 630a9e3a187f84348bd2659e2a644aa3, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4348626571371742, guid: 630a9e3a187f84348bd2659e2a644aa3, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4348626571371742, guid: 630a9e3a187f84348bd2659e2a644aa3, type: 2}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 630a9e3a187f84348bd2659e2a644aa3, type: 2}
+  m_IsPrefabAsset: 0
 --- !u!1001 &916768803
 Prefab:
   m_ObjectHideFlags: 0
@@ -176,6 +218,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useable: 1
+  isWinZone: 0
   playerCountToActivate: 1
   playersInZone: []
 --- !u!1001 &966688952
@@ -229,6 +272,27 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
   m_IsPrefabAsset: 0
+--- !u!1 &1358123330 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1880403412624156, guid: 630a9e3a187f84348bd2659e2a644aa3,
+    type: 2}
+  m_PrefabInternal: {fileID: 105817241}
+--- !u!114 &1358123333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1358123330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 193dd3a45b9664059ba90c6664729c2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Door: {fileID: 0}
+  Switch: {fileID: 0}
+  Trap: {fileID: 0}
+  DoorDelay: 1.5
+  switch_key: v
 --- !u!1 &1782136160
 GameObject:
   m_ObjectHideFlags: 0
