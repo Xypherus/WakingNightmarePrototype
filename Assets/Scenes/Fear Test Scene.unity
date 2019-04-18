@@ -2983,9 +2983,41 @@ Prefab:
       propertyPath: fearDecayCooldown
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 114495443886058440, guid: 23f972d680e86dd4da87e8a18548994e,
+        type: 2}
+      propertyPath: area
+      value: 
+      objectReference: {fileID: 1971251501}
+    - target: {fileID: 114495443886058440, guid: 23f972d680e86dd4da87e8a18548994e,
+        type: 2}
+      propertyPath: fearController
+      value: 
+      objectReference: {fileID: 827607153}
+    - target: {fileID: 114495443886058440, guid: 23f972d680e86dd4da87e8a18548994e,
+        type: 2}
+      propertyPath: stateMachine
+      value: 
+      objectReference: {fileID: 827607154}
+    - target: {fileID: 114000450197687962, guid: 23f972d680e86dd4da87e8a18548994e,
+        type: 2}
+      propertyPath: PlayerStateEvent
+      value: event:/Music
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
   m_IsPrefabAsset: 0
+--- !u!114 &827607153 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114000450197687962, guid: 23f972d680e86dd4da87e8a18548994e,
+    type: 2}
+  m_PrefabInternal: {fileID: 827607152}
+  m_Script: {fileID: 11500000, guid: 822deda5c15224840ba1cf9a4d2b8715, type: 3}
+--- !u!114 &827607154 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114962938915135368, guid: 23f972d680e86dd4da87e8a18548994e,
+    type: 2}
+  m_PrefabInternal: {fileID: 827607152}
+  m_Script: {fileID: 11500000, guid: f9ae141b4a962514789fb87279e077ee, type: 3}
 --- !u!1001 &832827599
 Prefab:
   m_ObjectHideFlags: 0
@@ -7183,6 +7215,11 @@ Prefab:
         type: 2}
       propertyPath: offset.y
       value: 3.33
+      objectReference: {fileID: 0}
+    - target: {fileID: 224159877169988034, guid: 7e83a31aff7cd8a4e8bb21a29dddd407,
+        type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7e83a31aff7cd8a4e8bb21a29dddd407, type: 2}

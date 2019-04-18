@@ -43,19 +43,19 @@ public class GameSave : MonoBehaviour{
         if (Input.GetKeyDown(KeyCode.M)) { LoadGame(); }
     }
 
-    public void SaveGame(Vector2 playerposition)
+    public static void SaveGame(Vector2 playerposition)
     {
         BinaryFormatter formatter = new BinaryFormatter();
-        string filePath = Application.persistentDataPath + "//saves//" + DateTime.Now.ToString("yy_MM_dd");
+        string filePath = Application.persistentDataPath + "/saves/" + DateTime.Now.ToString("yy_MM_dd");
 
         List<int> usableSafeZones = new List<int>();
-        foreach (SafeZoneScript zone in safeZones)
+        foreach (SafeZoneScript zone in gameSaver.safeZones)
         {
-            if (zone.useable && !usableSafeZones.Contains(safeZones.IndexOf(zone))) { usableSafeZones.Add(safeZones.IndexOf(zone)); }
+            if (zone.useable && !usableSafeZones.Contains(gameSaver.safeZones.IndexOf(zone))) { usableSafeZones.Add(gameSaver.safeZones.IndexOf(zone)); }
         }
 
         SaveData data = new SaveData(playerposition, SceneManager.GetActiveScene().buildIndex, usableSafeZones);
-        if (!Directory.Exists(Application.persistentDataPath + "//saves")) { Directory.CreateDirectory(Application.persistentDataPath + "//saves"); }
+        if (!Directory.Exists(Application.persistentDataPath + "/saves")) { Directory.CreateDirectory(Application.persistentDataPath + "/saves"); }
 
         FileStream file = new FileStream(filePath, FileMode.Create);
 
@@ -65,20 +65,26 @@ public class GameSave : MonoBehaviour{
         else { Debug.LogError("could not create file at " + filePath); }
     }
 
-    public void LoadGame()
+    public static void LoadGame()
     {
         BinaryFormatter formatter = new BinaryFormatter();
         SaveData data = (SaveData)formatter.Deserialize(GetLatestSave());
 
-        StartCoroutine(LoadLevel(data.sceneNumber, () => { 
+        gameSaver.StartCoroutine(LoadLevel(data.sceneNumber, () => {
             //Find object of type player controller
             //Then delete those characters
+            foreach (PlayerController player in FindObjectsOfType<PlayerController>()) {
+                Destroy(player.gameObject);
+            }
+
             Instantiate(Resources.Load<GameObject>("Characters/Thomas"), SerializableVector.GetUnityVector(data.playerPosition), Quaternion.identity);
             Instantiate(Resources.Load<GameObject>("Characters/Olivia"), SerializableVector.GetUnityVector(data.playerPosition), Quaternion.identity);
+
+            FindObjectOfType<NavmeshArea2D>().InitializeGrid();
             
-            foreach (SafeZoneScript zone in safeZones)
+            foreach (SafeZoneScript zone in gameSaver.safeZones)
             {
-                if (data.usableSafeZones.Contains(safeZones.IndexOf(zone))) { zone.useable = true; }
+                if (data.usableSafeZones.Contains(gameSaver.safeZones.IndexOf(zone))) { zone.useable = true; }
                 else
                 {
                     zone.useable = false;
@@ -88,15 +94,15 @@ public class GameSave : MonoBehaviour{
 
     }
 
-    public IEnumerator LoadLevel(int buildIndex, UnityEngine.Events.UnityAction callback) {
+    public static IEnumerator LoadLevel(int buildIndex, UnityEngine.Events.UnityAction callback) {
         yield return SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Single);
 
         callback();
     }
 
-    public FileStream GetLatestSave()
+    public static FileStream GetLatestSave()
     {
-        DirectoryInfo d = new DirectoryInfo(Application.persistentDataPath + "//saves");
+        DirectoryInfo d = new DirectoryInfo(Application.persistentDataPath + "/saves");
         d.GetDirectories().OrderByDescending(f => d.CreationTime).Select(f => d.Name).ToList();//sort directoy by date created
         FileInfo[] files = d.GetFiles();
 

@@ -162,11 +162,13 @@ MonoBehaviour:
   trapdamage: 40
   darknessFearChange: 1.5
   fears: 
+  PlayerStateEvent: 
   outOfRange: 0
   outOfZone: 0
   safe: 0
   fearCanDecay: 0
   currentFearModifier: 0
+  playerIsDead: 0
   withinFearZones: []
 --- !u!114 &114578357445916828
 MonoBehaviour:
@@ -214,6 +216,7 @@ MonoBehaviour:
   pathing: 0
   area: {fileID: 0}
   canMove: 1
+  playerName: Olivia
   accelMultiplier: 10
   jumpForce: 210
   vingette: {fileID: 21300000, guid: da2f5145e4912cb4b9f94a953de683a0, type: 3}

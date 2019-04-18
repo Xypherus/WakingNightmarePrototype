@@ -45,6 +45,7 @@ public class Door_Trap_Switch : MonoBehaviour{
     {
         yield return new WaitForSeconds(DoorDelay);
     }
+
     private void Update()
     {
         if(trigger.triggered == true && gameObject.CompareTag("Door"))

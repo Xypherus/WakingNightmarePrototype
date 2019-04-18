@@ -74,6 +74,13 @@ public class PlayerFearController : MonoBehaviour {
     public FearTypes[] fears;
 
     #endregion
+
+    //FMOD initialization and variable setup - Jake
+    [FMODUnity.EventRef]
+    public string PlayerStateEvent;
+    FMOD.Studio.EventInstance playerState;
+    float Fearpar = 0.0f;
+
     private Door_Trap_Switch trapswitch;
     
     //This is just a place holder, I need to figure out how to find wether or not the player is in fear range first
@@ -136,6 +143,10 @@ public class PlayerFearController : MonoBehaviour {
 
     private void Start()
     {
+        //Getting FMOD Event
+        playerState = FMODUnity.RuntimeManager.CreateInstance(PlayerStateEvent);
+        playerState.start();
+
         currentFear = 0;
         currentFearModifier = 1.0f;
         enemyMask = 1 << LayerMask.NameToLayer("Enemy");
@@ -148,6 +159,20 @@ public class PlayerFearController : MonoBehaviour {
     {
         Debug.Log("Adding player to list");
         GameManager.GM.PlayerCharacters.Add(this);
+    }
+    //Updating The Fear Parameter in FMOD - Jake
+    void Update()
+    {
+        playerState.setParameterValue("Fear", Fearpar);
+        //Sets min and max fear - Jake
+        if (Fearpar <= 0)
+        {
+            Fearpar = 0;
+        }
+        if (Fearpar >= 15)
+        {
+            Fearpar = 15;
+        }
     }
 
     /// <summary>
@@ -170,7 +195,8 @@ public class PlayerFearController : MonoBehaviour {
                     float distance = Vector2.Distance(enemy.transform.position, transform.position);
                     float fearMod = Mathf.Clamp((fearRange - distance) / fearRange, 0f, .9f) + .1f;
                     //Debug.Log("FearMod = " + fearMod);
-
+                    //Increases Fear Parameter Amount
+                    Fearpar += 0.01f;
                     ChangeFear((int)(enemyClass.fearDOT * fearMod), false);
                 }
             }
@@ -251,10 +277,14 @@ public class PlayerFearController : MonoBehaviour {
             if (safe == true)
             {
                 ChangeFear(-safezoneFearFade, false);
+                //Decreases Fear Parameter - Jake
+                Fearpar -= 0.2f;
             }
             else if(fearCanDecay)
             {
                 ChangeFear(-normalFearFade, false);
+                //Decreases Fear Parameter - Jake
+                Fearpar -= 0.01f;
             }
         }
     }
