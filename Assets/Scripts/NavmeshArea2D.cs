@@ -167,7 +167,8 @@ public class NavmeshArea2D : MonoBehaviour {
         {
             agents.Add(player.GetComponent<NavmeshAgent2D>());
         }
-        collider = GetComponent<CompositeCollider2D>();
+
+        if (agents.Count == 0) { Debug.LogWarning("No agents in navmesh", this); Debug.Break(); }
 
         meshes = new Dictionary<NavmeshAgent2D, NavmeshNode2D[,]>();
         foreach (NavmeshAgent2D agent in agents) {

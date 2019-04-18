@@ -9,7 +9,7 @@ public class PlayerSwapper : MonoBehaviour {
     public float maxPlayerDistance;
     public List<PlayerController> players;
     public PlayerController currentPlayer;
-    new public FollowCamera camera;
+    public FollowCamera followCam;
 
     private void Awake()
     {
@@ -23,7 +23,6 @@ public class PlayerSwapper : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        camera = FindObjectOfType<FollowCamera>();
 
         players = new List<PlayerController>();
         FindPlayers();
@@ -32,6 +31,7 @@ public class PlayerSwapper : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        followCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<FollowCamera>();
         CheckPlayerListIntegrity();
 
         if (Time.timeScale > 0) {
@@ -54,7 +54,9 @@ public class PlayerSwapper : MonoBehaviour {
     void CheckPlayerListIntegrity() {
         foreach (PlayerController player in players) {
             if (player == null) {
+                Debug.LogError("Fucking bullshit", this);
                 FindPlayers();
+                break;
             }
         }
     }
@@ -94,10 +96,10 @@ public class PlayerSwapper : MonoBehaviour {
             PlayerController stateMachine = playerObj.GetComponent<PlayerController>();
             if (stateMachine) {
                 if (!players.Contains(stateMachine)) { players.Add(stateMachine); }
-                if (stateMachine.playerName == "Thomas") { currentPlayer = stateMachine; }
             }
         }
 
+        ChangePlayer("Thomas");
         if (!currentPlayer && players.Count > 0) { currentPlayer = players[0]; }
 
         return players;
@@ -105,13 +107,13 @@ public class PlayerSwapper : MonoBehaviour {
 
     public void ChangePlayer(string playerName) {
         foreach (PlayerController player in players) {
-            if (player.name == playerName) { currentPlayer = player; }
+            if (player.playerName == playerName) { currentPlayer = player; }
             else { player.pathing = true; }
         }
 
         currentPlayer.pathing = false;
         currentPlayer.GetComponent<PlayerAI>().ping = null;
-        camera.player = currentPlayer.transform;
+        followCam.player = currentPlayer.transform;
     }
 
     public void ChangePlayer(int playerIndex) {
@@ -123,7 +125,7 @@ public class PlayerSwapper : MonoBehaviour {
         }
 
         currentPlayer.pathing = false;
-        camera.player = currentPlayer.transform;
+        followCam.player = currentPlayer.transform;
     }
 
     public void ChangeToNextPlayer() {
