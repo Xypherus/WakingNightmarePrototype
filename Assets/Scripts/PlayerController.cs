@@ -13,6 +13,7 @@ using soundTool.soundManager;
 public class PlayerController : NavmeshAgent2D {
 
     #region Editor Variables
+    public string playerName;
     [Tooltip("How fast this player will reach its defined max speed.")]
     public float accelMultiplier;
     [Tooltip("The force used to propell the player upward. Higher values for objects with higher mass.")]

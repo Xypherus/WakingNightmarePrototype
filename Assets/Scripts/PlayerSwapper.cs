@@ -32,6 +32,8 @@ public class PlayerSwapper : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        CheckPlayerListIntegrity();
+
         if (Time.timeScale > 0) {
             CheckPlayerDistances();
 
@@ -48,6 +50,14 @@ public class PlayerSwapper : MonoBehaviour {
             }
         }
 	}
+
+    void CheckPlayerListIntegrity() {
+        foreach (PlayerController player in players) {
+            if (player == null) {
+                FindPlayers();
+            }
+        }
+    }
 
     void CheckPlayerDistances() {
         foreach (PlayerController player in players) {
@@ -77,13 +87,20 @@ public class PlayerSwapper : MonoBehaviour {
         }
     }
 
-    public void FindPlayers() {
+    public List<PlayerController> FindPlayers() {
+        players = new List<PlayerController>();
+        currentPlayer = null;
         foreach (GameObject playerObj in GameObject.FindGameObjectsWithTag("Player")) {
             PlayerController stateMachine = playerObj.GetComponent<PlayerController>();
             if (stateMachine) {
                 if (!players.Contains(stateMachine)) { players.Add(stateMachine); }
+                if (stateMachine.playerName == "Thomas") { currentPlayer = stateMachine; }
             }
         }
+
+        if (!currentPlayer && players.Count > 0) { currentPlayer = players[0]; }
+
+        return players;
     }
 
     public void ChangePlayer(string playerName) {
