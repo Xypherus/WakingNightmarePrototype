@@ -11,10 +11,11 @@ public class Door_Trap_Switch : MonoBehaviour{
     public float DoorDelay = 1.5f;
 
     public int playerTrapCount = 2;
-    public List<PlayerController> playersInTrigger;
+    public List<PlayerFearController> playersInTrigger;
 
     Triggerscript trigger;
     public bool captured;
+    public bool canremove;
     private Animator open;
     private Rigidbody2D trap;
     public Rigidbody2D[] snare;
@@ -41,9 +42,10 @@ public class Door_Trap_Switch : MonoBehaviour{
         hinge.enabled = false;
     }
 
-    IEnumerator Delay()
+    IEnumerator Delay(UnityEngine.Events.UnityAction DelayFunct)
     {
         yield return new WaitForSeconds(DoorDelay);
+        DelayFunct();
     }
 
     private void Update()
@@ -70,11 +72,13 @@ public class Door_Trap_Switch : MonoBehaviour{
             {
                 Debug.Log("Trap has been triggered");
                 SoundManager.PlaySound(Trap);
+
                 foreach (Rigidbody2D body in snare)
                 {
                     body.bodyType = RigidbodyType2D.Dynamic;
                 }
-                if(captured = true && Input.GetButtonDown("Action") && playersInTrigger.Count >= playerTrapCount)
+
+                if(canremove == true && captured == true && Input.GetButtonDown("Action") && playersInTrigger.Count >= playerTrapCount)
                 {
                     gameObject.SetActive(false);
                     captured = false;
@@ -89,8 +93,9 @@ public class Door_Trap_Switch : MonoBehaviour{
                 SoundManager.PlaySound(Switch);
 
                 //Delays door sound to be one second after switch sound
-                StartCoroutine("Delay");
-                SoundManager.PlaySound(Door);
+                StartCoroutine(Delay( () => {
+                    SoundManager.PlaySound(Door);
+                }));
             }
         }
         if (trigger.triggered == false)
@@ -98,4 +103,5 @@ public class Door_Trap_Switch : MonoBehaviour{
             open.SetBool("isopen", false);
         }
     }
+
 }
