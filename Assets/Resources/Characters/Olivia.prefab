@@ -213,7 +213,7 @@ MonoBehaviour:
   ladder: {fileID: 0}
   animator: {fileID: 0}
   isStopped: 0
-  pathing: 0
+  pathing: 1
   area: {fileID: 0}
   canMove: 1
   playerName: Olivia

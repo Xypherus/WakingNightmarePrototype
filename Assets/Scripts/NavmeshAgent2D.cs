@@ -282,7 +282,7 @@ public class NavmeshAgent2D : MonoBehaviour {
         if (!pathing || isStopped) { return path; }
 
         if (Time.realtimeSinceStartup <= lastPath + pathAccuracy) { return path; }
-        else { Debug.Log("Updating AI", this); }
+
 
         List<NavmeshNode2D> closedList = new List<NavmeshNode2D>();
         List<NavmeshNode2D> openList = new List<NavmeshNode2D>();
