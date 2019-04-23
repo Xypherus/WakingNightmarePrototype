@@ -22,12 +22,12 @@ public class MainMenu : MonoBehaviour {
 		
 	}
 	
-	void StartGame()
+	public void StartGame()
     {
         GameManager.GM.LoadLevel(firstLevelValue);
     }
 
-    void LoadCreditsMenu()
+    public void LoadCreditsMenu()
     {
         GameManager.GM.LoadLevel(creditsLevelValue);
     }
