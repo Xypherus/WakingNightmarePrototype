@@ -13,13 +13,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EditorBanks:
   - {fileID: 114110004254592310}
-  - {fileID: 114156507093972634}
+  - {fileID: 114503295068852578}
   EditorEvents:
   - {fileID: 114068170918481728}
-  MasterBankRef: {fileID: 114156507093972634}
+  MasterBankRef: {fileID: 114503295068852578}
   StringsBankRef: {fileID: 114110004254592310}
-  stringsBankWriteTime: 636905773825324041
+  stringsBankWriteTime: 636904986377994351
   cacheVersion: 2
+--- !u!114 &114004037217815786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Fear
+  Min: 0
+  Max: 15
+  Default: 0
 --- !u!114 &114045614087307856
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -94,13 +109,13 @@ MonoBehaviour:
   Path: event:/Music
   guid: d72b987f7744774493a8e8ef7fef8579
   Banks:
-  - {fileID: 114156507093972634}
+  - {fileID: 114503295068852578}
   IsStream: 1
   Is3D: 0
   IsOneShot: 0
   Parameters:
-  - {fileID: 114605631361844750}
-  - {fileID: 114769794625535520}
+  - {fileID: 114004037217815786}
+  - {fileID: 114572999661686526}
   MinDistance: 0
   MaxDistance: 0
   Length: 233000
@@ -176,7 +191,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Path: Assets\Waking Nightmare's FMOD\Build\Desktop\Master Bank.strings.bank
-  lastModified: 636905773825324041
+  lastModified: 636904986377994351
   LoadResult: 0
   FileSizes:
   - Name: 
@@ -263,7 +278,7 @@ MonoBehaviour:
   FileSizes:
   - Name: 
     Value: 22858464
-  Exists: 1
+  Exists: 0
 --- !u!114 &114184363256215754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -405,6 +420,25 @@ MonoBehaviour:
   - Name: 
     Value: 22858464
   Exists: 0
+--- !u!114 &114503295068852578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: C:\Users\brand\OneDrive\Waking Nightmares\WakingNightmarePrototype\Assets\Waking
+    Nightmare's FMOD\Build\Desktop\Master Bank.bank
+  lastModified: 636911024334322602
+  LoadResult: 0
+  FileSizes:
+  - Name: 
+    Value: 22858464
+  Exists: 1
 --- !u!114 &114524576294322204
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -424,6 +458,21 @@ MonoBehaviour:
   - Name: 
     Value: 22858464
   Exists: 0
+--- !u!114 &114572999661686526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Region
+  Min: 0
+  Max: 10
+  Default: 0
 --- !u!114 &114586087467537336
 MonoBehaviour:
   m_ObjectHideFlags: 0
