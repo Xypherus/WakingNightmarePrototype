@@ -34,11 +34,11 @@ public class NavmeshArea2D : MonoBehaviour {
     float updateRate = 0.02f;
     float lastUpdate;
 
-    // Use this for initialization
-    protected void Start () {
-        collider = GetComponent<CompositeCollider2D>();
+    protected void Start()
+    {
+        
         InitializeGrid();
-	}
+    }
 
 	
 	// Update is called once per frame
@@ -161,6 +161,14 @@ public class NavmeshArea2D : MonoBehaviour {
     public void InitializeGrid() {
         xcount = Mathf.CeilToInt((bounds.max.x - bounds.min.x) / resolution) + 1;
         ycount = Mathf.CeilToInt((bounds.max.y - bounds.min.y) / resolution) + 1;
+
+        agents = new List<NavmeshAgent2D>();
+        foreach (PlayerController player in PlayerSwapper.playerSwapper.FindPlayers())
+        {
+            agents.Add(player.GetComponent<NavmeshAgent2D>());
+        }
+
+        if (agents.Count == 0) { Debug.LogWarning("No agents in navmesh", this); Debug.Break(); }
 
         meshes = new Dictionary<NavmeshAgent2D, NavmeshNode2D[,]>();
         foreach (NavmeshAgent2D agent in agents) {

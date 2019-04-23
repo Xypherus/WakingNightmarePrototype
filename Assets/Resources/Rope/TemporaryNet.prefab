@@ -25,9 +25,10 @@ GameObject:
   - component: {fileID: 61256030350989212}
   - component: {fileID: 70492368699113454}
   - component: {fileID: 114817580460875818}
-  m_Layer: 11
+  - component: {fileID: 114647540779494614}
+  m_Layer: 8
   m_Name: TemporaryNet
-  m_TagString: Untagged
+  m_TagString: Snare
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -105,6 +106,17 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 0.06, y: 0.43}
   m_Direction: 0
+--- !u!114 &114647540779494614
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1744389014700046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9eed70ad285f044a69fa177d10cde60b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114817580460875818
 MonoBehaviour:
   m_ObjectHideFlags: 1
