@@ -38,7 +38,7 @@ public class SafeZoneScript : MonoBehaviour {
 
             if(playersInZone.Count >= playerCountToActivate)
             {
-                GameSave.gameSaver.SaveGame(transform.position);
+                GameSave.SaveGame(transform.position);
 
                 foreach (PlayerFearController player in playersInZone)
                 {
