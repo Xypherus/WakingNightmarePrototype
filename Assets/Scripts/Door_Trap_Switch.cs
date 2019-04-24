@@ -17,6 +17,7 @@ public class Door_Trap_Switch : MonoBehaviour{
     public bool captured;
     public bool canremove;
     private Animator open;
+    private BoxCollider2D doorcollider;
     private Rigidbody2D trap;
     public Rigidbody2D[] snare;
     public string switch_key = "v";
@@ -25,6 +26,7 @@ public class Door_Trap_Switch : MonoBehaviour{
     {
         trigger = GetComponentInParent<Triggerscript>();
         trap = gameObject.GetComponent<Rigidbody2D>();
+        doorcollider = gameObject.GetComponent<BoxCollider2D>();
          
         if (gameObject.GetComponent<Animator>() != null)
         {
@@ -53,6 +55,7 @@ public class Door_Trap_Switch : MonoBehaviour{
         if(trigger.triggered == true && gameObject.CompareTag("Door"))
         {
             open.SetBool("isopen", true);
+            doorcollider.enabled = false;
             SoundManager.PlaySound(Door, 1f);
         }
 
@@ -89,11 +92,12 @@ public class Door_Trap_Switch : MonoBehaviour{
         {
             if (Input.GetKeyDown(switch_key))
             {
-                open.SetBool("isopen", true);
                 SoundManager.PlaySound(Switch);
 
                 //Delays door sound to be one second after switch sound
                 StartCoroutine(Delay( () => {
+                    open.SetBool("isopen", true);
+                    doorcollider.enabled = false;
                     SoundManager.PlaySound(Door);
                 }));
             }
@@ -101,6 +105,7 @@ public class Door_Trap_Switch : MonoBehaviour{
         if (trigger.triggered == false)
         {
             open.SetBool("isopen", false);
+            doorcollider.enabled = true;
         }
     }
 

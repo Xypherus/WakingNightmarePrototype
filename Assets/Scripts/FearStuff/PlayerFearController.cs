@@ -244,7 +244,7 @@ public class PlayerFearController : MonoBehaviour {
         {
             Fearpar = 15;
         }
-    }*/
+    }
 
     /// <summary>
     /// Performs all operations related to passive fear gain.
