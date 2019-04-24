@@ -148,13 +148,13 @@ public class PlayerAI : CharacterStateNetwork {
             Debug.DrawLine(agent.transform.position, targetNode.worldPosition);
 
             //if agent.GetTargetNodeInPath is not a ground node or is connected to the previous node by a jump connection,
-            /*
+            
             if (agent.NodeIsTraversible(currentNode) && agent.isGrounded && !agent.ladder && agent.ledge == null && (targetNode.gridPosition.y > currentNode.gridPosition.y || Vector2.Distance(targetNode.worldPosition, agent.transform.position) > agent.jumpDistance)) {
                 player.player.jumpped = true;
             }
-            */
+            
             //else if agent.GetTargetNodeInPath is a ladder type node and not already on ladder,
-            if ((Time.time - timeSinceGrab) > 2f && targetNode.type == NavmeshNode2D.NodeType.Ladder && !player.player.ladder)
+            else if ((Time.time - timeSinceGrab) > 2f && targetNode.type == NavmeshNode2D.NodeType.Ladder && !player.player.ladder)
             {
                 //grab the nearest ladder.
                 player.player.grabbed = true;
