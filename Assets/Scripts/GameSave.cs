@@ -11,6 +11,8 @@ public class GameSave : MonoBehaviour{
 
     public static GameSave gameSaver;
 
+    List<SafeZoneScript> safeZones = new List<SafeZoneScript>();
+
     public void Awake()
     {
         if (gameSaver)
@@ -23,49 +25,84 @@ public class GameSave : MonoBehaviour{
             gameSaver = this;
         }
 
+        DontDestroyOnLoad(gameObject);
+
     }
 
-    public void SaveGame(Vector2 playerposition)
+    private void Start()
+    {
+        safeZones = new List<SafeZoneScript>(FindObjectsOfType<SafeZoneScript>());
+
+        //temp code
+        //LoadGame();
+    }
+
+    private void Update()
+    {
+        //test code
+        if (Input.GetKeyDown(KeyCode.M)) { LoadGame(); }
+    }
+
+    public static void SaveGame(Vector2 playerposition)
     {
         BinaryFormatter formatter = new BinaryFormatter();
+        string filePath = Application.persistentDataPath + "/saves/" + DateTime.Now.ToString("yy_MM_dd");
 
-        List<SafeZoneScript> usableSafeZones = new List<SafeZoneScript>();
-        foreach (SafeZoneScript zone in FindObjectsOfType<SafeZoneScript>())
+        List<int> usableSafeZones = new List<int>();
+        foreach (SafeZoneScript zone in gameSaver.safeZones)
         {
-            if (zone.useable && !usableSafeZones.Contains(zone)) { usableSafeZones.Add(zone); }
+            if (zone.useable && !usableSafeZones.Contains(gameSaver.safeZones.IndexOf(zone))) { usableSafeZones.Add(gameSaver.safeZones.IndexOf(zone)); }
         }
 
         SaveData data = new SaveData(playerposition, SceneManager.GetActiveScene().buildIndex, usableSafeZones);
-        FileStream file = new FileStream(Application.persistentDataPath + "//saves//" + DateTime.Now.ToString("yy-MM-dd"), FileMode.Create);
+        if (!Directory.Exists(Application.persistentDataPath + "/saves")) { Directory.CreateDirectory(Application.persistentDataPath + "/saves"); }
+
+        FileStream file = new FileStream(filePath, FileMode.Create);
 
         formatter.Serialize(file, data);
         file.Close();
+        if(File.Exists(filePath)) { Debug.Log("Created save file at " + filePath); }
+        else { Debug.LogError("could not create file at " + filePath); }
     }
 
-    public void LoadGame()
+    public static void LoadGame()
     {
         BinaryFormatter formatter = new BinaryFormatter();
         SaveData data = (SaveData)formatter.Deserialize(GetLatestSave());
 
-        SceneManager.LoadScene(data.sceneNumber);
-
-        Instantiate(Resources.Load<GameObject>("Character//Thomas"), SerializableVector.GetUnityVector(data.playerPosition), Quaternion.identity);
-        Instantiate(Resources.Load<GameObject>("Character//Olivia"), SerializableVector.GetUnityVector(data.playerPosition), Quaternion.identity);
-
-        foreach (SafeZoneScript zone in FindObjectsOfType<SafeZoneScript>())
-        {
-            if (data.usableSafeZones.Contains(zone)) { zone.useable = true; }
-            else
-            {
-                zone.useable = false;
-                //zone.SetActive(false); //delete this line if loading zones is weird
+        gameSaver.StartCoroutine(LoadLevel(data.sceneNumber, () => {
+            //Find object of type player controller
+            //Then delete those characters
+            foreach (PlayerController player in FindObjectsOfType<PlayerController>()) {
+                Destroy(player.gameObject);
             }
-        }
+
+            Instantiate(Resources.Load<GameObject>("Characters/Thomas"), SerializableVector.GetUnityVector(data.playerPosition), Quaternion.identity);
+            Instantiate(Resources.Load<GameObject>("Characters/Olivia"), SerializableVector.GetUnityVector(data.playerPosition), Quaternion.identity);
+
+            FindObjectOfType<NavmeshArea2D>().InitializeGrid();
+            
+            foreach (SafeZoneScript zone in gameSaver.safeZones)
+            {
+                if (data.usableSafeZones.Contains(gameSaver.safeZones.IndexOf(zone))) { zone.useable = true; }
+                else
+                {
+                    zone.useable = false;
+                }
+            }
+        }));
+
     }
 
-    public FileStream GetLatestSave()
+    public static IEnumerator LoadLevel(int buildIndex, UnityEngine.Events.UnityAction callback) {
+        yield return SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Single);
+
+        callback();
+    }
+
+    public static FileStream GetLatestSave()
     {
-        DirectoryInfo d = new DirectoryInfo(Application.persistentDataPath + "//saves");
+        DirectoryInfo d = new DirectoryInfo(Application.persistentDataPath + "/saves");
         d.GetDirectories().OrderByDescending(f => d.CreationTime).Select(f => d.Name).ToList();//sort directoy by date created
         FileInfo[] files = d.GetFiles();
 
@@ -83,9 +120,9 @@ public class SaveData
 {
     public SerializableVector playerPosition;
     public int sceneNumber;
-    public List<SafeZoneScript> usableSafeZones;
+    public List<int> usableSafeZones = new List<int>();
 
-    public SaveData(Vector2 playerPosition, int sceneNumber, List<SafeZoneScript> usableSafeZones)
+    public SaveData(Vector2 playerPosition, int sceneNumber, List<int> usableSafeZones)
     {
         this.playerPosition = new SerializableVector(playerPosition);
         this.sceneNumber = sceneNumber;

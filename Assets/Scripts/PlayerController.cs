@@ -13,6 +13,7 @@ using soundTool.soundManager;
 public class PlayerController : NavmeshAgent2D {
 
     #region Editor Variables
+    public string playerName;
     [Tooltip("How fast this player will reach its defined max speed.")]
     public float accelMultiplier;
     [Tooltip("The force used to propell the player upward. Higher values for objects with higher mass.")]
@@ -96,6 +97,7 @@ public class PlayerController : NavmeshAgent2D {
         //initialize a string with the path to a random footstep sound found in "../StreamingAssets/Audio/footstep x"
         string audioPath = Application.dataPath + "/StreamingAssets/Audio/";
         string clipName = "footstep " + Random.Range(1, 4) + ".wav";
+        
 
         SoundManager.GetClipFromPath(audioPath + clipName, SoundManager.PlaySoundVoid);
     }

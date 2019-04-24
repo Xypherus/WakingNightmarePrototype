@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using soundTool.soundManager;
 
 /// <summary>
 /// Types of fear. Darkness is here for convience, should not be applied directly as a fear that a character has.
@@ -9,7 +10,7 @@ using System.Linq;
 public enum FearTypes { FearTypeA, FearTypeB, FearTypeC, FearTypeD, Darkness };
 
 public class PlayerFearController : MonoBehaviour {
-
+    private bool EnemyFear;
     #region EditorVariables
     /// <summary>
     /// The highest possable fear value that the player can have, Should generaly be set to 100
@@ -73,7 +74,31 @@ public class PlayerFearController : MonoBehaviour {
     [Tooltip("Add all fears that this character is afraid of here")]
     public FearTypes[] fears;
 
+    /// <summary>
+    /// The base heartrate for when the character has no fear. Input as 1 beat every x seconds.
+    /// </summary>
+    [Tooltip("The base heartrate for when the character has no fear. Input as 1 beat every x seconds.")]
+    public float baseHeartrate;
+
+    /// <summary>
+    /// The maximum heartrate for when the character is at max fear.  Input as 1 beat every x seconds.
+    /// </summary>
+    [Tooltip("The maximum heartrate for when the character is at max fear. Input as 1 beat every x seconds.")]
+    public float maxHeartrate;
+
+    /// <summary>
+    /// Audio for heartbeat
+    /// </summary>
+    [Tooltip("Audio for heartbeat")]
+    public AudioClip heartBeat;
+
     #endregion
+
+    //FMOD initialization and variable setup - Jake
+    [FMODUnity.EventRef]
+    public string PlayerStateEvent;
+    FMOD.Studio.EventInstance playerState;
+    float Fearpar = 0.0f;
     
     //This is just a place holder, I need to figure out how to find wether or not the player is in fear range first
     //I've set this variable up. It's true when out of fear range, false when in - Ben
@@ -109,6 +134,12 @@ public class PlayerFearController : MonoBehaviour {
     public bool playerIsDead;
 
     /// <summary>
+    /// The current time between heartbeats. Do not change manualy
+    /// </summary>
+    private float timeBetweenHeartBeats;
+
+
+    /// <summary>
     /// Fear zones that the player is in. Only visable for debug, should not be manualy changed.
     /// </summary>
     public List<FearZone> withinFearZones;
@@ -121,8 +152,9 @@ public class PlayerFearController : MonoBehaviour {
     /// </summary>
     /// <param name="fearChange">How much to change the fear Modifiers are applied on top of this value</param>
     /// <param name="killable">True of this fear is able to kill the player, False otherwise</param>
-    private void ChangeFear(int fearChange, bool killable)
+    public void ChangeFear(int fearChange, bool killable)
     {
+
         int newFear = currentFear + (int)(fearChange * currentFearModifier);
         if(killable) { currentFear = Mathf.Clamp(newFear, 0, maxFear); }
         else { currentFear = Mathf.Clamp(newFear, 0, maxFear - 1); }
@@ -131,22 +163,92 @@ public class PlayerFearController : MonoBehaviour {
         {
             //TriggerDeath();
         }
+        //Debug.Break();
     }
 
     private void Start()
     {
+
+        //Getting FMOD Event
+        //playerState = FMODUnity.RuntimeManager.CreateInstance(PlayerStateEvent);
+        Debug.Log("Start Called");
+        playerState.start();
+        
+
         currentFear = 0;
         currentFearModifier = 1.0f;
+
+        timeBetweenHeartBeats = baseHeartrate;
+
         enemyMask = 1 << LayerMask.NameToLayer("Enemy");
         InvokeRepeating("FearTicker", 1, fearTickTime);
         fearCanDecay = true;
         playerIsDead = false;
+
     }
 
     private void Awake()
     {
         Debug.Log("Adding player to list");
         GameManager.GM.PlayerCharacters.Add(this);
+        StartCoroutine(HeartBeatGenerator());
+    }
+    //Updating The Fear Parameter in FMOD - Jake
+
+    IEnumerator HeartBeatGenerator()
+    {
+        while (!playerIsDead)
+        {
+            if (heartBeat != null)
+            {
+                SoundManager.PlaySound(heartBeat);
+            }
+            yield return new WaitForSeconds(timeBetweenHeartBeats);
+        }
+        yield return null;
+    }
+
+    private void ApplyFearAudio()
+    {
+        float fearPercent = (currentFear / maxFear) * 100;
+        timeBetweenHeartBeats = (fearPercent / (maxHeartrate - baseHeartrate) / 100) + baseHeartrate;
+    }
+
+    void Update()
+    {
+        playerState.setParameterValue("Fear", Fearpar);
+        Debug.Log(Fearpar);
+        
+        //Increases Fear Parameter Amount
+        foreach (Collider2D enemy in inRange)
+        {
+            if (EnemyFear == true)
+            {
+                Fearpar += 0.01f;
+            }
+        }
+        //Decreases Fear Parameter Amount
+        
+            if (safe == true)
+            {
+                //Decreases Fear Parameter - Jake
+                Fearpar -= 0.2f;
+            }
+            else if (fearCanDecay)
+            {
+                //Decreases Fear Parameter - Jake
+                Fearpar -= 0.01f;
+            }
+        
+        //Sets min and max fear - Jake
+        if (Fearpar <= 0)
+        {
+            Fearpar = 0;
+        }
+        if (Fearpar >= 15)
+        {
+            Fearpar = 15;
+        }
     }
 
     /// <summary>
@@ -169,8 +271,9 @@ public class PlayerFearController : MonoBehaviour {
                     float distance = Vector2.Distance(enemy.transform.position, transform.position);
                     float fearMod = Mathf.Clamp((fearRange - distance) / fearRange, 0f, .9f) + .1f;
                     //Debug.Log("FearMod = " + fearMod);
-
                     ChangeFear((int)(enemyClass.fearDOT * fearMod), false);
+                    //Increase fear Parameter
+                    EnemyFear = true;
                 }
             }
             return true;
@@ -214,10 +317,6 @@ public class PlayerFearController : MonoBehaviour {
         {
             withinFearZones.Add(collision.GetComponent<FearZone>());
         }
-        if(collision.CompareTag("Trap"))
-        {
-            ChangeFear(trapdamage, true);  
-        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -245,10 +344,14 @@ public class PlayerFearController : MonoBehaviour {
             if (safe == true)
             {
                 ChangeFear(-safezoneFearFade, false);
+                //Decreases Fear Parameter - Jake
+                EnemyFear = false;
             }
             else if(fearCanDecay)
             {
                 ChangeFear(-normalFearFade, false);
+                //Decreases Fear Parameter - Jake
+                EnemyFear = false;
             }
         }
     }
@@ -269,11 +372,13 @@ public class PlayerFearController : MonoBehaviour {
 
     private void FearTicker()
     {
+        //Debug.Break();
         if(!playerIsDead)
         {
-            ApplyZoneFear();
+            Debug.Log(ApplyZoneFear());
             ApplyPassiveFear();
             ApplyFearDecay();
+            ApplyFearAudio();
         }
     }
 
@@ -282,8 +387,8 @@ public class PlayerFearController : MonoBehaviour {
     {
         if(collision.gameObject.layer == LayerMask.NameToLayer("Enemy"))
         {
+            Debug.Log("fear dealt", collision.gameObject);
             ChangeFear(collision.gameObject.GetComponent<EnemyClass>().fearDealt, true);
-
             //Handles the cooldown
             fearCooldownTime = fearDecayCooldown;
             if(fearCanDecay)
@@ -328,5 +433,4 @@ public class PlayerFearController : MonoBehaviour {
         }
     }
     
-
 }

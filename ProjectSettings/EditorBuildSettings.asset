@@ -18,6 +18,12 @@ EditorBuildSettings:
     path: Assets/Scenes/AItestLevel.unity
     guid: c6b4a3b34ab20b346a6c10054a424c2b
   - enabled: 1
-    path: Assets/Scenes/Level Selections Combined/Section 1 and Transistion Final.unity
+    path: Assets/Scenes/MVP Level/Section 1 and Transistion Final.unity
     guid: cd10e04fdf83b884ea3d26592ffd4a87
+  - enabled: 1
+    path: Assets/Scenes/UI/Credits Menu.unity
+    guid: f29ddb789c4fa584597491099f6502fc
+  - enabled: 1
+    path: Assets/Scenes/Final Scenes/Main Menu.unity
+    guid: 991223678626d1247b65c480f40e1b27
   m_configObjects: {}

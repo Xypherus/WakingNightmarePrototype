@@ -10,11 +10,11 @@ public class Rope : MonoBehaviour {
     public GameObject ropeSegment;
 
     //Initializes List of segments in the Ladder
-    List<Ladder> segments;
+    public List<Ladder> segments;
 
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Awake () {
         //Sets parent object to be uniform size
         transform.localScale = new Vector3(1, 1, 1);
 

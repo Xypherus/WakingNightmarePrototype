@@ -31,7 +31,7 @@ public class Ladder : MonoBehaviour {
 
         if (transform.localScale != Vector3.one)
         {
-            renderer.size = transform.localScale;
+            renderer.size = new Vector2(renderer.size.x, transform.localScale.y);
             transform.localScale = Vector3.one;
         }
 
@@ -46,7 +46,7 @@ public class Ladder : MonoBehaviour {
         OrientLadder();
 
         if (transform.localScale != Vector3.one) {
-            renderer.size = transform.localScale;
+            renderer.size = new Vector2(renderer.size.x,transform.localScale.y);
             transform.localScale = Vector3.one;
         }
 
