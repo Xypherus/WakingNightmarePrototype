@@ -87,7 +87,7 @@ public class PlayerController : NavmeshAgent2D {
     }
 
     public void PlaySound(string soundname) {
-        string audioPath = Application.dataPath + "/StreamingAssets/Audio Final Files/";
+        string audioPath = Application.dataPath + "/StreamingAssets/Audio/";
         string clipName = soundname + ".wav";
 
         SoundManager.GetClipFromPath(audioPath + clipName, SoundManager.PlaySoundVoid);
@@ -95,7 +95,7 @@ public class PlayerController : NavmeshAgent2D {
 
     public void PlayFootstep() {
         //initialize a string with the path to a random footstep sound found in "../StreamingAssets/Audio/footstep x"
-        string audioPath = Application.dataPath + "/StreamingAssets/Audio Final Files/";
+        string audioPath = Application.dataPath + "/StreamingAssets/Audio/";
         string clipName = "footstep " + Random.Range(1, 4) + ".wav";
 
         SoundManager.GetClipFromPath(audioPath + clipName, SoundManager.PlaySoundVoid);
