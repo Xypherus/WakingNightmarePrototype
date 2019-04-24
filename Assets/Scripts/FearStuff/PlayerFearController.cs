@@ -10,7 +10,7 @@ using soundTool.soundManager;
 public enum FearTypes { FearTypeA, FearTypeB, FearTypeC, FearTypeD, Darkness };
 
 public class PlayerFearController : MonoBehaviour {
-    //private bool EnemyFear;
+    private bool EnemyFear;
     #region EditorVariables
     /// <summary>
     /// The highest possable fear value that the player can have, Should generaly be set to 100
@@ -244,7 +244,7 @@ public class PlayerFearController : MonoBehaviour {
         {
             Fearpar = 15;
         }
-    }*/
+    }
 
     /// <summary>
     /// Performs all operations related to passive fear gain.
