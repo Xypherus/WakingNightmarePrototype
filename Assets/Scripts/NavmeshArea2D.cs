@@ -163,7 +163,7 @@ public class NavmeshArea2D : MonoBehaviour {
         ycount = Mathf.CeilToInt((bounds.max.y - bounds.min.y) / resolution) + 1;
 
         agents = new List<NavmeshAgent2D>();
-        foreach (PlayerController player in PlayerSwapper.playerSwapper.FindPlayers())
+        foreach (PlayerController player in FindObjectsOfType<PlayerController>())
         {
             agents.Add(player.GetComponent<NavmeshAgent2D>());
         }
