@@ -9,7 +9,7 @@ using System.Linq;
 public enum FearTypes { FearTypeA, FearTypeB, FearTypeC, FearTypeD, Darkness };
 
 public class PlayerFearController : MonoBehaviour {
-
+    //private bool EnemyFear;
     #region EditorVariables
     /// <summary>
     /// The highest possable fear value that the player can have, Should generaly be set to 100
@@ -142,8 +142,9 @@ public class PlayerFearController : MonoBehaviour {
     private void Start()
     {
         //Getting FMOD Event
-        playerState = FMODUnity.RuntimeManager.CreateInstance(PlayerStateEvent);
-        playerState.start();
+        //playerState = FMODUnity.RuntimeManager.CreateInstance(PlayerStateEvent);
+        //playerState.start();
+        
 
         currentFear = 0;
         currentFearModifier = 1.0f;
@@ -159,9 +160,32 @@ public class PlayerFearController : MonoBehaviour {
         GameManager.GM.PlayerCharacters.Add(this);
     }
     //Updating The Fear Parameter in FMOD - Jake
-    void Update()
+    /*void Update()
     {
         playerState.setParameterValue("Fear", Fearpar);
+        Debug.Log(Fearpar);
+        
+        //Increases Fear Parameter Amount
+        foreach (Collider2D enemy in inRange)
+        {
+            if (EnemyFear == true)
+            {
+                Fearpar += 0.01f;
+            }
+        }
+        //Decreases Fear Parameter Amount
+        
+            if (safe == true)
+            {
+                //Decreases Fear Parameter - Jake
+                Fearpar -= 0.2f;
+            }
+            else if (fearCanDecay)
+            {
+                //Decreases Fear Parameter - Jake
+                Fearpar -= 0.01f;
+            }
+        
         //Sets min and max fear - Jake
         if (Fearpar <= 0)
         {
@@ -171,7 +195,7 @@ public class PlayerFearController : MonoBehaviour {
         {
             Fearpar = 15;
         }
-    }
+    }*/
 
     /// <summary>
     /// Performs all operations related to passive fear gain.
@@ -193,9 +217,9 @@ public class PlayerFearController : MonoBehaviour {
                     float distance = Vector2.Distance(enemy.transform.position, transform.position);
                     float fearMod = Mathf.Clamp((fearRange - distance) / fearRange, 0f, .9f) + .1f;
                     //Debug.Log("FearMod = " + fearMod);
-                    //Increases Fear Parameter Amount
-                    Fearpar += 0.01f;
                     ChangeFear((int)(enemyClass.fearDOT * fearMod), false);
+                    //Increase fear Parameter
+                    //EnemyFear = true;
                 }
             }
             return true;
@@ -267,13 +291,13 @@ public class PlayerFearController : MonoBehaviour {
             {
                 ChangeFear(-safezoneFearFade, false);
                 //Decreases Fear Parameter - Jake
-                Fearpar -= 0.2f;
+                //EnemyFear = false;
             }
             else if(fearCanDecay)
             {
                 ChangeFear(-normalFearFade, false);
                 //Decreases Fear Parameter - Jake
-                Fearpar -= 0.01f;
+                //EnemyFear = false;
             }
         }
     }
