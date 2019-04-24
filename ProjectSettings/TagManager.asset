@@ -13,6 +13,8 @@ TagManager:
   - Trap
   - Switch
   - Snare
+  - Bullet
+  - Enemy
   layers:
   - Default
   - TransparentFX

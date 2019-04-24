@@ -78,7 +78,7 @@ public class CentipedeAI : MonoBehaviour
             speed *= -1;
             dir *= -1;
         }
-        centAnim.ResetTrigger("IsLunge");
+        centAnim.ResetTrigger("IsLunging");
         centAnim.SetTrigger("IsWalking");
         transform.Translate(Vector2.right * -speed * Time.deltaTime);
         SoundManager.PlaySound(Wander, 1f);
@@ -103,7 +103,7 @@ public class CentipedeAI : MonoBehaviour
             Flip();
             speed *= -1;
         }
-        centAnim.ResetTrigger("IsLunge");
+        centAnim.ResetTrigger("IsLunging");
         centAnim.SetTrigger("IsWalking");
         SoundManager.PlaySound(Wander, 1f);
         SoundManager.PlaySound(Aggro, 1f);
@@ -113,7 +113,7 @@ public class CentipedeAI : MonoBehaviour
     {
 
         centAnim.ResetTrigger("IsWalking");
-        centAnim.SetTrigger("IsLunge");
+        centAnim.SetTrigger("IsLunging");
         if (Time.time > lastLungeTime + lungeDelay)
         {
             SoundManager.PlaySound(LungeS, 1f);
