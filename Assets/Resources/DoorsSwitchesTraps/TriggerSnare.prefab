@@ -124,6 +124,7 @@ MonoBehaviour:
   segmentCount: 8
   ropeSegment: {fileID: 1744389014700046, guid: cd7a190f275f74a19bd3c3a327e7c9a8,
     type: 2}
+  segments: []
 --- !u!114 &114169610311370876
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -139,4 +140,9 @@ MonoBehaviour:
   Switch: {fileID: 0}
   Trap: {fileID: 0}
   DoorDelay: 1.5
+  playerTrapCount: 2
+  playersInTrigger: []
+  captured: 0
+  canremove: 0
+  snare: []
   switch_key: v

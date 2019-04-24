@@ -13,12 +13,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EditorBanks:
   - {fileID: 114110004254592310}
-  - {fileID: 114511522048913504}
+  - {fileID: 114189361724141410}
   EditorEvents:
   - {fileID: 114068170918481728}
-  MasterBankRef: {fileID: 114511522048913504}
+  MasterBankRef: {fileID: 114189361724141410}
   StringsBankRef: {fileID: 114110004254592310}
-  stringsBankWriteTime: 636904986377994351
+  stringsBankWriteTime: 636910486640000000
   cacheVersion: 2
 --- !u!114 &114004037217815786
 MonoBehaviour:
@@ -124,13 +124,13 @@ MonoBehaviour:
   Path: event:/Music
   guid: d72b987f7744774493a8e8ef7fef8579
   Banks:
-  - {fileID: 114511522048913504}
+  - {fileID: 114189361724141410}
   IsStream: 1
   Is3D: 0
   IsOneShot: 0
   Parameters:
-  - {fileID: 114964618787676984}
-  - {fileID: 114243049075090630}
+  - {fileID: 114661582675788422}
+  - {fileID: 114807532286786268}
   MinDistance: 0
   MaxDistance: 0
   Length: 233000
@@ -205,8 +205,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Path: Assets\Waking Nightmare's FMOD\Build\Desktop\Master Bank.strings.bank
-  lastModified: 636904986377994351
+  Path: Assets/Waking Nightmare's FMOD/Build/Desktop/Master Bank.strings.bank
+  lastModified: 636910486640000000
   LoadResult: 0
   FileSizes:
   - Name: 
@@ -323,6 +323,26 @@ MonoBehaviour:
   Path: D:\WakingNightmare\WakingNightmarePrototype\Assets\Waking Nightmare's FMOD\Build\Desktop\Master
     Bank.bank
   lastModified: 636905780142840989
+  LoadResult: 0
+  FileSizes:
+  - Name: 
+    Value: 22858464
+  Exists: 1
+--- !u!114 &114189361724141410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: /Users/pmusco17/Documents/Payton College Works/Semester 2 Sophmore/Game Studio/Waking
+    nightmares/WakingNightmarePrototype/Assets/Waking Nightmare's FMOD/Build/Desktop/Master
+    Bank.bank
+  lastModified: 636916938850000000
   LoadResult: 0
   FileSizes:
   - Name: 
@@ -805,6 +825,21 @@ MonoBehaviour:
   Min: 0
   Max: 15
   Default: 0
+--- !u!114 &114661582675788422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Fear
+  Min: 0
+  Max: 15
+  Default: 0
 --- !u!114 &114668076670832316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -913,6 +948,21 @@ MonoBehaviour:
   Max: 10
   Default: 0
 --- !u!114 &114778381399216936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Region
+  Min: 0
+  Max: 10
+  Default: 0
+--- !u!114 &114807532286786268
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
