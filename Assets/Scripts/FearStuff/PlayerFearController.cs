@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using soundTool.soundManager;
 
 /// <summary>
 /// Types of fear. Darkness is here for convience, should not be applied directly as a fear that a character has.
@@ -73,6 +74,24 @@ public class PlayerFearController : MonoBehaviour {
     [Tooltip("Add all fears that this character is afraid of here")]
     public FearTypes[] fears;
 
+    /// <summary>
+    /// The base heartrate for when the character has no fear. Input as 1 beat every x seconds.
+    /// </summary>
+    [Tooltip("The base heartrate for when the character has no fear. Input as 1 beat every x seconds.")]
+    public float baseHeartrate;
+
+    /// <summary>
+    /// The maximum heartrate for when the character is at max fear.  Input as 1 beat every x seconds.
+    /// </summary>
+    [Tooltip("The maximum heartrate for when the character is at max fear. Input as 1 beat every x seconds.")]
+    public float maxHeartrate;
+
+    /// <summary>
+    /// Audio for heartbeat
+    /// </summary>
+    [Tooltip("Audio for heartbeat")]
+    public AudioClip heartBeat;
+
     #endregion
 
     //FMOD initialization and variable setup - Jake
@@ -115,6 +134,12 @@ public class PlayerFearController : MonoBehaviour {
     public bool playerIsDead;
 
     /// <summary>
+    /// The current time between heartbeats. Do not change manualy
+    /// </summary>
+    private float timeBetweenHeartBeats;
+
+
+    /// <summary>
     /// Fear zones that the player is in. Only visable for debug, should not be manualy changed.
     /// </summary>
     public List<FearZone> withinFearZones;
@@ -148,6 +173,9 @@ public class PlayerFearController : MonoBehaviour {
 
         currentFear = 0;
         currentFearModifier = 1.0f;
+
+        timeBetweenHeartBeats = baseHeartrate;
+
         enemyMask = 1 << LayerMask.NameToLayer("Enemy");
         InvokeRepeating("FearTicker", 1, fearTickTime);
         fearCanDecay = true;
@@ -158,9 +186,30 @@ public class PlayerFearController : MonoBehaviour {
     {
         Debug.Log("Adding player to list");
         GameManager.GM.PlayerCharacters.Add(this);
+        StartCoroutine(HeartBeatGenerator());
     }
     //Updating The Fear Parameter in FMOD - Jake
-    /*void Update()
+
+    IEnumerator HeartBeatGenerator()
+    {
+        while (!playerIsDead)
+        {
+            if (heartBeat != null)
+            {
+                SoundManager.PlaySound(heartBeat);
+            }
+            yield return new WaitForSeconds(timeBetweenHeartBeats);
+        }
+        yield return null;
+    }
+
+    private void ApplyFearAudio()
+    {
+        float fearPercent = (currentFear / maxFear) * 100;
+        timeBetweenHeartBeats = (fearPercent / (maxHeartrate - baseHeartrate) / 100) + baseHeartrate;
+    }
+
+    void Update()
     {
         playerState.setParameterValue("Fear", Fearpar);
         Debug.Log(Fearpar);
@@ -323,6 +372,7 @@ public class PlayerFearController : MonoBehaviour {
             ApplyZoneFear();
             ApplyPassiveFear();
             ApplyFearDecay();
+            ApplyFearAudio();
         }
     }
 
@@ -377,5 +427,4 @@ public class PlayerFearController : MonoBehaviour {
         }
     }
     
-
 }
