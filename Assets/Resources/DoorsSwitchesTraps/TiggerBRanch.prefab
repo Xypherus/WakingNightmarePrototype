@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 61011908131732996}
   - component: {fileID: 114442683242355054}
   m_Layer: 0
-  m_Name: TiggerBranch
+  m_Name: TiggerBRanch
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
