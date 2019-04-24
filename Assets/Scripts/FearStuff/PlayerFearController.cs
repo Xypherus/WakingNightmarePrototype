@@ -167,8 +167,8 @@ public class PlayerFearController : MonoBehaviour {
     private void Start()
     {
         //Getting FMOD Event
-        //playerState = FMODUnity.RuntimeManager.CreateInstance(PlayerStateEvent);
-        //playerState.start();
+        playerState = FMODUnity.RuntimeManager.CreateInstance(PlayerStateEvent);
+        playerState.start();
         
 
         currentFear = 0;
@@ -268,7 +268,7 @@ public class PlayerFearController : MonoBehaviour {
                     //Debug.Log("FearMod = " + fearMod);
                     ChangeFear((int)(enemyClass.fearDOT * fearMod), false);
                     //Increase fear Parameter
-                    //EnemyFear = true;
+                    EnemyFear = true;
                 }
             }
             return true;
@@ -340,13 +340,13 @@ public class PlayerFearController : MonoBehaviour {
             {
                 ChangeFear(-safezoneFearFade, false);
                 //Decreases Fear Parameter - Jake
-                //EnemyFear = false;
+                EnemyFear = false;
             }
             else if(fearCanDecay)
             {
                 ChangeFear(-normalFearFade, false);
                 //Decreases Fear Parameter - Jake
-                //EnemyFear = false;
+                EnemyFear = false;
             }
         }
     }
