@@ -8,7 +8,7 @@ public class Door_Trap_Switch : MonoBehaviour{
     public AudioClip Door;
     public AudioClip Switch;
     public AudioClip Trap;
-    public float DoorDelay = 1.5f;
+    public float DoorDelay = 2f;
 
     public int playerTrapCount = 2;
     public List<PlayerFearController> playersInTrigger;
@@ -105,7 +105,9 @@ public class Door_Trap_Switch : MonoBehaviour{
         if (trigger.triggered == false)
         {
             open.SetBool("isopen", false);
-            doorcollider.enabled = true;
+            StartCoroutine(Delay(() => {
+                doorcollider.enabled = true;
+            }));
         }
     }
 
