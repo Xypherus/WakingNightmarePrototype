@@ -189,6 +189,9 @@ public class PlayerFearController : MonoBehaviour {
         StartCoroutine(HeartBeatGenerator());
     }
     //Updating The Fear Parameter in FMOD - Jake
+<<<<<<< HEAD
+    /*void Update()
+=======
 
     IEnumerator HeartBeatGenerator()
     {
@@ -210,6 +213,7 @@ public class PlayerFearController : MonoBehaviour {
     }
 
     void Update()
+>>>>>>> e68801177c464e7c699b01369bb6e2f6eef6ef05
     {
         playerState.setParameterValue("Fear", Fearpar);
         Debug.Log(Fearpar);
