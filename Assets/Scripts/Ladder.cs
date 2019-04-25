@@ -144,12 +144,14 @@ public class Ladder : MonoBehaviour {
             actor.ladder = this;
             actor.MoveTo(GetPositionOnLadder(actor.transform.position, percent), () =>
             {
+                actor.isProne = false;
                 actor.canMove = true;
                 actor.rigidbody.bodyType = RigidbodyType2D.Kinematic;
                 actor.rigidbody.velocity = Vector2.zero;
             });
         }
         else {
+            actor.isProne = false;
             actor.canMove = true;
             actor.ladder = this;
             actor.rigidbody.bodyType = RigidbodyType2D.Kinematic;

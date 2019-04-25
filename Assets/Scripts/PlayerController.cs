@@ -97,6 +97,7 @@ public class PlayerController : NavmeshAgent2D {
         //initialize a string with the path to a random footstep sound found in "../StreamingAssets/Audio/footstep x"
         string audioPath = Application.dataPath + "/StreamingAssets/Audio/";
         string clipName = "footstep " + Random.Range(1, 4) + ".wav";
+        
 
         SoundManager.GetClipFromPath(audioPath + clipName, SoundManager.PlaySoundVoid);
     }
@@ -132,10 +133,6 @@ public class PlayerController : NavmeshAgent2D {
         //Test For Crouching OR sprinting (can not be both)
         if (Input.GetAxisRaw("Prone") > 0 && ledge == null && !ladder)
         {
-            if (Input.GetButtonDown("Prone"))
-            {
-                transform.position = new Vector2(transform.position.x, transform.position.y - ((transform.localScale.y / 2) - (transform.localScale.y / 4)));
-            }
             isProne = true;
         }
         else if (Input.GetAxisRaw("Sprinting") > 0 && ledge == null && !ladder) {
