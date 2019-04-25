@@ -292,8 +292,16 @@ public class NavmeshArea2D : MonoBehaviour {
     /// <param name="agent">Used to specify which mesh to use.</param>
     /// <returns></returns>
     public NavmeshNode2D NodeAtPoint(Vector2 position, NavmeshAgent2D agent) {
-        if (meshes == null) { return null; }
-        else if (meshes[agent] == null) { return null; }
+        try
+        {
+            if (meshes == null) { return null; }
+            else if (meshes[agent] == null) { return null; }
+        }
+        catch (KeyNotFoundException e) {
+            Debug.LogError("the agent '" + agent.name + "' was not found in the navmesh!", agent);
+            return null;
+        }
+
         NavmeshNode2D node = null;
 
         Vector2 gridPos = new Vector2(Mathf.RoundToInt((position.x - bounds.min.x)/resolution), Mathf.RoundToInt((position.y -bounds.min.y) / resolution));

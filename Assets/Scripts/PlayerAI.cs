@@ -8,9 +8,7 @@ public class PlayerAI : CharacterStateNetwork {
     public Transform target;
     public Ping ping;
     public string currentState;
-    public string aiState;
-
-    
+    public string aiState;    
 
     NavmeshAgent2D agent;
     PlayerStateMachine player;
@@ -125,6 +123,8 @@ public class PlayerAI : CharacterStateNetwork {
             UnityEngine.Profiling.Profiler.BeginSample("Moving AI", agent);
             Vector2 targetLocation = Vector2.zero;
 
+            agent.isProne = PlayerSwapper.playerSwapper.currentPlayer.isProne;
+
             if (ping != null) {
                 targetLocation = ping.pingPosition;
             }
@@ -149,7 +149,7 @@ public class PlayerAI : CharacterStateNetwork {
 
             //if agent.GetTargetNodeInPath is not a ground node or is connected to the previous node by a jump connection,
             
-            if (agent.NodeIsTraversible(currentNode) && agent.isGrounded && !agent.ladder && agent.ledge == null && (targetNode.gridPosition.y > currentNode.gridPosition.y || Vector2.Distance(targetNode.worldPosition, agent.transform.position) > agent.jumpDistance)) {
+            if (agent.NodeIsTraversible(currentNode) && agent.isGrounded && !agent.ladder && agent.ledge == null && (targetNode.gridPosition.y > currentNode.gridPosition.y )) {
                 player.player.jumpped = true;
             }
             
@@ -196,6 +196,7 @@ public class PlayerAI : CharacterStateNetwork {
                     player.player.isProne = false;
                 }
             }
+
 
             UnityEngine.Profiling.Profiler.EndSample();
             if (Vector2.Distance(targetLocation, agent.transform.position) <= agent.stoppingDistance) { agent.isStopped = true; }
