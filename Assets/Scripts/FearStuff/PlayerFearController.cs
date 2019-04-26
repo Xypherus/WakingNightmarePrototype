@@ -154,6 +154,7 @@ public class PlayerFearController : MonoBehaviour {
     /// <param name="killable">True of this fear is able to kill the player, False otherwise</param>
     public void ChangeFear(int fearChange, bool killable)
     {
+
         int newFear = currentFear + (int)(fearChange * currentFearModifier);
         if(killable) { currentFear = Mathf.Clamp(newFear, 0, maxFear); }
         else { currentFear = Mathf.Clamp(newFear, 0, maxFear - 1); }
@@ -162,12 +163,13 @@ public class PlayerFearController : MonoBehaviour {
         {
             //TriggerDeath();
         }
+        //Debug.Break();
     }
 
     private void Start()
     {
-        //Getting FMOD Event
-        playerState = FMODUnity.RuntimeManager.CreateInstance(PlayerStateEvent);
+
+        Debug.Log("Start Called");
         playerState.start();
         
 
@@ -180,6 +182,9 @@ public class PlayerFearController : MonoBehaviour {
         InvokeRepeating("FearTicker", 1, fearTickTime);
         fearCanDecay = true;
         playerIsDead = false;
+
+        //Getting FMOD Event
+        //playerState = FMODUnity.RuntimeManager.CreateInstance(PlayerStateEvent);
     }
 
     private void Awake()
@@ -212,7 +217,7 @@ public class PlayerFearController : MonoBehaviour {
     void Update()
     {
         playerState.setParameterValue("Fear", Fearpar);
-        Debug.Log(Fearpar);
+        //Debug.Log(Fearpar);
         
         //Increases Fear Parameter Amount
         foreach (Collider2D enemy in inRange)
@@ -367,9 +372,10 @@ public class PlayerFearController : MonoBehaviour {
 
     private void FearTicker()
     {
+        //Debug.Break();
         if(!playerIsDead)
         {
-            ApplyZoneFear();
+            Debug.Log(ApplyZoneFear());
             ApplyPassiveFear();
             ApplyFearDecay();
             ApplyFearAudio();
