@@ -10,7 +10,7 @@ using soundTool.soundManager;
 public enum FearTypes { FearTypeA, FearTypeB, FearTypeC, FearTypeD, Darkness };
 
 public class PlayerFearController : MonoBehaviour {
-    private bool EnemyFear;
+    //private bool EnemyFear;
     #region EditorVariables
     /// <summary>
     /// The highest possable fear value that the player can have, Should generaly be set to 100
@@ -95,10 +95,10 @@ public class PlayerFearController : MonoBehaviour {
     #endregion
 
     //FMOD initialization and variable setup - Jake
-    [FMODUnity.EventRef]
-    public string PlayerStateEvent;
-    FMOD.Studio.EventInstance playerState;
-    float Fearpar = 0.0f;
+    //[FMODUnity.EventRef]
+    //public string PlayerStateEvent;
+    //FMOD.Studio.EventInstance playerState;
+    //float Fearpar = 0.0f;
     
     //This is just a place holder, I need to figure out how to find wether or not the player is in fear range first
     //I've set this variable up. It's true when out of fear range, false when in - Ben
@@ -170,9 +170,8 @@ public class PlayerFearController : MonoBehaviour {
     {
 
         Debug.Log("Start Called");
-        playerState.start();
-        
-
+        //playerState.start();
+         
         currentFear = 0;
         currentFearModifier = 1.0f;
 
@@ -193,7 +192,7 @@ public class PlayerFearController : MonoBehaviour {
         GameManager.GM.PlayerCharacters.Add(this);
         StartCoroutine(HeartBeatGenerator());
     }
-    //Updating The Fear Parameter in FMOD - Jake
+    
 
     IEnumerator HeartBeatGenerator()
     {
@@ -214,7 +213,8 @@ public class PlayerFearController : MonoBehaviour {
         timeBetweenHeartBeats = (fearPercent / (maxHeartrate - baseHeartrate) / 100) + baseHeartrate;
     }
 
-    void Update()
+    //Updating The Fear Parameter in FMOD - Jake
+    /*void Update()
     {
         playerState.setParameterValue("Fear", Fearpar);
         //Debug.Log(Fearpar);
@@ -249,7 +249,7 @@ public class PlayerFearController : MonoBehaviour {
         {
             Fearpar = 15;
         }
-    }
+    }*/
 
     /// <summary>
     /// Performs all operations related to passive fear gain.
@@ -273,7 +273,7 @@ public class PlayerFearController : MonoBehaviour {
                     //Debug.Log("FearMod = " + fearMod);
                     ChangeFear((int)(enemyClass.fearDOT * fearMod), false);
                     //Increase fear Parameter
-                    EnemyFear = true;
+                    //EnemyFear = true;
                 }
             }
             return true;
@@ -345,13 +345,13 @@ public class PlayerFearController : MonoBehaviour {
             {
                 ChangeFear(-safezoneFearFade, false);
                 //Decreases Fear Parameter - Jake
-                EnemyFear = false;
+                //EnemyFear = false;
             }
             else if(fearCanDecay)
             {
                 ChangeFear(-normalFearFade, false);
                 //Decreases Fear Parameter - Jake
-                EnemyFear = false;
+                //EnemyFear = false;
             }
         }
     }
