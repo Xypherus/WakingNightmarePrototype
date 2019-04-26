@@ -2942,7 +2942,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4861670924193674, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 6.88
+      value: -1.15
       objectReference: {fileID: 0}
     - target: {fileID: 4861670924193674, guid: 23f972d680e86dd4da87e8a18548994e, type: 2}
       propertyPath: m_LocalPosition.z
@@ -4057,25 +4057,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4046284244731342, guid: 5999c160d521963439a09b9c7f9cdc02,
     type: 2}
   m_PrefabInternal: {fileID: 1092524559}
---- !u!1 &1108061669 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1532883761468236, guid: 23f972d680e86dd4da87e8a18548994e,
-    type: 2}
-  m_PrefabInternal: {fileID: 827607152}
---- !u!114 &1108061675
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1108061669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0efa40a487704124d9bc32125b969bd5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  FearObject: {fileID: 1370664099}
-  inbounds: 0
-  PlayerStateEvent: event:/Music
 --- !u!1001 &1124903083
 Prefab:
   m_ObjectHideFlags: 0
@@ -5015,7 +4996,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fearType: 0
-  fearModifier: 1.5
+  fearModifier: 0
 --- !u!1001 &1395202577
 Prefab:
   m_ObjectHideFlags: 0
@@ -7190,7 +7171,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4155679507088626, guid: 7e83a31aff7cd8a4e8bb21a29dddd407, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 10.21
+      value: 2.1799998
       objectReference: {fileID: 0}
     - target: {fileID: 4155679507088626, guid: 7e83a31aff7cd8a4e8bb21a29dddd407, type: 2}
       propertyPath: m_LocalPosition.z
